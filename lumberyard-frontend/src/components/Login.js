@@ -24,6 +24,8 @@ const Login = ({ onLogin }) => {
     setError('');
 
     try {
+      console.log('Attempting login with:', credentials);
+      
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
@@ -32,7 +34,11 @@ const Login = ({ onLogin }) => {
         body: JSON.stringify(credentials),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (response.ok) {
         // Store token and user info in localStorage
@@ -46,11 +52,11 @@ const Login = ({ onLogin }) => {
         // Call the onLogin callback to update app state
         onLogin(data);
       } else {
-        setError(data.error || 'Login failed. Please check your credentials.');
+        setError(data.error || `Login failed with status ${response.status}. Please check your credentials.`);
       }
     } catch (err) {
-      setError('Network error. Please try again.');
-      console.error('Login error:', err);
+      console.error('Network error details:', err);
+      setError(`Network error: ${err.message}. Please check if the backend server is running on http://localhost:8080`);
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,8 @@
+com\lumberyard_backend\config\CorsConfig.class
 com\lumberyard_backend\controller\AuthController$ErrorResponse.class
 com\lumberyard_backend\service\AuthService.class
 com\lumberyard_backend\entity\Admin.class
 com\lumberyard_backend\security\JwtUtil.class
-com\lumberyard_backend\service\DataInitializer.class
 com\lumberyard_backend\security\SecurityConfig.class
 com\lumberyard_backend\service\UserService$1.class
 com\lumberyard_backend\security\JwtRequestFilter.class

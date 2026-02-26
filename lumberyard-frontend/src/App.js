@@ -9,6 +9,7 @@ import './App.css';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   
   // Check if user is already logged in on app load
   useEffect(() => {
@@ -19,6 +20,7 @@ function App() {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
+        setToken(token);
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
@@ -35,11 +37,13 @@ function App() {
       name: authData.name,
       role: authData.role
     });
+    setToken(authData.token);
     setIsAuthenticated(true);
   };
   
   const handleLogout = () => {
     setUser(null);
+    setToken(null);
     setIsAuthenticated(false);
   };
   
@@ -48,7 +52,7 @@ function App() {
     // Route to the appropriate dashboard based on user role
     switch(user.role) {
       case 'ADMIN':
-        return <AdminDashboard user={user} onLogout={handleLogout} />;
+        return <AdminDashboard user={user} onLogout={handleLogout} token={token} />;
       case 'INVENTORY_OPERATIONS_MANAGER':
         return <InventoryOperationsManagerDashboard user={user} onLogout={handleLogout} />;
       case 'LABOR_MANAGER':
@@ -61,7 +65,11 @@ function App() {
   }
   
   // Show login form if not authenticated
-  return <Login onLogin={handleLogin} />;
+  return (
+    <div>
+      <Login onLogin={handleLogin} />
+    </div>
+  );
 }
 
 export default App;
