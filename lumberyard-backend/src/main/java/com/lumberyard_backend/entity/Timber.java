@@ -1,42 +1,39 @@
 package com.lumberyard_backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Timber {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id;   // Internal DB ID (DO NOT EDIT)
+
+    @Column(unique = true, nullable = false)
+    private String timberCode;   // Custom Editable ID (T001, T002)
 
     private String name;
+    private String status;
+
     private double length;
     private double width;
     private double thickness;
+    private double longFeet;
     private double price;
-    private String status;
+    private double quantity;
 
-    // Constructors, getters, setters
-    public Timber() {}
+    // Getters and Setters
 
-    public Timber(String name, double length, double width, double thickness, double price, String status) {
-        this.name = name;
-        this.length = length;
-        this.width = width;
-        this.thickness = thickness;
-        this.price = price;
-        this.status = status;
-    }
-
-    // getters & setters
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+
+    public String getTimberCode() { return timberCode; }
+    public void setTimberCode(String timberCode) { this.timberCode = timberCode; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public double getLength() { return length; }
     public void setLength(double length) { this.length = length; }
@@ -47,9 +44,12 @@ public class Timber {
     public double getThickness() { return thickness; }
     public void setThickness(double thickness) { this.thickness = thickness; }
 
+    public double getLongFeet() { return longFeet; }
+    public void setLongFeet(double longFeet) { this.longFeet = longFeet; }
+
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public double getQuantity() { return quantity; }
+    public void setQuantity(double quantity) { this.quantity = quantity; }
 }
