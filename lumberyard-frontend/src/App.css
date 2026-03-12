@@ -1,3 +1,6 @@
+/* Import common dashboard styles */
+@import url('./components/dashboard/DashboardCommon.css');
+
 .App {
   text-align: center;
 }
