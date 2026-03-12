@@ -1,0 +1,134 @@
+/* src/pages/MainPage.css */
+
+.main-page {
+  background: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 800px;
+}
+
+.main-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 32px;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.header-left h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.header-badge {
+  padding: 6px 14px;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .modules-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.module-card {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-decoration: none;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #cbd5e1;
+}
+
+.module-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.module-icon.inventory {
+  background: #f0fdf4;
+  color: #059669;
+}
+
+.module-icon.production {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.module-content h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.module-content p {
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.module-arrow {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  color: #94a3b8;
+  transition: all 0.2s;
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.module-card:hover .module-arrow {
+  color: #0f172a;
+  opacity: 1;
+  transform: translateX(0);
+}

@@ -1,0 +1,5 @@
+com\lumberyard_backend\dto\ProductionRequest.class
+com\lumberyard_backend\entity\ProductionStatus.class
+com\lumberyard_backend\entity\Production.class
+com\lumberyard_backend\repository\ProductionRepository.class
+com\lumberyard_backend\controller\ProductionController.class

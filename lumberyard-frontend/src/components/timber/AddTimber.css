@@ -1,0 +1,366 @@
+/* src/components/timber/AddTimber.css */
+
+.add-timber {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  height: 100%;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.add-timber-header {
+  margin-bottom: 24px;
+}
+
+.add-timber-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.header-description {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+.timber-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 20px;
+}
+
+.form-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f59e0b;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required {
+  color: #ef4444;
+  font-size: 14px;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+  background-color: white !important;
+  color: #1e293b !important;
+  font-family: inherit;
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.form-input:hover, .form-select:hover {
+  border-color: #94a3b8;
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.form-input:disabled, .form-select:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+/* Price Summary */
+.price-summary {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.summary-row.total {
+  border-top: 1px solid #e2e8f0;
+  margin-top: 8px;
+  padding-top: 12px;
+  font-weight: 600;
+  color: #f59e0b;
+  font-size: 16px;
+}
+
+/* Preview Section */
+.preview-section {
+  margin-top: 8px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.preview-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-label {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.preview-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.submit-btn, .reset-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submit-btn {
+  background: #f59e0b;
+  color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.2);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-btn.loading {
+  background: #94a3b8;
+  cursor: wait;
+}
+
+.reset-btn {
+  background: white;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.reset-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Message */
+.message {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.success {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+.message.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.message-icon {
+  font-size: 16px;
+  font-weight: 600;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message.success .message-icon {
+  color: #16a34a;
+}
+
+.message.error .message-icon {
+  color: #dc2626;
+}
+
+.message-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: currentColor;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  padding: 0 4px;
+}
+
+.message-close:hover {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .add-timber {
+    padding: 20px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .submit-btn, .reset-btn {
+    width: 100%;
+  }
+
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
