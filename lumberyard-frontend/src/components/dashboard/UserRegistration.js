@@ -34,6 +34,7 @@ const UserRegistration = ({ token }) => {
     try {
       console.log('Fetching users with token:', token);
       const response = await fetch('http://localhost:8080/api/users/all', {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

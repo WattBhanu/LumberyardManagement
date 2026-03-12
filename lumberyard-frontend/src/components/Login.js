@@ -65,12 +65,21 @@ const Login = ({ onLogin }) => {
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit}>
-        <h2>Login</h2>
+        <div className="login-header">
+          <div className="login-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h2>Welcome Back</h2>
+          <p className="login-subtitle">Sign in to access your dashboard</p>
+        </div>
         
         {error && <div className="error-message">{error}</div>}
         
         <div className="input-group">
-          <label htmlFor="username">Email/Phone/Username:</label>
+          <label htmlFor="username">Email/Phone/Username</label>
           <input
             type="text"
             id="username"
@@ -83,7 +92,7 @@ const Login = ({ onLogin }) => {
         </div>
         
         <div className="input-group">
-          <label htmlFor="password">Password:</label>
+          <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
@@ -96,7 +105,7 @@ const Login = ({ onLogin }) => {
         </div>
         
         <button type="submit" className="login-button" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
     </div>

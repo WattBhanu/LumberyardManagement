@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -18,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -45,15 +47,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/login", "/api/users/register", "/api/users/test").permitAll()
-                .requestMatchers("/api/users/all").hasRole("ADMIN")
+                .requestMatchers("/api/auth/**", "/api/users/test").permitAll()
+                .requestMatchers("/api/users/register", "/api/users/all").hasRole("ADMIN")
+                // Inventory endpoints - Admin and Inventory Operations Manager
                 .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
+                .requestMatchers("/api/timber/**", "/api/logs/**", "/api/chemical/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
+                // Production endpoints - Admin and Inventory Operations Manager
+                .requestMatchers("/api/production/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
+                // Labor endpoints - Admin and Labor Manager
                 .requestMatchers("/api/labor/**").hasAnyRole("ADMIN", "LABOR_MANAGER")
+                // Finance endpoints - Admin and Finance Manager
                 .requestMatchers("/api/finance/**").hasAnyRole("ADMIN", "FINANCE_MANAGER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .cors(cors -> cors.configurationSource(corsConfigurationSource)); // Use our custom CORS configuration
+            .cors(cors -> cors.configurationSource(corsConfigurationSource));
         
         // Allow H2 Console to be displayed in a frame
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));

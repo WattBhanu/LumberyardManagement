@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import API from '../services/api'; // Import the configured API instance
 import { Link } from 'react-router-dom';
 import './ProductionPage.css';
 
 const ProductionPage = () => {
     const [productions, setProductions] = useState([]);
     const [timbers, setTimbers] = useState([]);
+    const [selectedTimber, setSelectedTimber] = useState(null);
     const [newProduction, setNewProduction] = useState({
         timberCode: '',
         processType: '',
@@ -29,7 +30,7 @@ const ProductionPage = () => {
 
     const fetchProductions = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/production');
+            const response = await API.get('/production');
             setProductions(response.data);
         } catch (error) {
             console.error('Error fetching productions:', error);
@@ -38,7 +39,7 @@ const ProductionPage = () => {
 
     const fetchTimbers = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/production/timber');
+            const response = await API.get('/production/timber');
             setTimbers(response.data);
         } catch (error) {
             console.error('Error fetching timbers:', error);
@@ -48,6 +49,13 @@ const ProductionPage = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewProduction({ ...newProduction, [name]: value });
+
+        if (name === 'timberCode') {
+            const timber = timbers.find(t => t.timberCode === value);
+            setSelectedTimber(timber);
+            setNewProduction(prod => ({ ...prod, amount: '' }));
+        }
+
         if (message) setMessage('');
     };
 
@@ -56,6 +64,12 @@ const ProductionPage = () => {
         
         if (!newProduction.processType || !newProduction.timberCode || !newProduction.amount) {
             setMessage('Please fill in all fields');
+            setMessageType('error');
+            return;
+        }
+
+        if (selectedTimber && parseInt(newProduction.amount, 10) > selectedTimber.quantity) {
+            setMessage('Amount to process cannot exceed available quantity.');
             setMessageType('error');
             return;
         }
@@ -73,9 +87,10 @@ const ProductionPage = () => {
         setConfirmModal({ isOpen: false, type: '', data: null, message: '' });
         setIsSubmitting(true);
         try {
-            await axios.post('http://localhost:8080/api/production', confirmModal.data);
-            await fetchProductions();
+            await API.post('/production', confirmModal.data);
+            await fetchData();
             setNewProduction({ timberCode: '', processType: '', amount: '' });
+            setSelectedTimber(null);
             setMessage('Process started successfully!');
             setMessageType('success');
         } catch (error) {
@@ -100,10 +115,30 @@ const ProductionPage = () => {
         const id = confirmModal.data;
         setConfirmModal({ isOpen: false, type: '', data: null, message: '' });
         try {
-            await axios.delete(`http://localhost:8080/api/production/${id}`);
+            await API.delete(`/production/${id}`);
             await fetchProductions();
         } catch (error) {
             console.error('Error deleting production:', error);
+        }
+    };
+
+    const handleFinishProduction = (id) => {
+        setConfirmModal({
+            isOpen: true,
+            type: 'finish',
+            data: id,
+            message: "Are you sure you want to mark this process as finished?"
+        });
+    };
+
+    const confirmFinishProduction = async () => {
+        const id = confirmModal.data;
+        setConfirmModal({ isOpen: false, type: '', data: null, message: '' });
+        try {
+            await API.post(`/production/${id}/finish`);
+            await fetchProductions();
+        } catch (error) {
+            console.error('Error finishing production:', error);
         }
     };
 
@@ -116,7 +151,7 @@ const ProductionPage = () => {
                         <span className="header-badge">Process Management</span>
                     </div>
                      <div className="header-right">
-                        <Link to="/" className="action-button">
+                        <Link to="/main" className="action-button">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line>
                             </svg>
@@ -152,21 +187,24 @@ const ProductionPage = () => {
                                           <select name="timberCode" value={newProduction.timberCode} onChange={handleInputChange} className="form-select" required>
                                               <option value="">Select Timber Code</option>
                                               {timbers.map(timber => (
-                                                  <option key={timber.id} value={timber.timberCode}>{timber.timberCode}</option>
+                                                  <option key={timber.id} value={timber.timberCode}>
+                                                      {timber.timberCode} (Qty: {timber.quantity})
+                                                  </option>
                                               ))}
                                           </select>
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label>Amount to Process <span className="required">*</span></label>
+                                        <label>Amount to Process {selectedTimber && `(Available: ${selectedTimber.quantity})`} <span className="required">*</span></label>
                                         <div className="input-wrapper">
                                           <input
                                               type="number"
                                               name="amount"
-                                              placeholder="Enter amount"
+                                              placeholder={selectedTimber ? `Max: ${selectedTimber.quantity}` : "Select timber first"}
                                               value={newProduction.amount}
                                               onChange={handleInputChange}
                                               min="1"
+                                              max={selectedTimber ? selectedTimber.quantity : undefined}
                                               className="form-input"
                                               required
                                           />
@@ -237,6 +275,14 @@ const ProductionPage = () => {
                                    </div>
                                    <div className="process-meta">
                                       <span className="amount-tag">Qty: {production.amount}</span>
+                                      {production.status !== 'FINISHED' && (
+                                          <button className="finish-sm-btn" onClick={() => handleFinishProduction(production.id)} title="Finish Process">
+                                              Finish
+                                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                              </svg>
+                                          </button>
+                                      )}
                                       <button className="delete-sm-btn" onClick={() => handleDeleteProduction(production.id)} title="Delete Process">
                                           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
@@ -253,7 +299,9 @@ const ProductionPage = () => {
                                       </div>
                                    </div>
                                     <div className="status-display">
-                                        <span className="status-text">Started</span>
+                                        <span className={`status-text ${production.status === 'FINISHED' ? 'finished' : 'started'}`}>
+                                            {production.status === 'FINISHED' ? 'Finished' : 'Started'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -283,7 +331,7 @@ const ProductionPage = () => {
                                     </svg>
                                 )}
                             </div>
-                            <h3>{confirmModal.type === 'delete' ? 'Delete Process' : 'Confirm Action'}</h3>
+                            <h3>{confirmModal.type === 'delete' ? 'Delete Process' : confirmModal.type === 'finish' ? 'Finish Process' : 'Confirm Action'}</h3>
                         </div>
                         <div className="modal-body">
                             <p>{confirmModal.message}</p>
@@ -296,10 +344,10 @@ const ProductionPage = () => {
                                 Cancel
                             </button>
                             <button 
-                                className={`modal-confirm-btn ${confirmModal.type === 'delete' ? 'danger' : 'primary'}`}
-                                onClick={confirmModal.type === 'delete' ? confirmDeleteProduction : confirmStartProduction}
+                                className={`modal-confirm-btn ${confirmModal.type === 'delete' ? 'danger' : confirmModal.type === 'finish' ? 'success' : 'primary'}`}
+                                onClick={confirmModal.type === 'delete' ? confirmDeleteProduction : confirmModal.type === 'finish' ? confirmFinishProduction : confirmStartProduction}
                             >
-                                {confirmModal.type === 'delete' ? 'Delete' : 'Confirm'}
+                                {confirmModal.type === 'delete' ? 'Delete' : confirmModal.type === 'finish' ? 'Finish' : 'Confirm'}
                             </button>
                         </div>
                     </div>

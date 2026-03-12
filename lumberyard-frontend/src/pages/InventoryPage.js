@@ -112,14 +112,6 @@ function InventoryPage() {
   return (
     <div className="dashboard">
       <div className="dashboard-content">
-        <div style={{ marginBottom: "20px" }}>
-          <Link to="/" className="action-button" style={{ display: "inline-flex", width: "fit-content" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line>
-              </svg>
-              Back to Main
-          </Link>
-        </div>
         {/* Header */}
         <div className="dashboard-header">
           <div className="header-left">
@@ -127,19 +119,12 @@ function InventoryPage() {
             <span className="header-badge">Lumberyard</span>
           </div>
           <div className="header-right">
-            <div className="date-display">
+            <Link to="/main" className="action-button">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line>
               </svg>
-              <span>{new Date().toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}</span>
-            </div>
+              Back to Main
+            </Link>
           </div>
         </div>
 

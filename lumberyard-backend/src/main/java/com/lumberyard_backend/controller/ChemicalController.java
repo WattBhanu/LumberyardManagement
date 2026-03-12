@@ -4,11 +4,12 @@ import org.springframework.http.ResponseEntity;
 import com.lumberyard_backend.entity.Chemical;
 import com.lumberyard_backend.repository.ChemicalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/chemical")
+@RequestMapping("/api/chemical")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ChemicalController {
 
@@ -17,18 +18,21 @@ public class ChemicalController {
 
     // GET ALL
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public List<Chemical> getAllChemicals() {
         return chemicalRepository.findAll();
     }
 
     // SEARCH
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public List<Chemical> searchChemical(@RequestParam String code) {
         return chemicalRepository.findByChemicalCodeContainingIgnoreCase(code);
     }
 
     // ADD
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> addChemical(@RequestBody Chemical chemical) {
 
         if (chemicalRepository.existsByChemicalCode(chemical.getChemicalCode())) {
@@ -43,6 +47,7 @@ public class ChemicalController {
 
     // REDUCE STOCK
     @PutMapping("/reduce")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> reduceChemicalStock(
             @RequestParam String chemicalCode,
             @RequestParam double quantity) {
@@ -63,6 +68,7 @@ public class ChemicalController {
 
     // ADD STOCK
     @PutMapping("/addStock")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> addChemicalStock(
             @RequestParam String chemicalCode,
             @RequestParam double quantity) {
@@ -81,6 +87,7 @@ public class ChemicalController {
 
     // ✅ DELETE CHEMICAL
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> deleteChemical(@RequestParam String chemicalCode) {
 
         Chemical chemical = chemicalRepository.findByChemicalCode(chemicalCode);

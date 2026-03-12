@@ -398,6 +398,25 @@
   border-radius: 12px;
 }
 
+.finish-sm-btn {
+  background: transparent;
+  border: none;
+  color: #059669;
+  cursor: pointer;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.finish-sm-btn:hover {
+  background: #d1fae5;
+}
+
 .delete-sm-btn {
   background: transparent;
   border: none;
@@ -454,6 +473,14 @@
   font-size: 14px;
   font-weight: 600;
   color: #3b82f6;
+}
+
+.status-text.started {
+  color: #3b82f6;
+}
+
+.status-text.finished {
+  color: #059669;
 }
 
 @media (max-width: 768px) {
@@ -591,4 +618,12 @@
 
 .modal-confirm-btn.danger:hover {
   background: #dc2626;
+}
+
+.modal-confirm-btn.success {
+  background: #059669;
+}
+
+.modal-confirm-btn.success:hover {
+  background: #047857;
 }

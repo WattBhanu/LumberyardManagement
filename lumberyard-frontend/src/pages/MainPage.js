@@ -1,15 +1,50 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './MainPage.css';
 
-const MainPage = () => {
+const MainPage = ({ user, onLogout }) => {
+    const navigate = useNavigate();
+    
+    const handleLogout = () => {
+        onLogout();
+        navigate('/');
+    };
+    
+    const isAdmin = user && user.role === 'ADMIN';
+    
     return (
         <div className="main-page">
             <div className="main-content">
                 <div className="main-header">
                     <div className="header-left">
                         <h1>Lumberyard Management</h1>
-                        <span className="header-badge">Main System Dashboard</span>
+                        <span className="header-badge">Inventory Operations</span>
+                    </div>
+                    <div className="header-right">
+                        {user && (
+                            <span className="user-info">
+                                Welcome, {user.name}
+                            </span>
+                        )}
+                        {isAdmin && (
+                            <button onClick={() => navigate('/admin')} className="back-to-admin-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <rect x="3" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="3" width="7" height="7"></rect>
+                                    <rect x="14" y="14" width="7" height="7"></rect>
+                                    <rect x="3" y="14" width="7" height="7"></rect>
+                                </svg>
+                                Back to Admin
+                            </button>
+                        )}
+                        <button onClick={handleLogout} className="logout-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            Logout
+                        </button>
                     </div>
                 </div>
 

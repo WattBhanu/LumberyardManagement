@@ -4,11 +4,12 @@ import org.springframework.http.ResponseEntity;
 import com.lumberyard_backend.entity.Logs;
 import com.lumberyard_backend.repository.LogsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/logs")
+@RequestMapping("/api/logs")
 @CrossOrigin(origins = "http://localhost:3000")
 public class LogsController {
 
@@ -17,18 +18,21 @@ public class LogsController {
 
     // GET ALL
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public List<Logs> getAllLogs() {
         return logsRepository.findAll();
     }
 
     // SEARCH
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public List<Logs> searchLogs(@RequestParam String code) {
         return logsRepository.findByLogCodeContainingIgnoreCase(code);
     }
 
     // ADD
     @PostMapping("/add")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> addLog(@RequestBody Logs log) {
 
         if (logsRepository.existsByLogCode(log.getLogCode())) {
@@ -41,6 +45,7 @@ public class LogsController {
 
     // ADD STOCK
     @PutMapping("/addStock")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> addLogStock(
             @RequestParam String logCode,
             @RequestParam double quantity) {
@@ -58,6 +63,7 @@ public class LogsController {
 
     // REDUCE STOCK
     @PutMapping("/reduce")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> reduceLogStock(
             @RequestParam String logCode,
             @RequestParam double quantity) {
@@ -78,6 +84,7 @@ public class LogsController {
 
     // ✅ DELETE LOG
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> deleteLog(@RequestParam String logCode) {
 
         Logs log = logsRepository.findByLogCode(logCode);
