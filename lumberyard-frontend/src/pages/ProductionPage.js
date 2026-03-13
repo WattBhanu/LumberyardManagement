@@ -88,14 +88,16 @@ const ProductionPage = () => {
         setIsSubmitting(true);
         try {
             await API.post('/production', confirmModal.data);
-            await fetchData();
+            await fetchProductions();
+            await fetchTimbers(); // Refresh timber list to show updated quantities in dropdown
             setNewProduction({ timberCode: '', processType: '', amount: '' });
             setSelectedTimber(null);
             setMessage('Process started successfully!');
             setMessageType('success');
         } catch (error) {
             console.error('Error adding production:', error);
-            setMessage('Failed to start process');
+            const errorMsg = error.response?.data?.message || error.response?.data || 'Failed to start process';
+            setMessage(errorMsg);
             setMessageType('error');
         } finally {
             setIsSubmitting(false);

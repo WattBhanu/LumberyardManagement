@@ -34,6 +34,16 @@ public class ProductionController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Timber not found");
         }
 
+        // Validate: Check if requested amount is available
+        if (request.getAmount() > timber.getQuantity()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Insufficient timber quantity. Available: " + timber.getQuantity() + ", Requested: " + request.getAmount());
+        }
+
+        // Deduct timber quantity
+        timber.setQuantity(timber.getQuantity() - request.getAmount());
+        timberRepository.save(timber);
+
         Production production = new Production();
         production.setTimber(timber);
         production.setProcessType(request.getProcessType());
