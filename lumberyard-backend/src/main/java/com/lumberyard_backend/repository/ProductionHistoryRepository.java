@@ -1,0 +1,13 @@
+package com.lumberyard_backend.repository;
+
+import com.lumberyard_backend.entity.ProductionHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ProductionHistoryRepository extends JpaRepository<ProductionHistory, Long> {
+    List<ProductionHistory> findByProductionIdOrderByChangeTimeDesc(Long productionId);
+    List<ProductionHistory> findByProductionId(Long productionId);
+}

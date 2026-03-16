@@ -1,5 +1,6 @@
 com\lumberyard_backend\controller\AuthController$ErrorResponse.class
 com\lumberyard_backend\service\AuthService.class
+com\lumberyard_backend\entity\ProductionHistory.class
 com\lumberyard_backend\model\AuthRequest.class
 com\lumberyard_backend\controller\InventoryController.class
 com\lumberyard_backend\entity\User.class
@@ -15,6 +16,7 @@ com\lumberyard_backend\security\SecurityConfig.class
 com\lumberyard_backend\service\UserService$1.class
 com\lumberyard_backend\security\JwtRequestFilter.class
 com\lumberyard_backend\entity\InventoryOperationsManager.class
+com\lumberyard_backend\repository\ProductionHistoryRepository.class
 com\lumberyard_backend\controller\AuthController.class
 com\lumberyard_backend\repository\UserRepository.class
 com\lumberyard_backend\entity\Role.class
