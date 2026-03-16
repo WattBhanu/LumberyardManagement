@@ -3,6 +3,8 @@ package com.lumberyard_backend.service;
 import com.lumberyard_backend.entity.*;
 import com.lumberyard_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -66,5 +68,24 @@ public class UserService {
         user.setStatus(true); // Set status to active by default
 
         return userRepository.save(user);
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            return (User) authentication.getPrincipal();
+        }
+        return null;
+    }
+
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found with id: " + userId);
+        }
+        userRepository.deleteById(userId);
     }
 }
