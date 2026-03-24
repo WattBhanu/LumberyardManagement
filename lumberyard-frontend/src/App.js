@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import LaborManagerDashboard from './components/dashboard/LaborManagerDashboard';
+import WorkerManagement from './components/labor/WorkerManagement';
+import AttendanceTracking from './components/labor/AttendanceTracking';
+import SalaryReports from './components/labor/SalaryReports';
 import FinanceManagerDashboard from './components/dashboard/FinanceManagerDashboard';
 import MainPage from './pages/MainPage';
 import InventoryPage from './pages/InventoryPage';
@@ -157,13 +160,17 @@ function App() {
         
         {/* Labor Manager Dashboard */}
         <Route 
-          path="/labor/*" 
+          path="/labor" 
           element={
             <ProtectedRoute allowedRoles={['LABOR_MANAGER', 'ADMIN']} userRole={user?.role}>
               <LaborManagerDashboard user={user} onLogout={handleLogout} />
             </ProtectedRoute>
           } 
-        />
+        >
+          <Route path="workers" element={<WorkerManagement />} />
+          <Route path="attendance" element={<AttendanceTracking />} />
+          <Route path="salary" element={<SalaryReports />} />
+        </Route>
         
         {/* Finance Manager Dashboard */}
         <Route 

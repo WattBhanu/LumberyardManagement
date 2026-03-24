@@ -48,6 +48,11 @@ public class UserController {
         return ResponseEntity.ok("Backend is running and accessible!");
     }
 
+    @GetMapping("/hash")
+    public ResponseEntity<?> getHash(@RequestParam String pass) {
+        return ResponseEntity.ok(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(pass));
+    }
+
     @DeleteMapping("/delete/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {

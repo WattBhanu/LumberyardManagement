@@ -41,5 +41,10 @@ public class Worker {
 
     private LocalDate dateOfBirth;
 
+    @Column(name = "home_address")
     private String homeAddress;
+
+    // Legacy address column — kept for backward compat
+    @Column(name = "address")
+    private String address;
 }
