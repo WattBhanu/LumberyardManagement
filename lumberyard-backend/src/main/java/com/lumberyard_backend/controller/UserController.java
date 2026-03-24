@@ -20,6 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> registerUser(@RequestParam String name, 
                                          @RequestParam String email, 
                                          @RequestParam(required = false) String phone,
@@ -34,6 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
