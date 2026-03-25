@@ -41,7 +41,7 @@ public class SalaryReportController {
         double totalPayroll = 0;
 
         for (Worker worker : workers) {
-            Optional<Attendance> attendanceOpt = attendanceRepository.findByWorker_IdAndDate(worker.getId(), date);
+            Optional<Attendance> attendanceOpt = attendanceRepository.findByWorker_WorkerIdAndDate(worker.getWorkerId(), date);
             SalaryReportItem item = new SalaryReportItem();
             item.setWorkerName(worker.getFirstName() + " " + worker.getLastName());
             item.setPosition(worker.getPosition());
@@ -90,7 +90,7 @@ public class SalaryReportController {
         int daysInMonth = endDate.getDayOfMonth();
 
         for (Worker worker : workers) {
-            List<Attendance> attendances = attendanceRepository.findByWorker_IdAndDateBetween(worker.getId(), startDate, endDate);
+            List<Attendance> attendances = attendanceRepository.findByWorker_WorkerIdAndDateBetween(worker.getWorkerId(), startDate, endDate);
             SalaryReportItem item = new SalaryReportItem();
             item.setWorkerName(worker.getFirstName() + " " + worker.getLastName());
             item.setPosition(worker.getPosition());

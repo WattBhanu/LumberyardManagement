@@ -26,7 +26,7 @@ public class AttendanceService {
         Worker worker = workerRepository.findById(request.getWorkerId())
                 .orElseThrow(() -> new RuntimeException("Worker not found"));
 
-        Optional<Attendance> existing = attendanceRepository.findByWorker_IdAndDate(worker.getId(), request.getDate());
+        Optional<Attendance> existing = attendanceRepository.findByWorker_WorkerIdAndDate(worker.getWorkerId(), request.getDate());
         
         Attendance attendance;
         if (existing.isPresent()) {

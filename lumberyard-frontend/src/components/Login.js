@@ -56,7 +56,7 @@ const Login = ({ onLogin }) => {
       }
     } catch (err) {
       console.error('Network error details:', err);
-      setError(`Network error: ${err.message}. Please check if the backend server is running on http://localhost:8081`);
+      setError(`Network error: ${err.message}. Please check if the backend server is running on http://localhost:8080`);
     } finally {
       setLoading(false);
     }

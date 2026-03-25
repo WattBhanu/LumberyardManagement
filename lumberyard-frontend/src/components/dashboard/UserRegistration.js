@@ -66,7 +66,7 @@ const UserRegistration = ({ token }) => {
       
       let errorMessage = 'Network error while fetching users';
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'Failed to connect to server to fetch users. Please check if the backend is running on http://localhost:8081';
+        errorMessage = 'Failed to connect to server to fetch users. Please check if the backend is running on http://localhost:8080';
       } else if (error.message) {
         errorMessage = `Network error while fetching users: ${error.message}`;
       }
@@ -92,19 +92,18 @@ const UserRegistration = ({ token }) => {
       console.log('Registering user with token:', token);
       console.log('Form data:', formData);
       
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token && token !== 'undefined' && token !== 'null') {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch('http://localhost:8080/api/users/register', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password,
-          role: formData.role
-        })
+        headers: headers,
+        body: JSON.stringify(formData)
       });
 
       console.log('Registration response status:', response.status);

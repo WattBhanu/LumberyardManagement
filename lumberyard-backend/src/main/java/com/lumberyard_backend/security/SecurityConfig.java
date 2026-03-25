@@ -55,7 +55,10 @@ public class SecurityConfig {
                 // Production endpoints - Admin and Inventory Operations Manager
                 .requestMatchers("/api/production/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
                 // Labor endpoints - Admin and Labor Manager
-                .requestMatchers("/api/labor/**", "/api/workers/**", "/api/attendance/**", "/api/salary/**").permitAll()
+                .requestMatchers("/api/labor/**", "/api/workers/**").hasAnyRole("ADMIN", "LABOR_MANAGER")
+                // Attendance endpoints - Admin, Labor Manager (record/view), Finance Manager (salary only)
+                .requestMatchers("/api/attendance/record", "/api/attendance/update/**").hasAnyRole("ADMIN", "LABOR_MANAGER")
+                .requestMatchers("/api/attendance/**").hasAnyRole("ADMIN", "LABOR_MANAGER", "FINANCE_MANAGER")
                 // Finance endpoints - Admin and Finance Manager
                 .requestMatchers("/api/finance/**").hasAnyRole("ADMIN", "FINANCE_MANAGER")
                 .anyRequest().authenticated()

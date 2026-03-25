@@ -20,13 +20,16 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestParam String name, 
-                                         @RequestParam String email, 
-                                         @RequestParam(required = false) String phone,
-                                         @RequestParam String password,
-                                         @RequestParam Role role) {
+    public ResponseEntity<?> registerUser(@RequestBody com.lumberyard_backend.dto.UserRegistrationRequest request) {
+        System.out.println("DEBUG: UserController.registerUser called with: " + request.getEmail());
         try {
-            User user = userService.createUser(name, email, phone, password, role);
+            User user = userService.createUser(
+                request.getName(), 
+                request.getEmail(), 
+                request.getPhone(), 
+                request.getPassword(), 
+                request.getRole()
+            );
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
@@ -34,6 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
