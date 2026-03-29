@@ -66,7 +66,7 @@ const WorkerPage = () => {
         {/* Header Section */}
         <div className="page-header">
           <div className="header-left">
-            <Link to="/labor-dashboard" className="back-button">
+            <Link to="/labor" className="back-button">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
               </svg>

@@ -263,6 +263,22 @@ public class WorkerController {
         }
     }
 
+    /**
+     * Get worker statistics
+     * Endpoint: GET /api/workers/stats
+     */
+    @GetMapping("/stats")
+    @PreAuthorize("hasAnyRole('LABOR_MANAGER', 'ADMIN')")
+    public ResponseEntity<?> getWorkerStats() {
+        try {
+            Object stats = workerService.getWorkerStats();
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Error fetching worker stats: " + e.getMessage()));
+        }
+    }
+
     // Inner class for error response
     public static class ErrorResponse {
         private String error;

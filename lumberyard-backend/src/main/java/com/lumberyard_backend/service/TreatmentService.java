@@ -1,0 +1,263 @@
+package com.lumberyard_backend.service;
+
+import com.lumberyard_backend.entity.TreatmentHistory;
+import com.lumberyard_backend.entity.TreatmentProcess;
+import com.lumberyard_backend.entity.TreatmentStatus;
+import com.lumberyard_backend.entity.Timber;
+import com.lumberyard_backend.entity.TimberTracking;
+import com.lumberyard_backend.repository.TreatmentRepository;
+import com.lumberyard_backend.repository.TreatmentHistoryRepository;
+import com.lumberyard_backend.repository.TimberRepository;
+import com.lumberyard_backend.repository.TimberTrackingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class TreatmentService {
+
+    @Autowired
+    private TreatmentRepository treatmentRepository;
+
+    @Autowired
+    private TreatmentHistoryRepository treatmentHistoryRepository;
+
+    @Autowired
+    private TimberRepository timberRepository;
+
+    @Autowired
+    private TimberTrackingRepository timberTrackingRepository;
+
+    // Start a new treatment process - DEDUCTS timber and chemicals immediately
+    public TreatmentProcess startTreatment(Long timberId, String chemicalType, Double timberQuantity, Double chemicalQuantity) {
+        Timber timber = timberRepository.findById(timberId)
+                .orElseThrow(() -> new RuntimeException("Timber not found with id: " + timberId));
+
+        // Validate timber is untreated (status should be "Untreated")
+        if (!"Untreated".equalsIgnoreCase(timber.getStatus())) {
+            throw new RuntimeException("Only untreated timber can be selected for treatment.");
+        }
+
+        // Validate that enough timber is available
+        if (timber.getQuantity() < timberQuantity) {
+            throw new RuntimeException("Insufficient timber quantity.");
+        }
+
+        // DEDUCT timber immediately from untreated stock
+        timber.setQuantity(timber.getQuantity() - timberQuantity);
+        if (timber.getQuantity() <= 0) {
+            timber.setStatus("Depleted");
+        }
+        timberRepository.save(timber);
+
+        TreatmentProcess treatment = new TreatmentProcess();
+        treatment.setTimber(timber);
+        treatment.setChemicalType(chemicalType);
+        treatment.setTimberQuantity(timberQuantity);
+        treatment.setChemicalQuantity(chemicalQuantity);
+        treatment.setStartTime(LocalDateTime.now());
+        treatment.setStatus(TreatmentStatus.STARTED);
+
+        // Save treatment
+        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+
+        // Create history record
+        TreatmentHistory history = new TreatmentHistory(
+            savedTreatment, 
+            null, 
+            TreatmentStatus.STARTED, 
+            "STARTED", 
+            "Treatment process started. Deducted " + timberQuantity + " units from " + timber.getTimberCode()
+        );
+        treatmentHistoryRepository.save(history);
+
+        return savedTreatment;
+    }
+
+    // Finish treatment - Creates treated timber record (deduction already done at start)
+    public TreatmentProcess finishTreatment(Long treatmentId) {
+        TreatmentProcess treatment = treatmentRepository.findById(treatmentId)
+                .orElseThrow(() -> new RuntimeException("Treatment not found with id: " + treatmentId));
+
+        TreatmentStatus previousStatus = treatment.getStatus();
+        treatment.setStatus(TreatmentStatus.FINISHED);
+        treatment.setEndTime(LocalDateTime.now());
+
+        // Get the original untreated timber (already deducted at start)
+        Timber originalTimber = treatment.getTimber();
+        
+        // Check if there's already a tracking record for this original timber
+        List<TimberTracking> existingTracking = timberTrackingRepository.findByOriginalTimberId(originalTimber.getId());
+        Timber treatedTimber;
+        
+        if (!existingTracking.isEmpty()) {
+            // Reuse the existing treated timber - add quantity to it
+            treatedTimber = existingTracking.get(0).getTreatedTimber();
+            
+            // Add the new quantity to existing treated timber
+            treatedTimber.setQuantity(treatedTimber.getQuantity() + treatment.getTimberQuantity());
+            timberRepository.save(treatedTimber);
+            
+            // Update the tracking record with new quantity
+            TimberTracking tracking = existingTracking.get(0);
+            tracking.setTreatedQuantity(tracking.getTreatedQuantity() + treatment.getTimberQuantity());
+            timberTrackingRepository.save(tracking);
+        } else {
+            // Create a NEW timber record for the treated stock
+            treatedTimber = new Timber();
+            treatedTimber.setTimberCode(originalTimber.getTimberCode() + "-TREATED");
+            treatedTimber.setName(originalTimber.getName() + " (Treated)");
+            treatedTimber.setStatus("Treated");
+            treatedTimber.setLength(originalTimber.getLength());
+            treatedTimber.setWidth(originalTimber.getWidth());
+            treatedTimber.setThickness(originalTimber.getThickness());
+            treatedTimber.setLongFeet(originalTimber.getLongFeet());
+            treatedTimber.setPrice(originalTimber.getPrice());
+            treatedTimber.setQuantity(treatment.getTimberQuantity());
+            
+            timberRepository.save(treatedTimber);
+            
+            // Create tracking record to link treated timber to original
+            TimberTracking tracking = new TimberTracking();
+            tracking.setTreatedTimber(treatedTimber);
+            tracking.setOriginalTimber(originalTimber);
+            tracking.setTreatedQuantity(treatment.getTimberQuantity());
+            timberTrackingRepository.save(tracking);
+        }
+        
+        // No deduction here - already done at start!
+
+        // Save treatment
+        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+
+        // Create history record
+        TreatmentHistory history = new TreatmentHistory(
+            savedTreatment, 
+            previousStatus, 
+            TreatmentStatus.FINISHED, 
+            "FINISHED", 
+            "Treatment completed. Created treated timber " + treatedTimber.getTimberCode() + " (timber was deducted at start)"
+        );
+        treatmentHistoryRepository.save(history);
+
+        return savedTreatment;
+    }
+
+    // Cancel treatment - REFUNDS materials back to inventory
+    public TreatmentProcess cancelTreatment(Long treatmentId) {
+        TreatmentProcess treatment = treatmentRepository.findById(treatmentId)
+                .orElseThrow(() -> new RuntimeException("Treatment not found with id: " + treatmentId));
+
+        TreatmentStatus previousStatus = treatment.getStatus();
+        treatment.setStatus(TreatmentStatus.CANCELLED);
+        treatment.setEndTime(LocalDateTime.now());
+
+        // REFUND timber back to untreated stock
+        Timber originalTimber = treatment.getTimber();
+        originalTimber.setQuantity(originalTimber.getQuantity() + treatment.getTimberQuantity());
+        // Change status back to Untreated if it was depleted
+        if ("Depleted".equalsIgnoreCase(originalTimber.getStatus())) {
+            originalTimber.setStatus("Untreated");
+        }
+        timberRepository.save(originalTimber);
+
+        // Save treatment
+        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+
+        // Create history record
+        TreatmentHistory history = new TreatmentHistory(
+            savedTreatment, 
+            previousStatus, 
+            TreatmentStatus.CANCELLED, 
+            "CANCELLED", 
+            "Treatment cancelled. Refunded " + treatment.getTimberQuantity() + " units back to " + originalTimber.getTimberCode()
+        );
+        treatmentHistoryRepository.save(history);
+
+        return savedTreatment;
+    }
+
+    // Delete treatment - Sets status to DELETED (soft delete, NO REFUND)
+    public TreatmentProcess deleteTreatment(Long treatmentId) {
+        TreatmentProcess treatment = treatmentRepository.findById(treatmentId)
+                .orElseThrow(() -> new RuntimeException("Treatment not found with id: " + treatmentId));
+
+        TreatmentStatus previousStatus = treatment.getStatus();
+        
+        // Set status to DELETED (don't actually delete from database)
+        treatment.setStatus(TreatmentStatus.DELETED);
+        treatment.setEndTime(LocalDateTime.now());
+
+        // Save the treatment with DELETED status
+        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+
+        // Create history record - NO REFUND since materials were already deducted at start
+        TreatmentHistory history = new TreatmentHistory(
+            savedTreatment, 
+            previousStatus, 
+            TreatmentStatus.DELETED, 
+            "DELETED", 
+            "Treatment deleted. No refund - materials were deducted at start and are considered lost."
+        );
+        treatmentHistoryRepository.save(history);
+
+        return savedTreatment;
+    }
+
+    // Get all active treatments
+    public List<TreatmentProcess> getActiveTreatments() {
+        return treatmentRepository.findAll().stream()
+                .filter(t -> t.getStatus() != TreatmentStatus.FINISHED 
+                          && t.getStatus() != TreatmentStatus.CANCELLED
+                          && t.getStatus() != TreatmentStatus.DELETED)
+                .collect(Collectors.toList());
+    }
+
+    // Get all completed treatments
+    public List<TreatmentProcess> getCompletedTreatments() {
+        return treatmentRepository.findByStatus(TreatmentStatus.FINISHED);
+    }
+
+    // Get all treatment history (sorted by most recent first)
+    public List<TreatmentHistory> getTreatmentHistory() {
+        return treatmentHistoryRepository.findAll().stream()
+                .sorted((h1, h2) -> h2.getChangeTime().compareTo(h1.getChangeTime()))
+                .collect(Collectors.toList());
+    }
+
+    // Get history by treatment ID
+    public List<TreatmentHistory> getHistoryByTreatmentId(Long treatmentId) {
+        return treatmentHistoryRepository.findByTreatmentId(treatmentId);
+    }
+
+    // Permanently delete a treatment and its history
+    public void permanentDelete(Long treatmentId) {
+        // First delete all history records for this treatment
+        List<TreatmentHistory> histories = treatmentHistoryRepository.findByTreatmentId(treatmentId);
+        treatmentHistoryRepository.deleteAll(histories);
+        
+        // Then delete the treatment
+        treatmentRepository.deleteById(treatmentId);
+    }
+
+    // Delete all treatment history
+    public void deleteAllHistory(String token) {
+        // Validate token (simple validation for now)
+        if (token == null || token.isEmpty()) {
+            throw new RuntimeException("Invalid deletion token");
+        }
+        
+        // Delete all history records
+        treatmentHistoryRepository.deleteAll();
+        
+        // Note: We don't delete actual treatments, just history
+    }
+
+    // Delete a single treatment history record
+    public void deleteHistoryRecord(Long historyId) {
+        treatmentHistoryRepository.deleteById(historyId);
+    }
+}

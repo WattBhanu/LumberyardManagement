@@ -8,6 +8,7 @@ import com.lumberyard_backend.repository.AttendanceRepository;
 import com.lumberyard_backend.repository.WorkerRepository;
 import com.lumberyard_backend.service.SalaryCalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ public class SalaryReportController {
     private SalaryCalculationService salaryCalculationService;
 
     @GetMapping("/daily")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER', 'LABOR_MANAGER')")
     public SalaryReportResponse getDailyReport(
             @RequestParam int year,
             @RequestParam int month,
@@ -77,6 +79,7 @@ public class SalaryReportController {
     }
 
     @GetMapping("/monthly")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER', 'LABOR_MANAGER')")
     public SalaryReportResponse getMonthlyReport(
             @RequestParam int year,
             @RequestParam int month) {

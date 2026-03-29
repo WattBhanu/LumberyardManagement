@@ -4,34 +4,34 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class ProductionHistory {
+public class TreatmentHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "production_id", nullable = false)
-    private Production production;
+    @JoinColumn(name = "treatment_id", nullable = false)
+    private TreatmentProcess treatment;
 
     @Enumerated(EnumType.STRING)
-    private ProductionStatus fromStatus;
+    private TreatmentStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
-    private ProductionStatus toStatus;
+    private TreatmentStatus toStatus;
 
     private LocalDateTime changeTime;
 
     private String eventType; // STATUS_CHANGE, STARTED, FINISHED, CANCELLED, DELETED
 
-    private String notes; // Additional info like "Process started", "Status changed from X to Y"
+    private String notes; // Additional info like "Treatment started", "Status changed from X to Y"
 
-    public ProductionHistory() {
+    public TreatmentHistory() {
         this.changeTime = LocalDateTime.now();
     }
 
-    public ProductionHistory(Production production, ProductionStatus fromStatus, ProductionStatus toStatus, String eventType, String notes) {
-        this.production = production;
+    public TreatmentHistory(TreatmentProcess treatment, TreatmentStatus fromStatus, TreatmentStatus toStatus, String eventType, String notes) {
+        this.treatment = treatment;
         this.fromStatus = fromStatus;
         this.toStatus = toStatus;
         this.eventType = eventType;
@@ -48,27 +48,27 @@ public class ProductionHistory {
         this.id = id;
     }
 
-    public Production getProduction() {
-        return production;
+    public TreatmentProcess getTreatment() {
+        return treatment;
     }
 
-    public void setProduction(Production production) {
-        this.production = production;
+    public void setTreatment(TreatmentProcess treatment) {
+        this.treatment = treatment;
     }
 
-    public ProductionStatus getFromStatus() {
+    public TreatmentStatus getFromStatus() {
         return fromStatus;
     }
 
-    public void setFromStatus(ProductionStatus fromStatus) {
+    public void setFromStatus(TreatmentStatus fromStatus) {
         this.fromStatus = fromStatus;
     }
 
-    public ProductionStatus getToStatus() {
+    public TreatmentStatus getToStatus() {
         return toStatus;
     }
 
-    public void setToStatus(ProductionStatus toStatus) {
+    public void setToStatus(TreatmentStatus toStatus) {
         this.toStatus = toStatus;
     }
 

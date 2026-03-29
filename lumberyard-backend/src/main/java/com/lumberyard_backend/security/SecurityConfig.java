@@ -52,6 +52,8 @@ public class SecurityConfig {
                 // Inventory endpoints - Admin and Inventory Operations Manager
                 .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
                 .requestMatchers("/api/timber/**", "/api/logs/**", "/api/chemical/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
+                // Treatment endpoints - Admin and Inventory Operations Manager
+                .requestMatchers("/api/treatment/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
                 // Production endpoints - Admin and Inventory Operations Manager
                 .requestMatchers("/api/production/**").hasAnyRole("ADMIN", "INVENTORY_OPERATIONS_MANAGER")
                 // Labor endpoints - Admin and Labor Manager

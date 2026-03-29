@@ -87,6 +87,25 @@ const MainPage = ({ user, onLogout }) => {
                             </svg>
                         </div>
                     </Link>
+
+                    <Link to="/treatment" className="module-card">
+                        <div className="module-icon treatment">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 2v20M2 12h20"></path>
+                                <circle cx="12" cy="12" r="8"></circle>
+                            </svg>
+                        </div>
+                        <div className="module-content">
+                            <h3>Treatment Process</h3>
+                            <p>Manage chemical treatment processes for timber preservation.</p>
+                        </div>
+                        <div className="module-arrow">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </div>
+                    </Link>
                 </div>
             </div>
         </div>

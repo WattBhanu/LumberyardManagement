@@ -17,7 +17,7 @@ const WorkerManagement = () => {
 
   const initialFormState = {
     firstName: '', lastName: '', email: '', phone: '',
-    position: 'Sawyer', department: 'Sawmill', status: 'Active',
+    position: 'Sawyer', department: 'Sawmill', status: 'ACTIVE',
     hireDate: '', dateOfBirth: '', homeAddress: ''
   };
 
@@ -40,7 +40,7 @@ const WorkerManagement = () => {
   const fetchWorkers = async () => {
     try {
       setLoading(true);
-      const response = await API.get('/workers');
+      const response = await API.get('/workers/all');
       setWorkers(response.data);
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load workers.' });
@@ -66,11 +66,25 @@ const WorkerManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Clean up form data - remove empty optional fields
+      const cleanData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        position: formData.position,
+        department: formData.department,
+        status: formData.status,
+        ...(formData.email && { email: formData.email }),
+        ...(formData.hireDate && { hireDate: formData.hireDate }),
+        ...(formData.dateOfBirth && { dateOfBirth: formData.dateOfBirth }),
+        ...(formData.homeAddress && { homeAddress: formData.homeAddress })
+      };
+
       if (editingWorker) {
-        await API.put(`/workers/${editingWorker.id}`, formData);
+        await API.put(`/workers/update/${editingWorker.workerId}`, cleanData);
         setMessage({ type: 'success', text: 'Worker updated successfully!' });
       } else {
-        await API.post('/workers', formData);
+        await API.post('/workers/add', cleanData);
         setMessage({ type: 'success', text: 'Worker added successfully!' });
       }
       setShowModal(false);
@@ -79,7 +93,9 @@ const WorkerManagement = () => {
       fetchWorkers();
       fetchStats();
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save worker.' });
+      const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Failed to save worker.';
+      setMessage({ type: 'error', text: errorMsg });
+      console.error('Error details:', error.response?.data);
     }
   };
 
@@ -89,21 +105,23 @@ const WorkerManagement = () => {
       firstName: worker.firstName, lastName: worker.lastName,
       email: worker.email || '', phone: worker.phone,
       position: worker.position, department: worker.department,
-      status: worker.status, hireDate: worker.hireDate || '',
+      status: worker.status || 'ACTIVE', hireDate: worker.hireDate || '',
       dateOfBirth: worker.dateOfBirth || '', homeAddress: worker.homeAddress || ''
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this worker?')) {
+    if (window.confirm('Are you sure you want to delete this worker? This will also delete all associated attendance records.')) {
       try {
-        await API.delete(`/workers/${id}`);
-        setMessage({ type: 'success', text: 'Worker deleted successfully!' });
+        await API.delete(`/workers/delete/${id}`);
+        setMessage({ type: 'success', text: 'Worker and associated attendance records deleted successfully!' });
         fetchWorkers();
         fetchStats();
       } catch (error) {
-        setMessage({ type: 'error', text: 'Failed to delete worker.' });
+        console.error('Delete failed:', error);
+        const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Failed to delete worker.';
+        setMessage({ type: 'error', text: errorMsg });
       }
     }
   };
@@ -124,7 +142,7 @@ const WorkerManagement = () => {
     return matchesSearch && matchesStatus && matchesDept;
   });
 
-  const activeCount = filteredWorkers.filter(w => w.status === 'Active').length;
+  const activeCount = filteredWorkers.filter(w => w.status === 'ACTIVE').length;
 
   return (
     <div className="wm-page">
@@ -214,8 +232,8 @@ const WorkerManagement = () => {
             />
             <select className="wm-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
               <option value="All">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
             </select>
             <select className="wm-select" value={departmentFilter} onChange={e => setDepartmentFilter(e.target.value)}>
               <option value="All">All Departments</option>
@@ -250,7 +268,7 @@ const WorkerManagement = () => {
                   </tr>
                 ) : (
                   filteredWorkers.map(worker => (
-                    <tr key={worker.id}>
+                    <tr key={worker.workerId || worker.id}>
                       <td className="wm-name-cell">
                         <div className="wm-avatar">{worker.firstName?.[0]}{worker.lastName?.[0]}</div>
                         <span>{worker.firstName} {worker.lastName}</span>
@@ -275,7 +293,7 @@ const WorkerManagement = () => {
                               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </button>
-                          <button className="wm-btn-delete" onClick={() => handleDelete(worker.id)} title="Delete">
+                          <button className="wm-btn-delete" onClick={() => handleDelete(worker.workerId)} title="Delete">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                               <polyline points="3 6 5 6 21 6" />
                               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -341,8 +359,8 @@ const WorkerManagement = () => {
                 <div className="wm-field">
                   <label>Status *</label>
                   <select name="status" value={formData.status} onChange={handleInputChange} required>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
                   </select>
                 </div>
                 <div className="wm-field wm-field-full">

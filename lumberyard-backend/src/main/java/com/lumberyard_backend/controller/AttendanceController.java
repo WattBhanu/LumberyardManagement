@@ -6,6 +6,7 @@ import com.lumberyard_backend.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public class AttendanceController {
     private AttendanceService attendanceService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'LABOR_MANAGER')")
     public ResponseEntity<Attendance> recordAttendance(@RequestBody AttendanceRequest request) {
         try {
             Attendance attendance = attendanceService.recordAttendance(request);
@@ -30,6 +32,7 @@ public class AttendanceController {
     }
 
     @GetMapping("/date/{date}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LABOR_MANAGER', 'FINANCE_MANAGER')")
     public List<Attendance> getAttendanceByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return attendanceService.getAttendanceByDate(date);
     }

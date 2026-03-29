@@ -171,6 +171,28 @@ public class WorkerService {
     }
 
     /**
+     * Get worker statistics
+     */
+    public Object getWorkerStats() {
+        List<Worker> allWorkers = workerRepository.findAll();
+        long totalWorkers = allWorkers.size();
+        long activeWorkers = allWorkers.stream()
+                .filter(w -> w.getStatus() == Worker.WorkerStatus.ACTIVE)
+                .count();
+        long inactiveWorkers = allWorkers.stream()
+                .filter(w -> w.getStatus() == Worker.WorkerStatus.INACTIVE)
+                .count();
+        
+        // Create a simple response object using Map
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        stats.put("totalWorkers", totalWorkers);
+        stats.put("activeWorkers", activeWorkers);
+        stats.put("inactiveWorkers", inactiveWorkers);
+        
+        return stats;
+    }
+
+    /**
      * Validate worker data
      */
     private void validateWorkerData(Worker worker) {

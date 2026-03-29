@@ -19,14 +19,14 @@ API.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      // Token might be expired or invalid (e.g., signature mismatch)
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('role');
-      // Redirect to login page
-      window.location.href = '/login';
-    }
+    // TEMPORARILY DISABLED - Only for debugging
+    // if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+    //   localStorage.removeItem('token');
+    //   localStorage.removeItem('user');
+    //   localStorage.removeItem('role');
+    //   window.location.href = '/';
+    // }
+    console.error('API Error:', error.response?.status, error.response?.data);
     return Promise.reject(error);
   }
 );

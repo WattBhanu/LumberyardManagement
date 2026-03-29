@@ -1,10 +1,7 @@
 package com.lumberyard_backend.entity;
 
-public enum ProductionStatus {
+public enum TreatmentStatus {
     STARTED,
-    SAWING,
-    PLANING,
-    ASSEMBLY,
     FINISHED,
     CANCELLED,
     DELETED

@@ -29,10 +29,44 @@ const AttendanceTracking = () => {
 
   const fetchWorkers = async () => {
     try {
-      const response = await API.get('/workers');
-      setWorkers(response.data.filter(w => w.status === 'Active'));
+      console.log('Fetching workers from /api/workers/all...');
+      // Try the main workers endpoint first
+      const response = await API.get('/workers/all');
+      console.log('Workers response:', response.data);
+      console.log('First worker sample:', response.data[0]);
+      
+      // More lenient filter - just check for id and active status (case-insensitive)
+      const validWorkers = Array.isArray(response.data) 
+        ? response.data.filter(w => {
+            const hasId = w && (w.id || w.workerId);
+            const status = (w.status || '').toUpperCase();
+            const isActive = status === 'ACTIVE' || status === 'ACTIVE '; // handle trailing spaces
+            console.log(`Worker: ${w.firstName} ${w.lastName}, ID: ${w.id || w.workerId}, Status: '${status}', Active: ${isActive}`);
+            return hasId && isActive;
+          })
+        : [];
+      
+      console.log('Valid workers after filter:', validWorkers.length, 'workers');
+      console.log('Filtered workers:', validWorkers);
+      setWorkers(validWorkers);
     } catch (error) {
-      console.error('Error fetching workers:', error);
+      console.error('Error fetching workers from /workers/all:', error.message);
+      console.error('Error status:', error.response?.status);
+      console.error('Error data:', error.response?.data);
+      
+      // Try alternative endpoint as fallback
+      try {
+        console.log('Trying fallback endpoint /api/labor/workers/all...');
+        const fallbackResponse = await API.get('/labor/workers/all');
+        const validWorkers = Array.isArray(fallbackResponse.data) 
+          ? fallbackResponse.data.filter(w => w && (w.id || w.workerId) && (w.status || '').toUpperCase() === 'ACTIVE')
+          : [];
+        console.log('Fallback workers:', validWorkers.length, 'workers');
+        setWorkers(validWorkers);
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError.message);
+        setWorkers([]);
+      }
     }
   };
 
@@ -40,10 +74,12 @@ const AttendanceTracking = () => {
     try {
       setLoading(true);
       const response = await API.get(`/attendance/date/${selectedDate}`);
-      setAttendance(response.data);
+      const validAttendance = Array.isArray(response.data) ? response.data : [];
+      setAttendance(validAttendance);
     } catch (error) {
       console.error('Error fetching attendance:', error);
       setMessage({ type: 'error', text: 'Failed to load attendance records.' });
+      setAttendance([]);
     } finally {
       setLoading(false);
     }
@@ -70,7 +106,7 @@ const AttendanceTracking = () => {
   const handleUpdate = (record) => {
     setEditingRecord(record);
     setFormData({
-      workerId: record.worker.id,
+      workerId: record.worker.id || record.worker.workerId,
       date: record.date,
       status: record.status,
       arrivalTime: record.arrivalTime || '',
@@ -234,9 +270,15 @@ const AttendanceTracking = () => {
                   <label>Worker *</label>
                   <select name="workerId" value={formData.workerId} onChange={handleInputChange} required>
                     <option value="">Select a worker</option>
-                    {workers.map(w => (
-                      <option key={w.id} value={w.id}>{w.firstName} {w.lastName} ({w.position})</option>
-                    ))}
+                    {workers.length > 0 ? (
+                      workers.map((w, index) => (
+                        <option key={w.id || w.workerId || `worker-${index}`} value={w.id || w.workerId}>
+                          {w.firstName} {w.lastName} ({w.position})
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No workers available</option>
+                    )}
                   </select>
                 </div>
                 <div className="at-field">
