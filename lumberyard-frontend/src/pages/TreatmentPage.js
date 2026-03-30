@@ -175,7 +175,7 @@ const TreatmentPage = () => {
             isOpen: true,
             type: 'finish',
             data: treatment,
-            message: `Are you sure you want to finish the treatment? This will mark timber ${treatment.timber.timberCode} as "Treated".`
+            message: `Are you sure you want to finish the treatment? This will mark timber ${treatment.timber.timberCode} as "Treated". Chemicals and timber were deducted at start and will NOT be refunded.`
         });
     };
 
@@ -204,7 +204,7 @@ const TreatmentPage = () => {
             isOpen: true,
             type: 'cancel',
             data: treatment,
-            message: `Are you sure you want to cancel the treatment? Materials will be refunded back to inventory.`
+            message: `Are you sure you want to cancel the treatment? Timber (${treatment.timberQuantity} units) and chemicals (${treatment.chemicalQuantity} units of ${treatment.chemicalType}) will be refunded back to inventory.`
         });
     };
 
@@ -217,7 +217,7 @@ const TreatmentPage = () => {
             await fetchTreatmentHistory();
             await fetchTimbers(); // Refresh timber list with refunded quantity
             await fetchChemicals(); // Refresh chemical list
-            setMessage('Treatment cancelled successfully! Materials refunded to inventory.');
+            setMessage('Treatment cancelled successfully! Timber and chemicals refunded to inventory.');
             setMessageType('success');
         } catch (error) {
             console.error('Error cancelling treatment:', error);
@@ -231,7 +231,7 @@ const TreatmentPage = () => {
             isOpen: true,
             type: 'delete',
             data: treatment,
-            message: `Are you sure you want to delete this treatment? Materials will NOT be refunded (already deducted at start).`
+            message: `Are you sure you want to delete this treatment? Materials will NOT be refunded (already deducted at start). Timber (${treatment.timberQuantity} units) and chemicals (${treatment.chemicalQuantity} units of ${treatment.chemicalType}) are considered lost.`
         });
     };
 
@@ -271,11 +271,11 @@ const TreatmentPage = () => {
             if (treatment.isPermanent) {
                 // Permanent delete - removes from database completely
                 await API.delete(`/treatment/${treatment.id}/permanent`);
-                setMessage('Treatment permanently deleted!');
+                setMessage('Treatment permanently deleted! Timber and chemicals were NOT refunded (already deducted at start).');
             } else {
                 // Soft delete - moves to history
                 await API.delete(`/treatment/${treatment.id}`);
-                setMessage('Treatment moved to history successfully!');
+                setMessage('Treatment moved to history successfully! Timber and chemicals were NOT refunded (already deducted at start).');
             }
             await fetchTreatments();
             await fetchTreatmentHistory();

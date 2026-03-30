@@ -5,10 +5,12 @@ import com.lumberyard_backend.entity.TreatmentProcess;
 import com.lumberyard_backend.entity.TreatmentStatus;
 import com.lumberyard_backend.entity.Timber;
 import com.lumberyard_backend.entity.TimberTracking;
+import com.lumberyard_backend.entity.Chemical;
 import com.lumberyard_backend.repository.TreatmentRepository;
 import com.lumberyard_backend.repository.TreatmentHistoryRepository;
 import com.lumberyard_backend.repository.TimberRepository;
 import com.lumberyard_backend.repository.TimberTrackingRepository;
+import com.lumberyard_backend.repository.ChemicalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,9 @@ public class TreatmentService {
     @Autowired
     private TimberTrackingRepository timberTrackingRepository;
 
+    @Autowired
+    private ChemicalRepository chemicalRepository;
+
     // Start a new treatment process - DEDUCTS timber and chemicals immediately
     public TreatmentProcess startTreatment(Long timberId, String chemicalType, Double timberQuantity, Double chemicalQuantity) {
         Timber timber = timberRepository.findById(timberId)
@@ -46,12 +51,30 @@ public class TreatmentService {
             throw new RuntimeException("Insufficient timber quantity.");
         }
 
+        // Find and validate chemical
+        Chemical chemical = chemicalRepository.findByName(chemicalType);
+        if (chemical == null) {
+            throw new RuntimeException("Chemical not found: " + chemicalType);
+        }
+        if (chemical.getQuantity() < chemicalQuantity) {
+            throw new RuntimeException("Insufficient chemical quantity. Available: " + chemical.getQuantity());
+        }
+
         // DEDUCT timber immediately from untreated stock
         timber.setQuantity(timber.getQuantity() - timberQuantity);
         if (timber.getQuantity() <= 0) {
             timber.setStatus("Depleted");
         }
         timberRepository.save(timber);
+
+        // DEDUCT chemical immediately from inventory
+        chemical.setQuantity(chemical.getQuantity() - chemicalQuantity);
+        if (chemical.getQuantity() <= 0) {
+            chemical.setStatus("Depleted");
+        } else {
+            chemical.setStatus("Active");
+        }
+        chemicalRepository.save(chemical);
 
         TreatmentProcess treatment = new TreatmentProcess();
         treatment.setTimber(timber);
@@ -70,7 +93,7 @@ public class TreatmentService {
             null, 
             TreatmentStatus.STARTED, 
             "STARTED", 
-            "Treatment process started. Deducted " + timberQuantity + " units from " + timber.getTimberCode()
+            "Treatment process started. Deducted " + timberQuantity + " units from " + timber.getTimberCode() + " and " + chemicalQuantity + " units of " + chemicalType
         );
         treatmentHistoryRepository.save(history);
 
@@ -139,7 +162,7 @@ public class TreatmentService {
             previousStatus, 
             TreatmentStatus.FINISHED, 
             "FINISHED", 
-            "Treatment completed. Created treated timber " + treatedTimber.getTimberCode() + " (timber was deducted at start)"
+            "Treatment completed. Created treated timber " + treatedTimber.getTimberCode() + " (timber and chemicals were deducted at start)"
         );
         treatmentHistoryRepository.save(history);
 
@@ -164,6 +187,14 @@ public class TreatmentService {
         }
         timberRepository.save(originalTimber);
 
+        // REFUND chemical back to inventory
+        Chemical chemical = chemicalRepository.findByName(treatment.getChemicalType());
+        if (chemical != null) {
+            chemical.setQuantity(chemical.getQuantity() + treatment.getChemicalQuantity());
+            chemical.setStatus("Active");
+            chemicalRepository.save(chemical);
+        }
+
         // Save treatment
         TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
 
@@ -173,7 +204,7 @@ public class TreatmentService {
             previousStatus, 
             TreatmentStatus.CANCELLED, 
             "CANCELLED", 
-            "Treatment cancelled. Refunded " + treatment.getTimberQuantity() + " units back to " + originalTimber.getTimberCode()
+            "Treatment cancelled. Refunded " + treatment.getTimberQuantity() + " units back to " + originalTimber.getTimberCode() + " and " + treatment.getChemicalQuantity() + " units of " + treatment.getChemicalType()
         );
         treatmentHistoryRepository.save(history);
 
@@ -200,7 +231,7 @@ public class TreatmentService {
             previousStatus, 
             TreatmentStatus.DELETED, 
             "DELETED", 
-            "Treatment deleted. No refund - materials were deducted at start and are considered lost."
+            "Treatment deleted. No refund - timber and chemicals were deducted at start and are considered lost."
         );
         treatmentHistoryRepository.save(history);
 
