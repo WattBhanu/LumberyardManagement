@@ -1,0 +1,354 @@
+/* Worker Selector Page */
+.worker-selector-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  padding: 2rem;
+}
+
+/* Header */
+.ws-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.ws-header-text h1 {
+  color: white;
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+
+.ws-header-text p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.25rem 0;
+  font-size: 1rem;
+}
+
+.ws-header-text strong {
+  color: white;
+  font-weight: 600;
+}
+
+/* Alert Messages */
+.ws-alert {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ws-alert-success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+.ws-alert-error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 2px solid #ef4444;
+}
+
+.ws-alert-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 2px solid #f59e0b;
+}
+
+.ws-alert-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.ws-alert-close:hover {
+  opacity: 1;
+}
+
+/* Info Card */
+.ws-info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.ws-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ws-info-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ws-info-value {
+  font-size: 1.25rem;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.ws-remaining {
+  color: #f59e0b;
+}
+
+/* Table Card */
+.ws-table-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.ws-table-header {
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.ws-table-header h2 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.5rem;
+}
+
+.ws-btn-select-all {
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ws-btn-select-all:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.ws-btn-select-all:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ws-loading {
+  padding: 4rem;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 1.125rem;
+}
+
+.ws-empty {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #a0aec0;
+}
+
+.ws-empty svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.ws-empty p {
+  font-size: 1.25rem;
+  margin: 0.5rem 0 0.25rem 0;
+  color: #4a5568;
+}
+
+.ws-empty small {
+  color: #a0aec0;
+  font-size: 0.875rem;
+}
+
+/* Table */
+.ws-table-wrap {
+  overflow-x: auto;
+}
+
+.ws-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ws-table thead {
+  background: #f7fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.ws-table th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ws-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.ws-row {
+  transition: all 0.2s ease;
+}
+
+.ws-row:hover {
+  background: #f7fafc;
+}
+
+.ws-row.ws-selected {
+  background: linear-gradient(90deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
+}
+
+.ws-worker-id {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 0.875rem;
+}
+
+.ws-worker-name {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Checkbox */
+.ws-checkbox,
+.ws-checkbox-header {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #667eea;
+}
+
+/* Status Badge */
+.ws-status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ws-status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.ws-status-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.ws-status-suspended {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ws-status-terminated {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* Footer */
+.ws-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ws-btn-cancel {
+  padding: 0.75rem 2rem;
+  background: #e2e8f0;
+  color: #475568;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ws-btn-cancel:hover:not(:disabled) {
+  background: #cbd5e1;
+}
+
+.ws-btn-assign {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ws-btn-assign:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.ws-btn-assign:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ws-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

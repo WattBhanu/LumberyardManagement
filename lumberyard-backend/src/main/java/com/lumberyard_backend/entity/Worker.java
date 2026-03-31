@@ -50,6 +50,18 @@ public class Worker {
     @Column(nullable = false)
     private WorkerStatus status = WorkerStatus.ACTIVE;
     
+    // Helper method to set status from string (case-insensitive)
+    public void setStatusFromString(String status) {
+        if (status != null) {
+            try {
+                this.status = WorkerStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Default to ACTIVE if invalid status
+                this.status = WorkerStatus.ACTIVE;
+            }
+        }
+    }
+    
     @Column(columnDefinition = "TEXT")
     private String skills;
     

@@ -12,6 +12,10 @@ import TreatmentPage from './pages/TreatmentPage';
 import WorkerManagement from './components/labor/WorkerManagement';
 import AttendanceTracking from './components/labor/AttendanceTracking';
 import SalaryReports from './components/labor/SalaryReports';
+// Job Assignment components
+import Jobs from './components/jobs/Jobs';
+import JobAssignment from './components/jobs/JobAssignment';
+import SelectJobs from './components/jobs/SelectJobs';
 // Old Worker components (for backward compatibility)
 import WorkerPage from './components/worker/WorkerPage';
 import './App.css';
@@ -184,6 +188,10 @@ function App() {
                     <Route path="workers" element={<WorkerManagement />} />
                     <Route path="attendance" element={<AttendanceTracking />} />
                     <Route path="salary" element={<SalaryReports />} />
+                    <Route path="jobs" element={<Jobs />}>
+                        <Route path="assignment" element={<JobAssignment />} />
+                        <Route path="select" element={<SelectJobs />} />
+                    </Route>
                 </Route>
 
                 {/* Finance Manager Dashboard */}
