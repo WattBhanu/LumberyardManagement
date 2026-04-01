@@ -2,7 +2,7 @@ package com.lumberyard_backend.controller;
 
 import com.lumberyard_backend.dto.TreatmentRequest;
 import com.lumberyard_backend.entity.TreatmentHistory;
-import com.lumberyard_backend.entity.TreatmentProcess;
+import com.lumberyard_backend.entity.Treatment;
 import com.lumberyard_backend.entity.TreatmentStatus;
 import com.lumberyard_backend.service.TreatmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,8 @@ public class TreatmentController {
 
     @PostMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
-    public ResponseEntity<TreatmentProcess> startTreatment(@RequestBody TreatmentRequest request) {
-        TreatmentProcess treatment = treatmentService.startTreatment(
+    public ResponseEntity<Treatment> startTreatment(@RequestBody TreatmentRequest request) {
+        Treatment treatment = treatmentService.startTreatment(
                 request.getTimberId(),
                 request.getChemicalType(),
                 request.getTimberQuantity(),
@@ -40,7 +40,7 @@ public class TreatmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> finishTreatment(@PathVariable Long id) {
         try {
-            TreatmentProcess treatment = treatmentService.finishTreatment(id);
+            Treatment treatment = treatmentService.finishTreatment(id);
             Map<String, Object> response = new HashMap<>();
             response.put("treatment", treatment);
             response.put("message", "Treatment completed successfully! New treated timber created.");
@@ -52,8 +52,8 @@ public class TreatmentController {
 
     @PostMapping("/{id}/cancel")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
-    public ResponseEntity<TreatmentProcess> cancelTreatment(@PathVariable Long id) {
-        TreatmentProcess treatment = treatmentService.cancelTreatment(id);
+    public ResponseEntity<Treatment> cancelTreatment(@PathVariable Long id) {
+        Treatment treatment = treatmentService.cancelTreatment(id);
         return ResponseEntity.ok(treatment);
     }
 
@@ -76,13 +76,13 @@ public class TreatmentController {
 
     @GetMapping("/active")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
-    public ResponseEntity<List<TreatmentProcess>> getActiveTreatments() {
+    public ResponseEntity<List<Treatment>> getActiveTreatments() {
         return ResponseEntity.ok(treatmentService.getActiveTreatments());
     }
 
     @GetMapping("/completed")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
-    public ResponseEntity<List<TreatmentProcess>> getCompletedTreatments() {
+    public ResponseEntity<List<Treatment>> getCompletedTreatments() {
         return ResponseEntity.ok(treatmentService.getCompletedTreatments());
     }
 
@@ -122,7 +122,7 @@ public class TreatmentController {
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN', 'INVENTORY_OPERATIONS_MANAGER')")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> statusMap) {
-        TreatmentProcess treatment = treatmentService.findById(id);
+        Treatment treatment = treatmentService.findById(id);
         if (treatment == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Treatment not found");
         }

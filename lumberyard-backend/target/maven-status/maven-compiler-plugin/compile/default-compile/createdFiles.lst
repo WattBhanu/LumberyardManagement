@@ -3,13 +3,13 @@ com\lumberyard_backend\service\AuthService.class
 com\lumberyard_backend\dto\TreatmentRequest.class
 com\lumberyard_backend\controller\ChemicalController.class
 com\lumberyard_backend\entity\Worker.class
-com\lumberyard_backend\entity\TreatmentProcess.class
 com\lumberyard_backend\entity\JobWorkerAssignment$WorkerRole.class
 com\lumberyard_backend\LumberyardBackendApplication.class
 com\lumberyard_backend\entity\MaterialUsage.class
 com\lumberyard_backend\repository\WorkerRepository.class
 com\lumberyard_backend\entity\ProductionHistory.class
 com\lumberyard_backend\model\AuthRequest.class
+com\lumberyard_backend\entity\Treatment.class
 com\lumberyard_backend\entity\User.class
 com\lumberyard_backend\controller\TimberController.class
 com\lumberyard_backend\controller\WorkerController$ErrorResponse.class

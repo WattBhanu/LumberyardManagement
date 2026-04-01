@@ -12,7 +12,7 @@ public class TreatmentHistory {
 
     @ManyToOne
     @JoinColumn(name = "treatment_id", nullable = false)
-    private TreatmentProcess treatment;
+    private Treatment treatment;
 
     @Enumerated(EnumType.STRING)
     private TreatmentStatus fromStatus;
@@ -30,7 +30,7 @@ public class TreatmentHistory {
         this.changeTime = LocalDateTime.now();
     }
 
-    public TreatmentHistory(TreatmentProcess treatment, TreatmentStatus fromStatus, TreatmentStatus toStatus, String eventType, String notes) {
+    public TreatmentHistory(Treatment treatment, TreatmentStatus fromStatus, TreatmentStatus toStatus, String eventType, String notes) {
         this.treatment = treatment;
         this.fromStatus = fromStatus;
         this.toStatus = toStatus;
@@ -48,11 +48,11 @@ public class TreatmentHistory {
         this.id = id;
     }
 
-    public TreatmentProcess getTreatment() {
+    public Treatment getTreatment() {
         return treatment;
     }
 
-    public void setTreatment(TreatmentProcess treatment) {
+    public void setTreatment(Treatment treatment) {
         this.treatment = treatment;
     }
 
