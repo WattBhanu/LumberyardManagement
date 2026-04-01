@@ -36,6 +36,21 @@ public class TreatmentService {
     @Autowired
     private ChemicalRepository chemicalRepository;
 
+    // Find treatment by ID
+    public TreatmentProcess findById(Long id) {
+        return treatmentRepository.findById(id).orElse(null);
+    }
+
+    // Save treatment
+    public TreatmentProcess save(TreatmentProcess treatment) {
+        return treatmentRepository.save(treatment);
+    }
+
+    // Save treatment history
+    public TreatmentHistory saveHistory(TreatmentHistory history) {
+        return treatmentHistoryRepository.save(history);
+    }
+
     // Start a new treatment process - DEDUCTS timber and chemicals immediately
     public TreatmentProcess startTreatment(Long timberId, String chemicalType, Double timberQuantity, Double chemicalQuantity) {
         Timber timber = timberRepository.findById(timberId)
@@ -274,21 +289,49 @@ public class TreatmentService {
         treatmentRepository.deleteById(treatmentId);
     }
 
-    // Delete all treatment history
+    // Delete all treatment history (admin only)
     public void deleteAllHistory(String token) {
         // Validate token (simple validation for now)
         if (token == null || token.isEmpty()) {
             throw new RuntimeException("Invalid deletion token");
         }
         
-        // Delete all history records
-        treatmentHistoryRepository.deleteAll();
+        // Get all treatments that are in final states
+        List<TreatmentProcess> finalStateTreatments = treatmentRepository.findAll().stream()
+                .filter(t -> t.getStatus() == TreatmentStatus.FINISHED
+                        || t.getStatus() == TreatmentStatus.CANCELLED
+                        || t.getStatus() == TreatmentStatus.DELETED)
+                .collect(Collectors.toList());
         
-        // Note: We don't delete actual treatments, just history
+        // Delete all history records and treatments
+        for (TreatmentProcess treatment : finalStateTreatments) {
+            List<TreatmentHistory> histories = treatmentHistoryRepository.findByTreatmentId(treatment.getId());
+            treatmentHistoryRepository.deleteAll(histories);
+            treatmentRepository.delete(treatment);
+        }
+        
+        // Also delete any orphaned history records (where treatment might be null)
+        treatmentHistoryRepository.deleteAll();
     }
 
     // Delete a single treatment history record
     public void deleteHistoryRecord(Long historyId) {
-        treatmentHistoryRepository.deleteById(historyId);
+        TreatmentHistory history = treatmentHistoryRepository.findById(historyId).orElse(null);
+        if (history == null) {
+            return;
+        }
+        
+        // If it's a final state record, also delete the treatment
+        if (history.getEventType() == "FINISHED" || history.getEventType() == "CANCELLED" || history.getEventType() == "DELETED") {
+            Long treatmentId = history.getTreatment().getId();
+            // Delete all history records for this treatment first
+            List<TreatmentHistory> histories = treatmentHistoryRepository.findByTreatmentId(treatmentId);
+            treatmentHistoryRepository.deleteAll(histories);
+            // Then delete the treatment
+            treatmentRepository.deleteById(treatmentId);
+        } else {
+            // Just delete the history record
+            treatmentHistoryRepository.deleteById(historyId);
+        }
     }
 }

@@ -282,11 +282,11 @@ const ProductionPage = () => {
     const [deleteHistoryModal, setDeleteHistoryModal] = useState({ isOpen: false, historyId: null, productionId: null, eventType: '' });
 
     const handleDeleteHistory = (historyId, productionId, eventType) => {
-        // Show confirmation for STARTED, FINISHED, CANCELLED and DELETED records
-        if (eventType === 'STARTED' || eventType === 'FINISHED' || eventType === 'CANCELLED' || eventType === 'DELETED') {
+        // Show confirmation for FINISHED, CANCELLED and DELETED records (these delete the production too)
+        if (eventType === 'FINISHED' || eventType === 'CANCELLED' || eventType === 'DELETED') {
             setDeleteHistoryModal({ isOpen: true, historyId, productionId, eventType });
         } else {
-            // For STATUS_CHANGE, delete immediately without confirmation
+            // For STARTED and STATUS_CHANGE, delete immediately without confirmation
             confirmDeleteHistory(historyId, productionId, eventType);
         }
     };

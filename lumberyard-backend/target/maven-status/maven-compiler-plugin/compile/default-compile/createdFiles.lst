@@ -60,6 +60,7 @@ com\lumberyard_backend\service\WorkerService.class
 com\lumberyard_backend\controller\TreatmentController.class
 com\lumberyard_backend\controller\FinanceController.class
 com\lumberyard_backend\model\AuthResponse.class
+com\lumberyard_backend\service\ProductionService.class
 com\lumberyard_backend\entity\JobAssignment.class
 com\lumberyard_backend\config\CorsConfig.class
 com\lumberyard_backend\controller\TimberTrackingController.class
