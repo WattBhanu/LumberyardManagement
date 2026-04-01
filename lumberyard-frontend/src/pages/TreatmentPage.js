@@ -481,11 +481,12 @@ const TreatmentPage = () => {
                                             <input
                                                 type="number"
                                                 name="chemicalQuantity"
-                                                placeholder="Enter chemical quantity"
+                                                placeholder={newTreatment.chemicalType ? `Max: ${chemicals.find(c => c.name === newTreatment.chemicalType)?.quantity || 0}` : "Enter chemical quantity"}
                                                 value={newTreatment.chemicalQuantity}
                                                 onChange={handleInputChange}
                                                 min="0.1"
                                                 step="0.1"
+                                                max={chemicals.find(c => c.name === newTreatment.chemicalType)?.quantity || ''}
                                                 className="form-input"
                                                 required
                                             />
