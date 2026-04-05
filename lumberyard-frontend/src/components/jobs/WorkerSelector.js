@@ -172,6 +172,14 @@ const WorkerSelector = ({ job, role, onComplete, onCancel }) => {
           <span className="ws-info-label">Available Workers:</span>
           <span className="ws-info-value">{availableWorkers.length}</span>
         </div>
+        <div className="ws-info-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Showing workers available on {new Date(job.date).toLocaleDateString()}. Workers assigned to other dates can still be selected.</span>
+        </div>
       </div>
 
       {/* Workers List */}

@@ -7,9 +7,11 @@ import com.lumberyard_backend.dto.JobUpdateDTO;
 import com.lumberyard_backend.dto.WorkerAssignmentDTO;
 import com.lumberyard_backend.entity.JobAssignment;
 import com.lumberyard_backend.entity.JobWorkerAssignment;
+import com.lumberyard_backend.entity.ShiftWorkerAssignment;
 import com.lumberyard_backend.entity.Worker;
 import com.lumberyard_backend.repository.JobAssignmentRepository;
 import com.lumberyard_backend.repository.JobWorkerAssignmentRepository;
+import com.lumberyard_backend.repository.ShiftWorkerAssignmentRepository;
 import com.lumberyard_backend.repository.WorkerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,9 @@ public class JobAssignmentService {
     
     @Autowired
     private JobWorkerAssignmentRepository jobWorkerAssignmentRepository;
+    
+    @Autowired
+    private ShiftWorkerAssignmentRepository shiftWorkerAssignmentRepository;
     
     @Autowired
     private WorkerRepository workerRepository;
@@ -67,11 +72,18 @@ public class JobAssignmentService {
     }
     
     /**
-     * Get all job assignments
+     * Get all job assignments (only today and future jobs)
      */
     public List<JobAssignmentDTO> getAllJobs() {
-        List<JobAssignment> jobs = jobAssignmentRepository.findAll();
-        return jobs.stream().map(this::convertToDTO).collect(Collectors.toList());
+        LocalDate today = LocalDate.now();
+        List<JobAssignment> allJobs = jobAssignmentRepository.findAll();
+        
+        // Filter out expired jobs (only keep today and future jobs)
+        List<JobAssignment> activeJobs = allJobs.stream()
+                .filter(job -> !job.getDate().isBefore(today))
+                .collect(Collectors.toList());
+        
+        return activeJobs.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
     
     /**
@@ -123,6 +135,8 @@ public class JobAssignmentService {
     
     /**
      * Assign workers to a job
+     * Note: Workers can be assigned to multiple jobs on different dates.
+     * The system only prevents assigning a worker to multiple jobs on the SAME date.
      */
     @Transactional
     public JobAssignmentDTO assignWorkers(WorkerAssignmentDTO dto) {
@@ -136,7 +150,8 @@ public class JobAssignmentService {
             Worker worker = workerRepository.findById(workerId)
                     .orElseThrow(() -> new RuntimeException("Worker not found with id: " + workerId));
             
-            // Check if worker is already assigned on this date
+            // Check if worker is already assigned on THIS SPECIFIC DATE
+            // Workers can be assigned to jobs on other dates
             List<Worker> assignedWorkers = jobWorkerAssignmentRepository.findWorkersAssignedToDate(job.getDate());
             if (assignedWorkers.contains(worker)) {
                 throw new RuntimeException("Worker " + worker.getFirstName() + " " + 
@@ -168,11 +183,15 @@ public class JobAssignmentService {
      * Get available workers for a specific date (workers without job assignments)
      */
     public List<Worker> getAvailableWorkers(LocalDate date) {
+        // Get all active and available workers
         List<Worker> allActiveWorkers = workerRepository.findByStatus(Worker.WorkerStatus.ACTIVE);
+        
+        // Filter workers who are marked as available AND not assigned to any job on the given date
         List<Worker> assignedWorkers = jobWorkerAssignmentRepository.findWorkersAssignedToDate(date);
         
         return allActiveWorkers.stream()
-                .filter(w -> !assignedWorkers.contains(w))
+                .filter(w -> w.getIsAvailable() != null && w.getIsAvailable()) // Only workers marked as available
+                .filter(w -> !assignedWorkers.contains(w)) // Exclude workers already assigned on this date
                 .collect(Collectors.toList());
     }
     
@@ -295,6 +314,15 @@ public class JobAssignmentService {
     public void deleteJob(Long jobId) {
         JobAssignment job = jobAssignmentRepository.findById(jobId)
                 .orElseThrow(() -> new RuntimeException("Job not found with id: " + jobId));
+        
+        // First, delete all shift worker assignments for this job
+        List<ShiftWorkerAssignment> shiftAssignments = job.getShiftWorkerAssignments();
+        if (shiftAssignments != null && !shiftAssignments.isEmpty()) {
+            System.out.println("Deleting " + shiftAssignments.size() + " shift worker assignments for job " + job.getJobName());
+            
+            // Delete all shift worker assignments using repository
+            shiftWorkerAssignmentRepository.deleteByJobAssignmentId(job.getId());
+        }
         
         // Free all assigned workers by deleting their assignments
         if (job.getWorkerAssignments() != null && !job.getWorkerAssignments().isEmpty()) {

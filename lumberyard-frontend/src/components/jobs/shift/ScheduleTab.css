@@ -1,0 +1,561 @@
+/* ScheduleTab.css - Professional Job Schedule Dashboard */
+
+/* Base Container */
+.schedule-tab {
+  width: 100%;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Controls Bar */
+.schedule-controls {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-radius: 60px;
+  border: 1px solid #eef2f8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.schedule-control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.schedule-control-group label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Date Input */
+.schedule-date-input {
+  padding: 0.6rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  background: white;
+  color: #1e293b;
+}
+
+.schedule-date-input:hover {
+  border-color: #cbd5e1;
+}
+
+.schedule-date-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Sort Select */
+.schedule-sort-select {
+  padding: 0.6rem 2rem 0.6rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: white;
+  color: #1e293b;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  transition: all 0.2s;
+}
+
+.schedule-sort-select:hover {
+  border-color: #cbd5e1;
+}
+
+.schedule-sort-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Status Filter Buttons */
+.schedule-filter-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.schedule-filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 40px;
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+.schedule-filter-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.schedule-filter-btn-active {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  border-color: #4f46e5;
+  color: white;
+}
+
+/* Stats Summary */
+.schedule-stats {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.schedule-stat-badge {
+  padding: 0.3rem 0.8rem;
+  background: #f1f5f9;
+  border-radius: 40px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.schedule-stat-badge span {
+  color: #4f46e5;
+  font-weight: 700;
+  margin-right: 0.25rem;
+}
+
+/* Jobs Grid */
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Job Square Card */
+.job-square {
+  background: white;
+  border: 1px solid #eef2f8;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  position: relative;
+}
+
+.job-square::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.job-square:hover::before {
+  transform: scaleX(1);
+}
+
+.job-square:hover {
+  border-color: #e0e7ff;
+  transform: translateY(-6px);
+  box-shadow: 0 24px 36px -16px rgba(79, 70, 229, 0.2);
+}
+
+/* Job Square Header */
+.job-square-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #fafcff;
+  border-bottom: 1px solid #eef2f8;
+}
+
+.job-square-id {
+  font-weight: 700;
+  color: #4f46e5;
+  font-family: monospace;
+  font-size: 0.8rem;
+  background: #e0e7ff;
+  padding: 0.25rem 0.7rem;
+  border-radius: 40px;
+}
+
+/* Status Badge */
+.job-square-status {
+  padding: 0.25rem 0.8rem;
+  border-radius: 40px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-in_progress {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.status-completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Job Square Body */
+.job-square-body {
+  padding: 1.25rem;
+}
+
+.job-square-name {
+  margin: 0 0 0.5rem 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.job-square-date {
+  margin: 0 0 1rem 0;
+  color: #64748b;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Requirements Section */
+.job-square-requirements {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.job-square-position {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.6rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.job-square-position:hover {
+  background: #f1f5f9;
+}
+
+.position-name {
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.position-name::before {
+  content: "👤";
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.position-count {
+  font-weight: 700;
+  color: #4f46e5;
+  background: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 40px;
+  font-size: 0.7rem;
+}
+
+.job-square-position-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+/* Progress Bar */
+.job-progress {
+  margin-top: 1rem;
+}
+
+.job-progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.job-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.job-progress-text {
+  font-size: 0.65rem;
+  color: #64748b;
+  text-align: right;
+}
+
+/* Job Square Footer */
+.job-square-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-top: 1px solid #eef2f8;
+  color: #4f46e5;
+  font-weight: 600;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.job-square:hover .job-square-footer {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+}
+
+.job-square-footer svg {
+  transition: transform 0.2s;
+}
+
+.job-square:hover .job-square-footer svg {
+  transform: translateX(4px);
+}
+
+/* Loading State */
+.schedule-loading {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: 28px;
+  margin-top: 1rem;
+}
+
+.schedule-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty State */
+.schedule-empty {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: 28px;
+  margin-top: 1rem;
+}
+
+.schedule-empty svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+  color: #94a3b8;
+}
+
+.schedule-empty p {
+  font-size: 1rem;
+  margin: 0.5rem 0 0.25rem 0;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.schedule-empty small {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .schedule-controls {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 24px;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .schedule-control-group {
+    justify-content: space-between;
+  }
+
+  .schedule-filter-group {
+    justify-content: center;
+  }
+
+  .schedule-stats {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .job-square {
+    max-width: 100%;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .schedule-controls {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .schedule-control-group label {
+    color: #94a3b8;
+  }
+
+  .schedule-date-input,
+  .schedule-sort-select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .schedule-filter-btn {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+  }
+
+  .schedule-filter-btn:hover {
+    background: #1e293b;
+  }
+
+  .schedule-filter-btn-active {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+  }
+
+  .schedule-stat-badge {
+    background: #334155;
+    color: #94a3b8;
+  }
+
+  .job-square {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .job-square-header {
+    background: #0f172a;
+    border-bottom-color: #334155;
+  }
+
+  .job-square-name {
+    color: #f1f5f9;
+  }
+
+  .job-square-position {
+    background: #0f172a;
+  }
+
+  .position-name {
+    color: #cbd5e1;
+  }
+
+  .position-count {
+    background: #1e293b;
+  }
+
+  .job-square-position-empty {
+    background: #0f172a;
+    color: #64748b;
+  }
+
+  .job-square-footer {
+    background: #0f172a;
+    border-top-color: #334155;
+    color: #a5b4fc;
+  }
+
+  .schedule-loading,
+  .schedule-empty {
+    background: #1e293b;
+  }
+
+  .schedule-empty p {
+    color: #cbd5e1;
+  }
+}
+
+/* Animation for new jobs */
+@keyframes jobCardAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.job-square {
+  animation: jobCardAppear 0.25s ease-out;
+}

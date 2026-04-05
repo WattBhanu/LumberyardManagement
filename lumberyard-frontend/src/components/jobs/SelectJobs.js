@@ -12,19 +12,72 @@ const SelectJobs = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [showWorkerSelector, setShowWorkerSelector] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(''); // Empty string means "all dates"
 
   useEffect(() => {
     fetchUnassignedJobs();
-  }, []);
+  }, [selectedDate]);
 
   const fetchUnassignedJobs = async () => {
     try {
       setLoading(true);
-      console.log('Fetching unassigned jobs...');
-      const today = new Date().toISOString().split('T')[0];
-      const response = await API.get(`/jobs/unassigned?date=${today}`);
-      console.log('Unassigned jobs loaded:', response.data);
-      setJobs(response.data);
+      if (selectedDate) {
+        console.log('Fetching unassigned jobs for specific date:', selectedDate);
+        const response = await API.get(`/jobs/unassigned?date=${selectedDate}`);
+        console.log('Unassigned jobs loaded:', response.data);
+        console.log('Number of jobs needing workers:', response.data.length);
+        response.data.forEach(job => {
+          console.log(`Job ${job.jobId}:`, {
+            date: job.date,
+            positionRequirements: job.positionRequirements,
+            requiredEmployees: job.requiredEmployees,
+            requiredSupervisors: job.requiredSupervisors,
+            assignedPositionsCount: job.assignedPositionsCount,
+            assignedEmployeesCount: job.assignedEmployeesCount,
+            assignedSupervisorsCount: job.assignedSupervisorsCount,
+            status: job.status
+          });
+        });
+        setJobs(response.data);
+      } else {
+        // Fetch all jobs and filter those that need workers
+        console.log('Fetching ALL unassigned jobs (no date filter)...');
+        const response = await API.get('/jobs');
+        console.log('All jobs loaded:', response.data);
+        
+        // Get today's date for filtering
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        
+        // Filter jobs that need workers AND are not expired (today or future)
+        const jobsNeedingWorkers = response.data.filter(job => {
+          // First, filter out expired jobs (before today)
+          const jobDate = new Date(job.date);
+          jobDate.setHours(0, 0, 0, 0);
+          if (jobDate < today) {
+            return false; // Skip expired jobs
+          }
+          
+          // Then check if job needs workers
+          const positionReqs = job.positionRequirements || {};
+          const totalPositions = Object.keys(positionReqs).length;
+          
+          if (totalPositions > 0) {
+            // Position-based: check if any position needs workers
+            return Object.entries(positionReqs).some(([position, required]) => {
+              const assigned = job.assignedPositionsCount?.[position] || 0;
+              return assigned < required;
+            });
+          } else {
+            // Legacy: check employees or supervisors
+            return (job.assignedEmployeesCount || 0) < (job.requiredEmployees || 0) ||
+                   (job.assignedSupervisorsCount || 0) < (job.requiredSupervisors || 0);
+          }
+        });
+        
+        console.log('Jobs needing workers (filtered):', jobsNeedingWorkers.length);
+        setJobs(jobsNeedingWorkers);
+      }
     } catch (error) {
       console.error('Error fetching unassigned jobs:', error);
     } finally {
@@ -80,6 +133,38 @@ const SelectJobs = () => {
           <h1>Select Job to Assign Workers</h1>
           <span className="sj-badge">JOBS NEEDING WORKERS</span>
         </div>
+        <div className="sj-date-filter">
+          <label htmlFor="job-date-filter">Filter by Date:</label>
+          <select
+            id="job-date-filter"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="sj-date-input"
+          >
+            <option value="">All Dates (Next 2 Weeks)</option>
+            {(() => {
+              const options = [];
+              const today = new Date();
+              for (let i = 0; i <= 14; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() + i);
+                const dateString = date.toISOString().split('T')[0];
+                const displayDate = date.toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                });
+                const todayLabel = i === 0 ? ' (Today)' : (i === 1 ? ' (Tomorrow)' : '');
+                options.push(
+                  <option key={dateString} value={dateString}>
+                    {displayDate}{todayLabel}
+                  </option>
+                );
+              }
+              return options;
+            })()}
+          </select>
+        </div>
       </div>
 
       {/* Jobs List */}
@@ -97,8 +182,18 @@ const SelectJobs = () => {
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
             </svg>
-            <p>All jobs are fully staffed!</p>
-            <small>No jobs need workers at the moment.</small>
+            <p>
+              {selectedDate 
+                ? `No jobs need workers on ${new Date(selectedDate).toLocaleDateString()}`
+                : 'No jobs need workers in the next 2 weeks!'}
+            </p>
+            <small>
+              {selectedDate 
+                ? (selectedDate === new Date().toISOString().split('T')[0]
+                    ? "All jobs for today are fully staffed! Try selecting a different date."
+                    : "All jobs for this date are fully staffed! Try a different date.")
+                : "All jobs are fully staffed for the next 2 weeks. Create a new job or check back later."}
+            </small>
           </div>
         ) : (
           <div className="sj-table-wrap">
@@ -119,6 +214,18 @@ const SelectJobs = () => {
                   // Get all position requirements
                   const positionReqs = job.positionRequirements || {};
                   const totalPositions = Object.keys(positionReqs).length;
+                  const hasLegacyRequirements = (job.requiredEmployees || 0) > 0 || (job.requiredSupervisors || 0) > 0;
+                  
+                  console.log(`Rendering job ${job.jobId}:`, {
+                    totalPositions,
+                    positionReqs,
+                    hasLegacyRequirements,
+                    requiredEmployees: job.requiredEmployees,
+                    requiredSupervisors: job.requiredSupervisors,
+                    assignedPositionsCount: job.assignedPositionsCount,
+                    assignedEmployeesCount: job.assignedEmployeesCount,
+                    assignedSupervisorsCount: job.assignedSupervisorsCount
+                  });
                   
                   return (
                     <tr key={job.id} className="sj-row">

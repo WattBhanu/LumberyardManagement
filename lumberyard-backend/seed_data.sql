@@ -1,7 +1,13 @@
 USE lumberyard_db;
 
--- 1. Insert Managers into 'users' and their respective joined tables
+-- 1. Insert Admin and Managers into 'users' and their respective joined tables
 -- Password for all is 'admin123' (hashed: $2a$10$HkWLUjHvQG1N2UWUicFh7O4q1RCNjG/lG7XCpKXuvjhXNS9PRY2Aa)
+
+-- Admin User
+INSERT INTO users (email, name, password, phone, role, status)
+VALUES ('admin@lumberyard.com', 'System Admin', '$2a$10$HkWLUjHvQG1N2UWUicFh7O4q1RCNjG/lG7XCpKXuvjhXNS9PRY2Aa', '000-000-0000', 'ADMIN', 1);
+SET @admin_id = LAST_INSERT_ID();
+INSERT INTO admins (user_id) VALUES (@admin_id);
 
 -- Inventory Operations Manager
 INSERT INTO users (email, name, password, phone, role, status)

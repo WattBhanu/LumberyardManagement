@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function run() {
     try {
-        const loginRes = await axios.post('http://localhost:8080/api/auth/login', {
+        const loginRes = await axios.post('http://localhost:8081/api/auth/login', {
             username: 'admin@lumberyard.com',
             password: 'password'
         });
@@ -10,11 +10,11 @@ async function run() {
         const config = { headers: { Authorization: `Bearer ${token}` } };
         
         console.log('Fetching workers stats...');
-        const statsRes = await axios.get('http://localhost:8080/api/workers/stats', config);
+        const statsRes = await axios.get('http://localhost:8081/api/workers/stats', config);
         console.log('Stats:', statsRes.data);
         
         console.log('Creating a test worker...');
-        const createRes = await axios.post('http://localhost:8080/api/workers', {
+        const createRes = await axios.post('http://localhost:8081/api/workers', {
             firstName: 'EndToEnd',
             lastName: 'Test',
             email: 'end2end' + Date.now() + '@test.com',
@@ -31,7 +31,7 @@ async function run() {
         
         console.log('Recording attendance arrival...');
         const date = new Date().toISOString().split('T')[0];
-        const attRes = await axios.post('http://localhost:8080/api/attendance', {
+        const attRes = await axios.post('http://localhost:8081/api/attendance', {
             workerId: workerId,
             date: date,
             status: 'Present',
@@ -40,7 +40,7 @@ async function run() {
         console.log('Arrival recorded. ID:', attRes.data.id);
         
         console.log('Recording attendance departure...');
-        const depRes = await axios.post('http://localhost:8080/api/attendance', {
+        const depRes = await axios.post('http://localhost:8081/api/attendance', {
             workerId: workerId,
             date: date,
             status: 'Present',
@@ -50,7 +50,7 @@ async function run() {
         
         console.log('Fetching daily salary...');
         const [yyyy, mm, dd] = date.split('-');
-        const salRes = await axios.get(`http://localhost:8080/api/salary/reports/daily?year=${yyyy}&month=${parseInt(mm)}&day=${parseInt(dd)}`, config);
+        const salRes = await axios.get(`http://localhost:8081/api/salary/reports/daily?year=${yyyy}&month=${parseInt(mm)}&day=${parseInt(dd)}`, config);
         console.log('Daily Salary Items Length:', salRes.data.items.length);
         const myItem = salRes.data.items.find(i => i.workerName === 'EndToEnd Test');
         if (myItem) {

@@ -42,8 +42,11 @@ public class JobAssignment {
     @Column(nullable = false)
     private JobStatus status = JobStatus.PENDING;
     
-    @OneToMany(mappedBy = "jobAssignment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "jobAssignment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<JobWorkerAssignment> workerAssignments = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "jobAssignment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ShiftWorkerAssignment> shiftWorkerAssignments = new ArrayList<>();
     
     public enum JobStatus {
         PENDING,

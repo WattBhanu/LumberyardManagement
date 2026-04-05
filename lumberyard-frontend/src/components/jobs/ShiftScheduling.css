@@ -1,0 +1,534 @@
+/* ShiftSchedulingPage.css - Professional Shift Management Dashboard */
+
+/* Base Layout */
+.shift-scheduling-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fc 0%, #eef2f8 100%);
+  padding: 2rem;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Header Section */
+.shift-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.shift-back-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 44px;
+  background: rgba(79, 70, 229, 0.1);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  color: #4f46e5;
+}
+
+.shift-back-btn:hover {
+  background: #4f46e5;
+  color: white;
+  transform: translateX(-4px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+}
+
+.shift-header-text {
+  flex: 1;
+}
+
+.shift-header-text h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1e293b 0%, #2d3a5e 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.3px;
+}
+
+.shift-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  border-radius: 40px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+}
+
+/* Navigation Tabs */
+.shift-nav-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 60px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #eef2f8;
+}
+
+.shift-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+}
+
+.shift-tab:hover {
+  background: #f1f5f9;
+  color: #4f46e5;
+}
+
+.shift-tab-active {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.shift-tab-active:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  color: white;
+}
+
+/* Tab Content Container */
+.shift-tab-content {
+  background: white;
+  border-radius: 28px;
+  padding: 1.5rem;
+  min-height: 550px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  animation: fadeSlideUp 0.3s ease-out;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Calendar View Styles */
+.shift-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.shift-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.shift-month-nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 38px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #64748b;
+}
+
+.shift-month-nav-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #4f46e5;
+}
+
+.shift-current-month {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  min-width: 160px;
+  text-align: center;
+}
+
+.shift-calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shift-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.shift-weekday {
+  text-align: center;
+  padding: 0.75rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.shift-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.shift-day-cell {
+  aspect-ratio: 1;
+  background: #fafcff;
+  border-radius: 16px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #eef2f8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shift-day-cell:hover {
+  border-color: #cbd5e1;
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.shift-day-number {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.shift-day-other-month {
+  opacity: 0.4;
+}
+
+.shift-day-badge {
+  font-size: 0.6rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 8px;
+  background: #e0e7ff;
+  color: #4f46e5;
+  text-align: center;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shift-day-today {
+  border: 2px solid #4f46e5;
+  background: #eef2ff;
+}
+
+/* Shift List View */
+.shift-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.shift-date-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f8fafc;
+  padding: 0.4rem 0.8rem 0.4rem 1rem;
+  border-radius: 60px;
+}
+
+.shift-date-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.shift-create-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 60px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shift-create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+}
+
+/* Shift Cards */
+.shift-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.shift-card {
+  background: #fafcff;
+  border-radius: 20px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border: 1px solid #eef2f8;
+  transition: all 0.2s;
+}
+
+.shift-card:hover {
+  border-color: #e0e7ff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.shift-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.shift-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #4f46e5;
+  font-size: 0.9rem;
+}
+
+.shift-name {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.shift-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.shift-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.shift-edit-btn,
+.shift-delete-btn {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shift-edit-btn {
+  color: #4f46e5;
+}
+
+.shift-edit-btn:hover {
+  background: #e0e7ff;
+}
+
+.shift-delete-btn {
+  color: #ef4444;
+}
+
+.shift-delete-btn:hover {
+  background: #fee2e2;
+}
+
+.shift-empty {
+  text-align: center;
+  padding: 4rem;
+  color: #94a3b8;
+}
+
+/* Loading State */
+.shift-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  gap: 1rem;
+}
+
+.shift-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .shift-scheduling-page {
+    padding: 1rem;
+  }
+
+  .shift-nav-tabs {
+    border-radius: 20px;
+    padding: 0.3rem;
+  }
+
+  .shift-tab {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  .shift-tab span:first-child {
+    display: none;
+  }
+
+  .shift-tab-content {
+    padding: 1rem;
+  }
+
+  .shift-weekday {
+    font-size: 0.6rem;
+    padding: 0.4rem;
+  }
+
+  .shift-day-cell {
+    padding: 0.4rem;
+  }
+
+  .shift-day-number {
+    font-size: 0.7rem;
+  }
+
+  .shift-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .shift-actions {
+    align-self: flex-end;
+  }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .shift-scheduling-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .shift-header-text h1 {
+    background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .shift-nav-tabs {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .shift-tab {
+    color: #94a3b8;
+  }
+
+  .shift-tab:hover {
+    background: #334155;
+    color: #a5b4fc;
+  }
+
+  .shift-tab-content {
+    background: #1e293b;
+  }
+
+  .shift-current-month {
+    color: #f1f5f9;
+  }
+
+  .shift-weekday {
+    color: #94a3b8;
+  }
+
+  .shift-day-cell {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .shift-day-number {
+    color: #e2e8f0;
+  }
+
+  .shift-card {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .shift-name {
+    color: #f1f5f9;
+  }
+
+  .shift-date-selector {
+    background: #0f172a;
+  }
+
+  .shift-date-input {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+}

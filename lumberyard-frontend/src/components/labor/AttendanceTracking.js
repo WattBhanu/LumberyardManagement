@@ -12,6 +12,7 @@ const AttendanceTracking = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [message, setMessage] = useState(null);
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'with-time', 'without-time'
 
   const [formData, setFormData] = useState({
     workerId: '',
@@ -88,10 +89,56 @@ const AttendanceTracking = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
+    // Clear arrival/departure times when status is changed to Absent
+    if (name === 'status' && value === 'Absent') {
+      setFormData(prev => ({
+        ...prev,
+        status: value,
+        arrivalTime: '',
+        departureTime: ''
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate: Absent workers cannot have times
+    if (formData.status === 'Absent') {
+      if (formData.arrivalTime || formData.departureTime) {
+        setMessage({ 
+          type: 'error', 
+          text: 'Absent workers cannot have arrival or departure times.' 
+        });
+        return;
+      }
+    }
+    
+    // Validate times for present workers
+    if (formData.arrivalTime && formData.departureTime && formData.status !== 'Absent') {
+      const arrival = new Date(`1970-01-01T${formData.arrivalTime}`);
+      const departure = new Date(`1970-01-01T${formData.departureTime}`);
+      
+      if (departure < arrival) {
+        setMessage({ 
+          type: 'error', 
+          text: 'Departure time cannot be earlier than arrival time. Worked hours cannot be negative.' 
+        });
+        return;
+      }
+      
+      // Check if worked hours exceed 24
+      const diffHours = (departure - arrival) / (1000 * 60 * 60);
+      if (diffHours > 24) {
+        setMessage({ 
+          type: 'error', 
+          text: 'Worked hours cannot exceed 24 hours.' 
+        });
+        return;
+      }
+    }
+    
     try {
       await API.post('/attendance', formData);
       setMessage({ type: 'success', text: 'Attendance recorded successfully!' });
@@ -99,7 +146,7 @@ const AttendanceTracking = () => {
       setEditingRecord(null);
       fetchAttendance();
     } catch (error) {
-      setMessage({ type: 'error', text: "Failed to record attendance. Check if it's a duplicate." });
+      setMessage({ type: 'error', text: error.response?.data?.message || "Failed to record attendance. Check if it's a duplicate." });
     }
   };
 
@@ -132,6 +179,20 @@ const AttendanceTracking = () => {
   const totalWorkers = attendance.length;
   const totalHours = attendance.reduce((sum, r) => sum + (r.workedHours || 0), 0);
 
+  // Filter attendance records based on time filter
+  const getFilteredAttendance = () => {
+    if (timeFilter === 'all') return attendance;
+    if (timeFilter === 'with-time') {
+      return attendance.filter(r => r.arrivalTime && r.departureTime);
+    }
+    if (timeFilter === 'without-time') {
+      return attendance.filter(r => !r.arrivalTime || !r.departureTime);
+    }
+    return attendance;
+  };
+
+  const filteredAttendance = getFilteredAttendance();
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '—';
     const d = new Date(dateStr);
@@ -159,6 +220,16 @@ const AttendanceTracking = () => {
             value={selectedDate}
             onChange={e => setSelectedDate(e.target.value)}
           />
+          <select 
+            className="at-time-filter"
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            title="Filter by time entries"
+          >
+            <option value="all">All Records</option>
+            <option value="with-time">With Time Entries</option>
+            <option value="without-time">Without Time Entries</option>
+          </select>
           <button className="at-add-btn" onClick={openAddModal}>+ Record Attendance</button>
         </div>
       </div>
@@ -205,12 +276,18 @@ const AttendanceTracking = () => {
                 </tr>
               </thead>
               <tbody>
-                {attendance.length === 0 ? (
+                {filteredAttendance.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="at-empty">No attendance records for this date.</td>
+                    <td colSpan="10" className="at-empty">
+                      {timeFilter === 'all' 
+                        ? 'No attendance records for this date.' 
+                        : timeFilter === 'with-time'
+                        ? 'No records with time entries.'
+                        : 'No records without time entries.'}
+                    </td>
                   </tr>
                 ) : (
-                  attendance.map(record => (
+                  filteredAttendance.map(record => (
                     <tr key={record.id}>
                       <td className="at-worker-name">
                         {record.worker.firstName} {record.worker.lastName}
@@ -295,11 +372,25 @@ const AttendanceTracking = () => {
                 </div>
                 <div className="at-field">
                   <label>Arrival Time</label>
-                  <input type="time" name="arrivalTime" value={formData.arrivalTime} onChange={handleInputChange} />
+                  <input 
+                    type="time" 
+                    name="arrivalTime" 
+                    value={formData.arrivalTime} 
+                    onChange={handleInputChange} 
+                    disabled={formData.status === 'Absent'}
+                    placeholder={formData.status === 'Absent' ? 'Not applicable' : ''}
+                  />
                 </div>
                 <div className="at-field">
                   <label>Departure Time</label>
-                  <input type="time" name="departureTime" value={formData.departureTime} onChange={handleInputChange} />
+                  <input 
+                    type="time" 
+                    name="departureTime" 
+                    value={formData.departureTime} 
+                    onChange={handleInputChange}
+                    disabled={formData.status === 'Absent'}
+                    placeholder={formData.status === 'Absent' ? 'Not applicable' : ''}
+                  />
                 </div>
                 <div className="at-field at-field-full">
                   <label>Note</label>

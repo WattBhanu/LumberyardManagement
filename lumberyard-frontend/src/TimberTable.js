@@ -9,7 +9,7 @@ function TimberTable() {
 
   const fetchTimbers = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/timber/all");
+      const res = await axios.get("http://localhost:8081/timber/all");
       setTimbers(res.data);
     } catch (err) {
       console.error("Error fetching timbers:", err);
@@ -32,7 +32,7 @@ function TimberTable() {
       return;
     }
     try {
-      await axios.put("http://localhost:8080/timber/reduce", null, {
+      await axios.put("http://localhost:8081/timber/reduce", null, {
         params: { timberCode: reduceData.timberCode, quantity: parseFloat(reduceData.quantity) }
       });
       setMessage("Stock reduced successfully!");
@@ -50,7 +50,7 @@ function TimberTable() {
       return;
     }
     try {
-      await axios.put("http://localhost:8080/timber/addStock", null, {
+      await axios.put("http://localhost:8081/timber/addStock", null, {
         params: { timberCode: addData.timberCode, quantity: parseFloat(addData.quantity) }
       });
       setMessage("Stock added successfully!");

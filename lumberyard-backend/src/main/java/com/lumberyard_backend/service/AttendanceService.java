@@ -39,14 +39,37 @@ public class AttendanceService {
 
         if (request.getStatus() != null) attendance.setStatus(request.getStatus());
         if (request.getNote() != null) attendance.setNote(request.getNote());
-        if (request.getArrivalTime() != null) attendance.setArrivalTime(request.getArrivalTime());
-        if (request.getDepartureTime() != null) attendance.setDepartureTime(request.getDepartureTime());
+        
+        // Validate: Absent workers cannot have arrival/departure times
+        if ("Absent".equalsIgnoreCase(request.getStatus())) {
+            if (request.getArrivalTime() != null || request.getDepartureTime() != null) {
+                throw new IllegalArgumentException("Absent workers cannot have arrival or departure times.");
+            }
+            // Ensure times are null for absent workers
+            attendance.setArrivalTime(null);
+            attendance.setDepartureTime(null);
+            attendance.setWorkedHours(0.0);
+        } else {
+            if (request.getArrivalTime() != null) attendance.setArrivalTime(request.getArrivalTime());
+            if (request.getDepartureTime() != null) attendance.setDepartureTime(request.getDepartureTime());
 
-        // Automatically calculate worked hours if both arrival and departure are set
-        if (attendance.getArrivalTime() != null && attendance.getDepartureTime() != null) {
-            Duration duration = Duration.between(attendance.getArrivalTime(), attendance.getDepartureTime());
-            double hours = duration.toMinutes() / 60.0;
-            attendance.setWorkedHours(Math.round(hours * 100.0) / 100.0);
+            // Automatically calculate worked hours if both arrival and departure are set
+            if (attendance.getArrivalTime() != null && attendance.getDepartureTime() != null) {
+                Duration duration = Duration.between(attendance.getArrivalTime(), attendance.getDepartureTime());
+                double hours = duration.toMinutes() / 60.0;
+                
+                // Validate: worked hours cannot be negative
+                if (hours < 0) {
+                    throw new IllegalArgumentException("Departure time cannot be earlier than arrival time. Worked hours cannot be negative.");
+                }
+                
+                // Cap maximum worked hours at 24
+                if (hours > 24) {
+                    throw new IllegalArgumentException("Worked hours cannot exceed 24 hours.");
+                }
+                
+                attendance.setWorkedHours(Math.round(hours * 100.0) / 100.0);
+            }
         }
 
         return attendanceRepository.save(attendance);

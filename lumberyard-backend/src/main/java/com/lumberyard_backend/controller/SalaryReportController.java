@@ -54,13 +54,23 @@ public class SalaryReportController {
                 boolean isPresent = "Present".equalsIgnoreCase(attendance.getStatus());
                 item.setPresentDays(isPresent ? 1 : 0);
                 item.setAbsentDays(isPresent ? 0 : 1);
-                item.setTotalHours(attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 0);
-                item.setAttendancePercentage(isPresent ? 100 : 0);
                 
-                double hourlyWage = salaryCalculationService.calculateHourlyWage(worker);
-                double dailySalary = salaryCalculationService.calculateDailySalary(hourlyWage, item.getTotalHours());
-                item.setTotalSalary(dailySalary);
-                totalPayroll += dailySalary;
+                // Only calculate salary if worker is present
+                if (isPresent) {
+                    item.setTotalHours(attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 0);
+                    item.setAttendancePercentage(100);
+                    
+                    double hourlyWage = salaryCalculationService.calculateHourlyWage(worker);
+                    double dailySalary = salaryCalculationService.calculateDailySalary(hourlyWage, item.getTotalHours());
+                    item.setTotalSalary(dailySalary);
+                } else {
+                    // Worker is absent - set hours and salary to 0
+                    item.setTotalHours(0);
+                    item.setAttendancePercentage(0);
+                    item.setTotalSalary(0);
+                }
+                
+                totalPayroll += item.getTotalSalary();
             } else {
                 item.setPresentDays(0);
                 item.setAbsentDays(1);
@@ -106,6 +116,7 @@ public class SalaryReportController {
                     presentDays++;
                     totalHours += (a.getWorkedHours() != null ? a.getWorkedHours() : 0);
                 }
+                // Absent days are counted but don't add hours or salary
             }
 
             item.setPresentDays(presentDays);
@@ -113,6 +124,7 @@ public class SalaryReportController {
             item.setTotalHours(totalHours);
             item.setAttendancePercentage(((double) presentDays / daysInMonth) * 100);
             
+            // Calculate salary only for hours worked (present days)
             double hourlyWage = salaryCalculationService.calculateHourlyWage(worker);
             double monthlySalary = salaryCalculationService.calculateDailySalary(hourlyWage, totalHours);
             item.setTotalSalary(monthlySalary);

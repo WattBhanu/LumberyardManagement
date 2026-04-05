@@ -16,6 +16,7 @@ import SalaryReports from './components/labor/SalaryReports';
 import Jobs from './components/jobs/Jobs';
 import JobAssignment from './components/jobs/JobAssignment';
 import SelectJobs from './components/jobs/SelectJobs';
+import ShiftScheduling from './components/jobs/ShiftScheduling';
 // Old Worker components (for backward compatibility)
 import WorkerPage from './components/worker/WorkerPage';
 import './App.css';
@@ -191,6 +192,7 @@ function App() {
                     <Route path="jobs" element={<Jobs />}>
                         <Route path="assignment" element={<JobAssignment />} />
                         <Route path="select" element={<SelectJobs />} />
+                        <Route path="shift-scheduling" element={<ShiftScheduling />} />
                     </Route>
                 </Route>
 

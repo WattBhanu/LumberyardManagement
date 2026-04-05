@@ -9,6 +9,7 @@ C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\c
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\LogsController.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\ProductionController.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\SalaryReportController.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\ShiftController.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\TimberController.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\TimberTrackingController.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\TreatmentController.java
@@ -21,6 +22,9 @@ C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\c
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\JobUpdateDTO.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\ProductionRequest.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\SalaryReportResponse.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\ShiftDTO.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\ShiftScheduleDTO.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\ShiftWorkerAssignmentDTO.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\TreatmentRequest.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\UserRegistrationRequest.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\dto\WorkerAssignmentDTO.java
@@ -39,6 +43,8 @@ C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\c
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\ProductionHistory.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\ProductionStatus.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Role.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Shift.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\ShiftWorkerAssignment.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Timber.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\TimberTracking.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\TreatmentHistory.java
@@ -58,6 +64,8 @@ C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\c
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\MaterialUsageRepository.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\ProductionHistoryRepository.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\ProductionRepository.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\ShiftRepository.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\ShiftWorkerAssignmentRepository.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\TimberRepository.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\TimberTrackingRepository.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\TreatmentHistoryRepository.java
@@ -73,6 +81,7 @@ C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\c
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\CustomUserDetailsService.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\JobAssignmentService.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\SalaryCalculationService.java
+C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\ShiftService.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\TimberTrackingService.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\TreatmentService.java
 C:\Users\Dinuga\untitled\LumberyardManagement\lumberyard-backend\src\main\java\com\lumberyard_backend\service\UserService.java

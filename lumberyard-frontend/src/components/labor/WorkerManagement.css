@@ -1,3 +1,5 @@
+/* WorkerProfileManagement.css - Modern & Professional Styles with Icons */
+
 /* ══════════════════════════════════════
    Worker Profile Management - Modern Styles
 ══════════════════════════════════════ */
@@ -83,12 +85,24 @@
   border-color: rgba(255, 255, 255, 0.5);
 }
 
+.wm-back-btn::before {
+  content: "←";
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
 .wm-header-text h1 {
   color: white;
   font-size: 1.9rem;
   font-weight: 700;
   letter-spacing: -0.3px;
   margin-bottom: 8px;
+}
+
+.wm-header-text h1::before {
+  content: "👥 ";
+  font-size: 1.8rem;
+  font-weight: normal;
 }
 
 .wm-badge {
@@ -103,6 +117,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.wm-badge::before {
+  content: "📋 ";
+  font-size: 0.7rem;
 }
 
 .wm-add-btn {
@@ -121,8 +140,10 @@
   gap: 8px;
 }
 
-.wm-add-btn i {
-  font-size: 1rem;
+.wm-add-btn::before {
+  content: "+";
+  font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .wm-add-btn:hover {
@@ -151,10 +172,22 @@
   border-left: 6px solid var(--accent);
 }
 
+.wm-alert-success::before {
+  content: "✓ ";
+  font-weight: 700;
+  margin-right: 8px;
+}
+
 .wm-alert-error {
   background: #ffe9e9;
   color: var(--danger);
   border-left: 6px solid #f97373;
+}
+
+.wm-alert-error::before {
+  content: "⚠ ";
+  font-weight: 700;
+  margin-right: 8px;
 }
 
 .wm-alert-close {
@@ -165,6 +198,10 @@
   color: inherit;
   opacity: 0.7;
   transition: opacity 0.2s;
+}
+
+.wm-alert-close::before {
+  content: "×";
 }
 
 .wm-alert-close:hover {
@@ -211,14 +248,29 @@
   color: #2563eb;
 }
 
+.wm-icon-blue::before {
+  content: "👥";
+  font-size: 1.6rem;
+}
+
 .wm-icon-green {
   background: #e3f9ed;
   color: var(--success);
 }
 
+.wm-icon-green::before {
+  content: "✅";
+  font-size: 1.6rem;
+}
+
 .wm-icon-red {
   background: #fff0f0;
   color: var(--danger);
+}
+
+.wm-icon-red::before {
+  content: "⏸️";
+  font-size: 1.6rem;
 }
 
 .wm-stat-number {
@@ -269,6 +321,11 @@
   gap: 8px;
 }
 
+.wm-table-title-row h2::before {
+  content: "📋";
+  font-size: 1.3rem;
+}
+
 .wm-table-meta {
   display: flex;
   gap: 12px;
@@ -288,6 +345,11 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.wm-active-badge::before {
+  content: "🟢";
+  font-size: 0.65rem;
 }
 
 /* ── FILTERS ── */
@@ -350,6 +412,22 @@
   gap: 10px;
 }
 
+.wm-loading::before {
+  content: "⟳";
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  font-size: 1.2rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .wm-table {
   width: 100%;
   border-collapse: collapse;
@@ -367,6 +445,41 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.wm-table th:nth-child(1)::before {
+  content: "👤 ";
+  font-size: 0.7rem;
+}
+
+.wm-table th:nth-child(2)::before {
+  content: "🆔 ";
+  font-size: 0.7rem;
+}
+
+.wm-table th:nth-child(3)::before {
+  content: "💼 ";
+  font-size: 0.7rem;
+}
+
+.wm-table th:nth-child(4)::before {
+  content: "🏢 ";
+  font-size: 0.7rem;
+}
+
+.wm-table th:nth-child(5)::before {
+  content: "📞 ";
+  font-size: 0.7rem;
+}
+
+.wm-table th:nth-child(6)::before {
+  content: "⚡ ";
+  font-size: 0.7rem;
+}
+
+.wm-table th:nth-child(7)::before {
+  content: "⚙️ ";
+  font-size: 0.7rem;
 }
 
 .wm-table td {
@@ -424,8 +537,20 @@
   color: var(--success);
 }
 
+.wm-status-active::before {
+  content: "●";
+  font-size: 0.65rem;
+  color: var(--success);
+}
+
 .wm-status-inactive {
   background: #fee9e6;
+  color: var(--danger);
+}
+
+.wm-status-inactive::before {
+  content: "○";
+  font-size: 0.65rem;
   color: var(--danger);
 }
 
@@ -450,6 +575,16 @@
   justify-content: center;
 }
 
+.wm-btn-edit::before {
+  content: "✎";
+  font-size: 1rem;
+}
+
+.wm-btn-delete::before {
+  content: "🗑";
+  font-size: 1rem;
+}
+
 .wm-btn-edit:hover {
   background: #d9eff7;
   color: #1e5a7a;
@@ -468,7 +603,189 @@
   color: #8aa1b9;
 }
 
-/* ── MODAL ── */
+.wm-empty::before {
+  content: "📭";
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* ── CUSTOM DELETION CONFIRMATION MODAL ── */
+.wm-delete-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  animation: overlayFadeIn 0.2s ease;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+  }
+}
+
+.wm-delete-modal {
+  background: white;
+  border-radius: 32px;
+  max-width: 480px;
+  width: 90%;
+  overflow: hidden;
+  animation: modalSlideUp 0.3s ease-out;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wm-delete-header {
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.wm-delete-icon {
+  width: 48px;
+  height: 48px;
+  background: #dc2626;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.wm-delete-icon::before {
+  content: "⚠";
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.wm-delete-header h3 {
+  margin: 0;
+  color: #991b1b;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.wm-delete-body {
+  padding: 2rem;
+}
+
+.wm-delete-body p {
+  margin: 0 0 0.5rem 0;
+  color: #1e293b;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.wm-delete-worker-name {
+  font-weight: 700;
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.wm-delete-warning-list {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.wm-delete-warning-list li {
+  margin: 0.5rem 0;
+  line-height: 1.4;
+}
+
+.wm-delete-warning-list li::marker {
+  color: #dc2626;
+}
+
+.wm-delete-footer {
+  padding: 1rem 2rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  border-top: 1px solid #eef2f8;
+  background: #fafcff;
+}
+
+.wm-delete-cancel {
+  padding: 0.7rem 1.5rem;
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.wm-delete-cancel::before {
+  content: "✕ ";
+  font-weight: bold;
+}
+
+.wm-delete-cancel:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.wm-delete-confirm {
+  padding: 0.7rem 1.8rem;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wm-delete-confirm::before {
+  content: "🗑";
+  font-size: 0.9rem;
+}
+
+.wm-delete-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
+}
+
+/* ── MAIN MODAL (Add/Edit Worker) ── */
 .wm-overlay {
   position: fixed;
   inset: 0;
@@ -520,6 +837,13 @@
   color: transparent;
 }
 
+.wm-modal-header h2::before {
+  content: "✏️ ";
+  background: none;
+  -webkit-background-clip: unset;
+  color: var(--primary-light);
+}
+
 .wm-modal-close {
   font-size: 1.8rem;
   background: none;
@@ -528,6 +852,10 @@
   color: var(--gray-300);
   transition: color 0.2s;
   line-height: 1;
+}
+
+.wm-modal-close::before {
+  content: "×";
 }
 
 .wm-modal-close:hover {
@@ -560,6 +888,34 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #516d8a;
+}
+
+.wm-field label[for="name"]::before {
+  content: "👤 ";
+}
+
+.wm-field label[for="email"]::before {
+  content: "📧 ";
+}
+
+.wm-field label[for="phone"]::before {
+  content: "📞 ";
+}
+
+.wm-field label[for="address"]::before {
+  content: "📍 ";
+}
+
+.wm-field label[for="position"]::before {
+  content: "💼 ";
+}
+
+.wm-field label[for="department"]::before {
+  content: "🏢 ";
+}
+
+.wm-field label[for="employeeId"]::before {
+  content: "🆔 ";
 }
 
 .wm-field input,
@@ -605,6 +961,11 @@
   font-family: inherit;
 }
 
+.wm-cancel-btn::before {
+  content: "✕ ";
+  font-weight: bold;
+}
+
 .wm-cancel-btn:hover {
   background: var(--gray-50);
   border-color: var(--gray-400);
@@ -622,10 +983,21 @@
   font-family: inherit;
 }
 
+.wm-save-btn::before {
+  content: "✓ ";
+  font-weight: bold;
+}
+
 .wm-save-btn:hover {
   opacity: 0.92;
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.wm-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* ── RESPONSIVE DESIGN ── */
@@ -678,19 +1050,121 @@
   .wm-select {
     width: 100%;
   }
-}
 
-/* ── UTILITY CLASSES ── */
-.wm-loading-spinner {
-  display: inline-block;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
+  .wm-delete-modal {
+    width: 95%;
   }
-  to {
-    transform: rotate(360deg);
+
+  .wm-delete-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .wm-delete-body {
+    padding: 1.25rem;
+  }
+
+  .wm-delete-footer {
+    padding: 0.75rem 1.25rem 1.25rem;
+    flex-direction: column;
+  }
+
+  .wm-delete-cancel,
+  .wm-delete-confirm {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .wm-page {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .wm-stat-card,
+  .wm-table-card,
+  .wm-modal {
+    background: #1e293b;
+  }
+
+  .wm-table-title-row h2 {
+    color: #f1f5f9;
+  }
+
+  .wm-table th {
+    background: #0f172a;
+    color: #94a3b8;
+    border-bottom-color: #334155;
+  }
+
+  .wm-table td {
+    border-bottom-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .wm-table tbody tr:hover {
+    background: #0f172a;
+  }
+
+  .wm-search,
+  .wm-select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .wm-modal-header {
+    border-bottom-color: #334155;
+  }
+
+  .wm-field input,
+  .wm-field select,
+  .wm-field textarea {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .wm-field label {
+    color: #94a3b8;
+  }
+
+  .wm-delete-modal {
+    background: #1e293b;
+  }
+
+  .wm-delete-header {
+    background: linear-gradient(135deg, #2d1a1a 0%, #3d2626 100%);
+  }
+
+  .wm-delete-header h3 {
+    color: #f87171;
+  }
+
+  .wm-delete-body p {
+    color: #e2e8f0;
+  }
+
+  .wm-delete-worker-name {
+    background: #3d2626;
+    color: #f87171;
+  }
+
+  .wm-delete-warning-list {
+    color: #94a3b8;
+  }
+
+  .wm-delete-footer {
+    background: #0f172a;
+    border-top-color: #334155;
+  }
+
+  .wm-delete-cancel {
+    background: #334155;
+    color: #cbd5e1;
+  }
+
+  .wm-delete-cancel:hover {
+    background: #475569;
   }
 }

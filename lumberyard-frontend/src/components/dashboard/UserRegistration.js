@@ -38,7 +38,7 @@ const UserRegistration = ({ token }) => {
   const fetchAllUsers = async () => {
     try {
       console.log('Fetching users with token:', token);
-      const response = await fetch('http://localhost:8080/api/users/all', {
+      const response = await fetch('http://localhost:8081/api/users/all', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -66,7 +66,7 @@ const UserRegistration = ({ token }) => {
       
       let errorMessage = 'Network error while fetching users';
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'Failed to connect to server to fetch users. Please check if the backend is running on http://localhost:8080';
+        errorMessage = 'Failed to connect to server to fetch users. Please check if the backend is running on http://localhost:8081';
       } else if (error.message) {
         errorMessage = `Network error while fetching users: ${error.message}`;
       }
@@ -100,7 +100,7 @@ const UserRegistration = ({ token }) => {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const response = await fetch('http://localhost:8080/api/users/register', {
+      const response = await fetch('http://localhost:8081/api/users/register', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(formData)
@@ -189,7 +189,7 @@ const UserRegistration = ({ token }) => {
     }
     
     try {
-      const response = await fetch(`http://localhost:8080/api/users/delete/${deleteConfirm.userId}`, {
+      const response = await fetch(`http://localhost:8081/api/users/delete/${deleteConfirm.userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
