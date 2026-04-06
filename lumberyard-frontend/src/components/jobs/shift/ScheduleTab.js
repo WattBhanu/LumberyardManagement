@@ -6,7 +6,6 @@ import ShiftAssignmentModal from './ShiftAssignmentModal';
 
 const ScheduleTab = () => {
   const [selectedDate, setSelectedDate] = useState(''); // Empty = all dates
-  const [sortBy, setSortBy] = useState('date-only'); // 'date-only', 'job-only'
   const [schedule, setSchedule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -50,18 +49,9 @@ const ScheduleTab = () => {
       return jobDate >= today;
     });
     
+    // Sort by date by default
     let sortedJobs = [...activeJobs];
-    
-    switch (sortBy) {
-      case 'date-only':
-        sortedJobs.sort((a, b) => a.date.localeCompare(b.date));
-        break;
-      case 'job-only':
-        sortedJobs.sort((a, b) => a.jobName.localeCompare(b.jobName));
-        break;
-      default:
-        break;
-    }
+    sortedJobs.sort((a, b) => a.date.localeCompare(b.date));
     
     return sortedJobs;
   };
@@ -91,18 +81,6 @@ const ScheduleTab = () => {
                 </option>
               );
             })}
-          </select>
-        </div>
-
-        <div className="schedule-control-group">
-          <label>Sort by:</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="schedule-sort-select"
-          >
-            <option value="date-only">Date only</option>
-            <option value="job-only">Job only</option>
           </select>
         </div>
       </div>

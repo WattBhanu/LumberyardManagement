@@ -20,28 +20,36 @@ const WorkerTab = () => {
       const response = await API.get('/shifts');
       console.log('All shifts:', response.data);
       
-      // Extract unique workers from all shifts
+      // Get current date for filtering expired jobs
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = today.toISOString().split('T')[0];
+      
+      // Extract unique workers from all shifts, filtering out expired jobs
       const workerMap = new Map();
       response.data.forEach(shift => {
         if (shift.workerAssignments) {
           shift.workerAssignments.forEach(assignment => {
-            if (!workerMap.has(assignment.workerId)) {
-              workerMap.set(assignment.workerId, {
-                ...assignment,
-                shifts: []
+            // Filter out assignments with dates before today (expired jobs)
+            if (assignment.date && assignment.date >= todayStr) {
+              if (!workerMap.has(assignment.workerId)) {
+                workerMap.set(assignment.workerId, {
+                  ...assignment,
+                  shifts: []
+                });
+              }
+              workerMap.get(assignment.workerId).shifts.push({
+                shiftName: assignment.shiftName,
+                jobName: assignment.jobName,
+                date: assignment.date
               });
             }
-            workerMap.get(assignment.workerId).shifts.push({
-              shiftName: assignment.shiftName,
-              jobName: assignment.jobName,
-              date: assignment.date
-            });
           });
         }
       });
       
       const workersList = Array.from(workerMap.values());
-      console.log('Workers list:', workersList);
+      console.log('Workers list (filtered):', workersList);
       setWorkers(workersList);
     } catch (error) {
       console.error('Error fetching workers:', error);
@@ -56,9 +64,19 @@ const WorkerTab = () => {
     try {
       const response = await API.get(`/shifts/worker/${worker.workerId}`);
       console.log('Worker details:', response.data);
+      
+      // Filter out expired assignments from worker details
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayStr = today.toISOString().split('T')[0];
+      
+      const activeAssignments = response.data.filter(assignment => 
+        assignment.date && assignment.date >= todayStr
+      );
+      
       setWorkerDetails({
         ...worker,
-        assignments: response.data
+        assignments: activeAssignments
       });
     } catch (error) {
       console.error('Error fetching worker details:', error);
