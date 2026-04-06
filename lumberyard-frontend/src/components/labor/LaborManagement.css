@@ -1,14 +1,14 @@
-/* LaborManagement.css - Professional Labor Management Styles with Icons */
+﻿/* LaborManagement.css - Professional Labor Management Styles with Icons */
 
-.labor-management {
+.labor-mgmt-management {
     padding: 2rem;
     min-height: 100vh;
     background: linear-gradient(135deg, #f5f7fc 0%, #eef2f8 100%);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* ── HEADER SECTION ── */
-.labor-header {
+/* â”€â”€ HEADER SECTION â”€â”€ */
+.labor-mgmt-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,7 +17,7 @@
     gap: 1rem;
 }
 
-.back-btn {
+.labor-mgmt-back-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -32,19 +32,19 @@
     transition: all 0.2s ease;
 }
 
-.back-btn::before {
-    content: "←";
+.labor-mgmt-back-btn::before {
+    content: "";
     font-size: 1.1rem;
     font-weight: normal;
 }
 
-.back-btn:hover {
+.labor-mgmt-back-btn:hover {
     background: #f1f5f9;
     border-color: #cbd5e1;
     transform: translateX(-2px);
 }
 
-.add-btn {
+.labor-mgmt-add-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -60,20 +60,20 @@
     box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
-.add-btn::before {
+.labor-mgmt-add-btn::before {
     content: "+";
     font-size: 1.1rem;
     font-weight: bold;
 }
 
-.add-btn:hover {
+.labor-mgmt-add-btn:hover {
     background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
 }
 
-/* ── TABLE CARD ── */
-.data-table-container {
+/* â”€â”€ TABLE CARD â”€â”€ */
+.labor-mgmt-table-container {
     background: white;
     border-radius: 28px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
@@ -81,13 +81,13 @@
     border: 1px solid #eef2f8;
 }
 
-.data-table {
+.labor-mgmt-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.85rem;
 }
 
-.data-table th {
+.labor-mgmt-table th {
     background: #fafcff;
     padding: 1rem 1.25rem;
     text-align: left;
@@ -99,57 +99,57 @@
     border-bottom: 1px solid #eef2f8;
 }
 
-.data-table th:nth-child(1)::before {
-    content: "🆔 ";
+.labor-mgmt-table th:nth-child(1)::before {
+    content: "ðŸ†” ";
     font-size: 0.7rem;
 }
 
-.data-table th:nth-child(2)::before {
-    content: "👤 ";
+.labor-mgmt-table th:nth-child(2)::before {
+    content: "ðŸ‘¤ ";
     font-size: 0.7rem;
 }
 
-.data-table th:nth-child(3)::before {
-    content: "💼 ";
+.labor-mgmt-table th:nth-child(3)::before {
+    content: "ðŸ’¼ ";
     font-size: 0.7rem;
 }
 
-.data-table th:nth-child(4)::before {
-    content: "📞 ";
+.labor-mgmt-table th:nth-child(4)::before {
+    content: "ðŸ“ž ";
     font-size: 0.7rem;
 }
 
-.data-table th:nth-child(5)::before {
-    content: "✉️ ";
+.labor-mgmt-table th:nth-child(5)::before {
+    content: "âœ‰ï¸ ";
     font-size: 0.7rem;
 }
 
-.data-table th:nth-child(6)::before {
-    content: "⚡ ";
+.labor-mgmt-table th:nth-child(6)::before {
+    content: "âš¡ ";
     font-size: 0.7rem;
 }
 
-.data-table th:nth-child(7)::before {
-    content: "⚙️ ";
+.labor-mgmt-table th:nth-child(7)::before {
+    content: "âš™ï¸ ";
     font-size: 0.7rem;
 }
 
-.data-table td {
+.labor-mgmt-table td {
     padding: 1rem 1.25rem;
     border-bottom: 1px solid #f1f5f9;
     color: #1e293b;
     vertical-align: middle;
 }
 
-.data-table tbody tr {
+.labor-mgmt-table tbody tr {
     transition: background 0.2s;
 }
 
-.data-table tbody tr:hover {
+.labor-mgmt-table tbody tr:hover {
     background: #fafcff;
 }
 
-.data-table tbody tr:last-child td {
+.labor-mgmt-table tbody tr:last-child td {
     border-bottom: none;
 }
 
@@ -166,24 +166,24 @@
     letter-spacing: 0.4px;
 }
 
-.status-active {
+.labor-mgmt-status-active {
     background: #dcfce7;
     color: #166534;
 }
 
-.status-active::before {
-    content: "●";
+.labor-mgmt-status-active::before {
+    content: "â—";
     font-size: 0.55rem;
     color: #166534;
 }
 
-.status-inactive {
+.labor-mgmt-status-inactive {
     background: #fee2e2;
     color: #991b1b;
 }
 
-.status-inactive::before {
-    content: "○";
+.labor-mgmt-status-inactive::before {
+    content: "â—‹";
     font-size: 0.55rem;
     color: #991b1b;
 }
@@ -194,7 +194,7 @@
     gap: 0.5rem;
 }
 
-.edit-btn, .delete-btn {
+.labor-mgmt-edit-btn, .labor-mgmt-delete-btn {
     width: 34px;
     height: 34px;
     display: inline-flex;
@@ -208,32 +208,32 @@
     color: #64748b;
 }
 
-.edit-btn::before {
-    content: "✎";
+.labor-mgmt-edit-btn::before {
+    content: "âœŽ";
     font-size: 0.9rem;
 }
 
-.delete-btn::before {
-    content: "🗑";
+.labor-mgmt-delete-btn::before {
+    content: "ðŸ—‘";
     font-size: 0.9rem;
 }
 
-.edit-btn:hover {
+.labor-mgmt-edit-btn:hover {
     background: #d9eff7;
     border-color: #4a7fc1;
     color: #1e5a7a;
     transform: scale(1.05);
 }
 
-.delete-btn:hover {
+.labor-mgmt-delete-btn:hover {
     background: #ffe6e5;
     border-color: #dc2626;
     color: #dc2626;
     transform: scale(1.05);
 }
 
-/* ── LOADING & EMPTY STATES ── */
-.loading-state {
+/* â”€â”€ LOADING & EMPTY STATES â”€â”€ */
+.labor-mgmt-loading-state {
     padding: 4rem 2rem;
     text-align: center;
     color: #94a3b8;
@@ -243,8 +243,8 @@
     gap: 1rem;
 }
 
-.loading-state::before {
-    content: "⟳";
+.labor-mgmt-loading-state::before {
+    content: "âŸ³";
     display: inline-block;
     animation: labor-spin 1s linear infinite;
     font-size: 2rem;
@@ -255,28 +255,28 @@
     to { transform: rotate(360deg); }
 }
 
-.empty-state {
+.labor-mgmt-empty-state {
     padding: 4rem 2rem;
     text-align: center;
     color: #94a3b8;
 }
 
-.empty-state::before {
-    content: "📭";
+.labor-mgmt-empty-state::before {
+    content: "ðŸ“­";
     display: block;
     font-size: 3rem;
     margin-bottom: 1rem;
     opacity: 0.5;
 }
 
-.empty-state p {
+.labor-mgmt-empty-state p {
     font-size: 1rem;
     margin: 0.5rem 0 0.25rem 0;
     color: #64748b;
 }
 
-/* ── MODAL STYLES ── */
-.modal-overlay {
+/* â”€â”€ MODAL STYLES â”€â”€ */
+.labor-mgmt-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -303,7 +303,7 @@
     }
 }
 
-.modal-content {
+.labor-mgmt-modal-content {
     background: white;
     border-radius: 32px;
     width: 100%;
@@ -325,7 +325,7 @@
     }
 }
 
-.modal-header {
+.labor-mgmt-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -337,19 +337,19 @@
     border-radius: 32px 32px 0 0;
 }
 
-.modal-header h2 {
+.labor-mgmt-modal-header h2 {
     margin: 0;
     font-size: 1.3rem;
     font-weight: 700;
     color: #0f172a;
 }
 
-.modal-header h2::before {
-    content: "✏️ ";
+.labor-mgmt-modal-header h2::before {
+    content: "âœï¸ ";
     font-size: 1.2rem;
 }
 
-.modal-close {
+.labor-mgmt-modal-close {
     background: #f1f5f9;
     border: none;
     width: 36px;
@@ -364,16 +364,16 @@
     transition: all 0.2s;
 }
 
-.modal-close::before {
-    content: "×";
+.labor-mgmt-modal-close::before {
+    content: "Ã—";
 }
 
-.modal-close:hover {
+.labor-mgmt-modal-close:hover {
     background: #fee2e2;
     color: #dc2626;
 }
 
-/* ── FORM STYLES ── */
+/* â”€â”€ FORM STYLES â”€â”€ */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -381,17 +381,17 @@
     padding: 1.5rem 2rem;
 }
 
-.form-group {
+.labor-mgmt-form-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.form-group.full-width {
+.labor-mgmt-form-group.full-width {
     grid-column: span 2;
 }
 
-.form-group label {
+.labor-mgmt-form-group label {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -402,33 +402,33 @@
     color: #516d8a;
 }
 
-.form-group label[for="name"]::before {
-    content: "👤 ";
+.labor-mgmt-form-group label[for="name"]::before {
+    content: "ðŸ‘¤ ";
 }
 
-.form-group label[for="position"]::before {
-    content: "💼 ";
+.labor-mgmt-form-group label[for="position"]::before {
+    content: "ðŸ’¼ ";
 }
 
-.form-group label[for="phone"]::before {
-    content: "📞 ";
+.labor-mgmt-form-group label[for="phone"]::before {
+    content: "ðŸ“ž ";
 }
 
-.form-group label[for="email"]::before {
-    content: "✉️ ";
+.labor-mgmt-form-group label[for="email"]::before {
+    content: "âœ‰ï¸ ";
 }
 
-.form-group label[for="department"]::before {
-    content: "🏢 ";
+.labor-mgmt-form-group label[for="department"]::before {
+    content: "ðŸ¢ ";
 }
 
-.form-group label[for="status"]::before {
-    content: "⚡ ";
+.labor-mgmt-form-group label[for="status"]::before {
+    content: "âš¡ ";
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.labor-mgmt-form-group input,
+.labor-mgmt-form-group select,
+.labor-mgmt-form-group textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 1.5px solid #e2edf7;
@@ -439,20 +439,20 @@
     background: white;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.labor-mgmt-form-group input:focus,
+.labor-mgmt-form-group select:focus,
+.labor-mgmt-form-group textarea:focus {
     outline: none;
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.form-group textarea {
+.labor-mgmt-form-group textarea {
     resize: vertical;
     min-height: 80px;
 }
 
-/* ── MODAL ACTIONS ── */
+/* â”€â”€ MODAL ACTIONS â”€â”€ */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -463,7 +463,7 @@
     border-radius: 0 0 32px 32px;
 }
 
-.cancel-btn {
+.labor-mgmt-cancel-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -478,17 +478,17 @@
     transition: all 0.2s;
 }
 
-.cancel-btn::before {
-    content: "✕";
+.labor-mgmt-cancel-btn::before {
+    content: "âœ•";
     font-size: 0.9rem;
 }
 
-.cancel-btn:hover {
+.labor-mgmt-cancel-btn:hover {
     background: #e2e8f0;
     transform: translateY(-1px);
 }
 
-.save-btn {
+.labor-mgmt-save-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -504,25 +504,25 @@
     box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
 }
 
-.save-btn::before {
-    content: "✓";
+.labor-mgmt-save-btn::before {
+    content: "âœ“";
     font-size: 1rem;
     font-weight: bold;
 }
 
-.save-btn:hover {
+.labor-mgmt-save-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
 }
 
-.save-btn:disabled {
+.labor-mgmt-save-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-/* ── MESSAGE ALERTS ── */
-.message {
+/* â”€â”€ MESSAGE ALERTS â”€â”€ */
+.labor-mgmt-message {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -543,31 +543,31 @@
     }
 }
 
-.message.success {
+.labor-mgmt-message.success {
     background: #ecfdf5;
     color: #065f46;
     border-left: 4px solid #10b981;
 }
 
-.message.success::before {
-    content: "✓";
+.labor-mgmt-message.success::before {
+    content: "âœ“";
     font-weight: bold;
     font-size: 1.1rem;
 }
 
-.message.error {
+.labor-mgmt-message.error {
     background: #fef2f2;
     color: #991b1b;
     border-left: 4px solid #ef4444;
 }
 
-.message.error::before {
-    content: "⚠";
+.labor-mgmt-message.error::before {
+    content: "âš ";
     font-weight: bold;
     font-size: 1.1rem;
 }
 
-/* ── CUSTOM DELETION CONFIRMATION MODAL ── */
+/* â”€â”€ CUSTOM DELETION CONFIRMATION MODAL â”€â”€ */
 .delete-confirm-overlay {
     position: fixed;
     top: 0;
@@ -635,7 +635,7 @@
 }
 
 .delete-confirm-icon::before {
-    content: "⚠";
+    content: "âš ";
     font-size: 1.5rem;
     font-weight: bold;
 }
@@ -708,7 +708,7 @@
 }
 
 .delete-confirm-cancel::before {
-    content: "✕";
+    content: "âœ•";
     font-size: 0.9rem;
 }
 
@@ -733,7 +733,7 @@
 }
 
 .delete-confirm-confirm::before {
-    content: "🗑";
+    content: "ðŸ—‘";
     font-size: 0.9rem;
 }
 
@@ -742,18 +742,18 @@
     box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
 }
 
-/* ── RESPONSIVE DESIGN ── */
+/* â”€â”€ RESPONSIVE DESIGN â”€â”€ */
 @media (max-width: 768px) {
-    .labor-management {
+    .labor-mgmt-management {
         padding: 1rem;
     }
 
-    .labor-header {
+    .labor-mgmt-header {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .back-btn, .add-btn {
+    .labor-mgmt-back-btn, .labor-mgmt-add-btn {
         justify-content: center;
     }
 
@@ -762,15 +762,15 @@
         padding: 1rem;
     }
 
-    .form-group.full-width {
+    .labor-mgmt-form-group.full-width {
         grid-column: span 1;
     }
 
-    .modal-content {
+    .labor-mgmt-modal-content {
         max-width: 95%;
     }
 
-    .modal-header {
+    .labor-mgmt-modal-header {
         padding: 1rem 1.25rem;
     }
 
@@ -779,13 +779,13 @@
         flex-direction: column;
     }
 
-    .cancel-btn, .save-btn {
+    .labor-mgmt-cancel-btn, .labor-mgmt-save-btn {
         width: 100%;
         justify-content: center;
     }
 
-    .data-table th,
-    .data-table td {
+    .labor-mgmt-table th,
+    .labor-mgmt-table td {
         padding: 0.75rem 1rem;
     }
 
@@ -815,50 +815,50 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-    .labor-management {
+    .labor-mgmt-management {
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     }
 
-    .data-table-container {
+    .labor-mgmt-table-container {
         background: #1e293b;
         border-color: #334155;
     }
 
-    .data-table th {
+    .labor-mgmt-table th {
         background: #0f172a;
         color: #94a3b8;
         border-bottom-color: #334155;
     }
 
-    .data-table td {
+    .labor-mgmt-table td {
         border-bottom-color: #334155;
         color: #e2e8f0;
     }
 
-    .data-table tbody tr:hover {
+    .labor-mgmt-table tbody tr:hover {
         background: #0f172a;
     }
 
-    .back-btn {
+    .labor-mgmt-back-btn {
         background: #1e293b;
         border-color: #334155;
         color: #94a3b8;
     }
 
-    .back-btn:hover {
+    .labor-mgmt-back-btn:hover {
         background: #334155;
     }
 
-    .modal-content {
+    .labor-mgmt-modal-content {
         background: #1e293b;
     }
 
-    .modal-header {
+    .labor-mgmt-modal-header {
         background: #1e293b;
         border-bottom-color: #334155;
     }
 
-    .modal-header h2 {
+    .labor-mgmt-modal-header h2 {
         color: #f1f5f9;
     }
 
@@ -867,25 +867,25 @@
         border-top-color: #334155;
     }
 
-    .form-group label {
+    .labor-mgmt-form-group label {
         color: #94a3b8;
     }
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .labor-mgmt-form-group input,
+    .labor-mgmt-form-group select,
+    .labor-mgmt-form-group textarea {
         background: #0f172a;
         border-color: #334155;
         color: #e2e8f0;
     }
 
-    .cancel-btn {
+    .labor-mgmt-cancel-btn {
         background: #334155;
         border-color: #475569;
         color: #cbd5e1;
     }
 
-    .cancel-btn:hover {
+    .labor-mgmt-cancel-btn:hover {
         background: #475569;
     }
 
@@ -927,4 +927,24 @@
     .delete-confirm-cancel:hover {
         background: #475569;
     }
+}
+
+/* Salary Reports Summary Cards */
+.labor-mgmt-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.labor-mgmt-summary-card {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Salary Reports Header */
+.labor-mgmt-header h1 {
+  color: white;; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); padding: 1rem 2rem; border-radius: 9999px; display: inline-block; text-align: center; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }

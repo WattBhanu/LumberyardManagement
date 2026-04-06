@@ -276,7 +276,7 @@
 .wm-stat-number {
   font-size: 2.1rem;
   font-weight: 800;
-  color: var(--gray-900);
+  color: white !important;
   line-height: 1;
 }
 
@@ -855,7 +855,7 @@
 }
 
 .wm-modal-close::before {
-  content: "×";
+  content: "";
 }
 
 .wm-modal-close:hover {

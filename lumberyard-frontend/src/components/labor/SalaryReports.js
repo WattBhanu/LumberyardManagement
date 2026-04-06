@@ -35,9 +35,9 @@ const SalaryReports = () => {
   };
 
   return (
-    <div className="labor-management">
-      <div className="labor-header">
-        <button className="back-btn" onClick={() => navigate('/labor')}>
+    <div className="labor-mgmt-management">
+      <div className="labor-mgmt-header">
+        <button className="labor-mgmt-back-btn" onClick={() => navigate('/labor')}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
@@ -82,22 +82,22 @@ const SalaryReports = () => {
         </div>
       </div>
 
-      <div className="summary-grid" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <div className="summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+      <div className="labor-mgmt-summary-grid" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div className="labor-mgmt-summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
           <h4 style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Total Payroll (LKR)</h4>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '0.5rem', color: '#2563eb' }}>{reportData.totalPayroll.toLocaleString()}</div>
         </div>
-        <div className="summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+        <div className="labor-mgmt-summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
           <h4 style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Average Salary (LKR)</h4>
           <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{reportData.averageSalary.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>
         </div>
       </div>
 
-      <div className="data-table-container">
+      <div className="labor-mgmt-table-container">
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
         ) : (
-          <table className="data-table">
+          <table className="labor-mgmt-table">
             <thead>
               {reportType === 'daily' ? (
                 <tr>
