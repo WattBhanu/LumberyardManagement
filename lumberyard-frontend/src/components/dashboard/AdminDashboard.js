@@ -71,7 +71,7 @@ const AdminDashboard = ({ user, onLogout, token }) => {
                 <h3>Labor Dashboard</h3>
                 <p>Access labor management and worker tracking</p>
                 <button 
-                  className="card-button secondary"
+                  className="card-button"
                   onClick={() => navigate('/labor')}
                 >
                   Open Labor
