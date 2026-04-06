@@ -1,7 +1,7 @@
 package com.lumberyard_backend.service;
 
 import com.lumberyard_backend.entity.TreatmentHistory;
-import com.lumberyard_backend.entity.TreatmentProcess;
+import com.lumberyard_backend.entity.Treatment;
 import com.lumberyard_backend.entity.TreatmentStatus;
 import com.lumberyard_backend.entity.Timber;
 import com.lumberyard_backend.entity.TimberTracking;
@@ -36,8 +36,23 @@ public class TreatmentService {
     @Autowired
     private ChemicalRepository chemicalRepository;
 
+    // Find treatment by ID
+    public Treatment findById(Long id) {
+        return treatmentRepository.findById(id).orElse(null);
+    }
+
+    // Save treatment
+    public Treatment save(Treatment treatment) {
+        return treatmentRepository.save(treatment);
+    }
+
+    // Save treatment history
+    public TreatmentHistory saveHistory(TreatmentHistory history) {
+        return treatmentHistoryRepository.save(history);
+    }
+
     // Start a new treatment process - DEDUCTS timber and chemicals immediately
-    public TreatmentProcess startTreatment(Long timberId, String chemicalType, Double timberQuantity, Double chemicalQuantity) {
+    public Treatment startTreatment(Long timberId, String chemicalType, Double timberQuantity, Double chemicalQuantity) {
         Timber timber = timberRepository.findById(timberId)
                 .orElseThrow(() -> new RuntimeException("Timber not found with id: " + timberId));
 
@@ -76,7 +91,7 @@ public class TreatmentService {
         }
         chemicalRepository.save(chemical);
 
-        TreatmentProcess treatment = new TreatmentProcess();
+        Treatment treatment = new Treatment();
         treatment.setTimber(timber);
         treatment.setChemicalType(chemicalType);
         treatment.setTimberQuantity(timberQuantity);
@@ -85,7 +100,7 @@ public class TreatmentService {
         treatment.setStatus(TreatmentStatus.STARTED);
 
         // Save treatment
-        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+        Treatment savedTreatment = treatmentRepository.save(treatment);
 
         // Create history record
         TreatmentHistory history = new TreatmentHistory(
@@ -101,8 +116,8 @@ public class TreatmentService {
     }
 
     // Finish treatment - Creates treated timber record (deduction already done at start)
-    public TreatmentProcess finishTreatment(Long treatmentId) {
-        TreatmentProcess treatment = treatmentRepository.findById(treatmentId)
+    public Treatment finishTreatment(Long treatmentId) {
+        Treatment treatment = treatmentRepository.findById(treatmentId)
                 .orElseThrow(() -> new RuntimeException("Treatment not found with id: " + treatmentId));
 
         TreatmentStatus previousStatus = treatment.getStatus();
@@ -154,7 +169,7 @@ public class TreatmentService {
         // No deduction here - already done at start!
 
         // Save treatment
-        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+        Treatment savedTreatment = treatmentRepository.save(treatment);
 
         // Create history record
         TreatmentHistory history = new TreatmentHistory(
@@ -170,8 +185,8 @@ public class TreatmentService {
     }
 
     // Cancel treatment - REFUNDS materials back to inventory
-    public TreatmentProcess cancelTreatment(Long treatmentId) {
-        TreatmentProcess treatment = treatmentRepository.findById(treatmentId)
+    public Treatment cancelTreatment(Long treatmentId) {
+        Treatment treatment = treatmentRepository.findById(treatmentId)
                 .orElseThrow(() -> new RuntimeException("Treatment not found with id: " + treatmentId));
 
         TreatmentStatus previousStatus = treatment.getStatus();
@@ -196,7 +211,7 @@ public class TreatmentService {
         }
 
         // Save treatment
-        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+        Treatment savedTreatment = treatmentRepository.save(treatment);
 
         // Create history record
         TreatmentHistory history = new TreatmentHistory(
@@ -212,8 +227,8 @@ public class TreatmentService {
     }
 
     // Delete treatment - Sets status to DELETED (soft delete, NO REFUND)
-    public TreatmentProcess deleteTreatment(Long treatmentId) {
-        TreatmentProcess treatment = treatmentRepository.findById(treatmentId)
+    public Treatment deleteTreatment(Long treatmentId) {
+        Treatment treatment = treatmentRepository.findById(treatmentId)
                 .orElseThrow(() -> new RuntimeException("Treatment not found with id: " + treatmentId));
 
         TreatmentStatus previousStatus = treatment.getStatus();
@@ -223,7 +238,7 @@ public class TreatmentService {
         treatment.setEndTime(LocalDateTime.now());
 
         // Save the treatment with DELETED status
-        TreatmentProcess savedTreatment = treatmentRepository.save(treatment);
+        Treatment savedTreatment = treatmentRepository.save(treatment);
 
         // Create history record - NO REFUND since materials were already deducted at start
         TreatmentHistory history = new TreatmentHistory(
@@ -239,7 +254,7 @@ public class TreatmentService {
     }
 
     // Get all active treatments
-    public List<TreatmentProcess> getActiveTreatments() {
+    public List<Treatment> getActiveTreatments() {
         return treatmentRepository.findAll().stream()
                 .filter(t -> t.getStatus() != TreatmentStatus.FINISHED 
                           && t.getStatus() != TreatmentStatus.CANCELLED
@@ -248,7 +263,7 @@ public class TreatmentService {
     }
 
     // Get all completed treatments
-    public List<TreatmentProcess> getCompletedTreatments() {
+    public List<Treatment> getCompletedTreatments() {
         return treatmentRepository.findByStatus(TreatmentStatus.FINISHED);
     }
 
@@ -274,21 +289,49 @@ public class TreatmentService {
         treatmentRepository.deleteById(treatmentId);
     }
 
-    // Delete all treatment history
+    // Delete all treatment history (admin only)
     public void deleteAllHistory(String token) {
         // Validate token (simple validation for now)
         if (token == null || token.isEmpty()) {
             throw new RuntimeException("Invalid deletion token");
         }
         
-        // Delete all history records
-        treatmentHistoryRepository.deleteAll();
+        // Get all treatments that are in final states
+        List<Treatment> finalStateTreatments = treatmentRepository.findAll().stream()
+                .filter(t -> t.getStatus() == TreatmentStatus.FINISHED
+                        || t.getStatus() == TreatmentStatus.CANCELLED
+                        || t.getStatus() == TreatmentStatus.DELETED)
+                .collect(Collectors.toList());
         
-        // Note: We don't delete actual treatments, just history
+        // Delete all history records and treatments
+        for (Treatment treatment : finalStateTreatments) {
+            List<TreatmentHistory> histories = treatmentHistoryRepository.findByTreatmentId(treatment.getId());
+            treatmentHistoryRepository.deleteAll(histories);
+            treatmentRepository.delete(treatment);
+        }
+        
+        // Also delete any orphaned history records (where treatment might be null)
+        treatmentHistoryRepository.deleteAll();
     }
 
     // Delete a single treatment history record
     public void deleteHistoryRecord(Long historyId) {
-        treatmentHistoryRepository.deleteById(historyId);
+        TreatmentHistory history = treatmentHistoryRepository.findById(historyId).orElse(null);
+        if (history == null) {
+            return;
+        }
+        
+        // If it's a final state record, also delete the treatment
+        if (history.getEventType() == "FINISHED" || history.getEventType() == "CANCELLED" || history.getEventType() == "DELETED") {
+            Long treatmentId = history.getTreatment().getId();
+            // Delete all history records for this treatment first
+            List<TreatmentHistory> histories = treatmentHistoryRepository.findByTreatmentId(treatmentId);
+            treatmentHistoryRepository.deleteAll(histories);
+            // Then delete the treatment
+            treatmentRepository.deleteById(treatmentId);
+        } else {
+            // Just delete the history record
+            treatmentHistoryRepository.deleteById(historyId);
+        }
     }
 }

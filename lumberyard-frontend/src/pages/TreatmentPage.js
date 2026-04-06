@@ -28,6 +28,9 @@ const TreatmentPage = () => {
     const [deleteAllModal, setDeleteAllModal] = useState(false);
     const [deleteToken, setDeleteToken] = useState(null);
     const [user, setUser] = useState(null);
+    const [deleteHistoryModal, setDeleteHistoryModal] = useState({ isOpen: false, historyId: null, treatmentId: null, eventType: '' });
+
+    const stages = ['STARTED', 'LOADING', 'APPLICATION', 'CURING', 'FINISHED'];
 
     useEffect(() => {
         const userData = localStorage.getItem('user');
@@ -179,6 +182,27 @@ const TreatmentPage = () => {
         });
     };
 
+    const handleStatusClick = (treatment, status) => {
+        // If clicking FINISHED, show confirmation popup
+        if (status === 'FINISHED') {
+            handleFinishTreatment(treatment);
+            return;
+        }
+
+        // For other statuses, update directly
+        updateStatus(treatment.id, status);
+    };
+
+    const updateStatus = async (id, status) => {
+        try {
+            await API.put(`/treatment/${id}/status`, { status });
+            fetchTreatments();
+            fetchTreatmentHistory();
+        } catch (error) {
+            console.error('Error updating status:', error);
+        }
+    };
+
     const confirmFinishTreatment = async () => {
         const treatment = confirmModal.data;
         setConfirmModal({ isOpen: false, type: '', data: null, message: '' });
@@ -235,31 +259,32 @@ const TreatmentPage = () => {
         });
     };
 
-    const handleDeleteHistoryRecord = (historyId, treatmentId, eventType) => {
+    const handleDeleteHistory = (historyId, treatmentId, eventType) => {
+        // Show confirmation for FINISHED, CANCELLED and DELETED records (these delete the treatment too)
         if (eventType === 'FINISHED' || eventType === 'CANCELLED' || eventType === 'DELETED') {
-            // For final states, permanently delete both the treatment and its history
-            setConfirmModal({
-                isOpen: true,
-                type: 'delete',
-                data: { id: treatmentId, isPermanent: true },
-                message: `Are you sure you want to permanently delete this treatment record from history? This cannot be undone.`
-            });
+            setDeleteHistoryModal({ isOpen: true, historyId, treatmentId, eventType });
         } else {
-            // Just delete the history record
-            confirmDeleteHistoryRecord(historyId);
+            // For STARTED and STATUS_CHANGE, delete immediately without confirmation
+            confirmDeleteHistory(historyId, treatmentId, eventType);
         }
     };
 
-    const confirmDeleteHistoryRecord = async (historyId) => {
-        setConfirmModal({ isOpen: false, type: '', data: null, message: '' });
+    const confirmDeleteHistory = async (historyId, treatmentId, eventType) => {
+        setDeleteHistoryModal({ isOpen: false, historyId: null, treatmentId: null, eventType: '' });
         try {
-            await API.delete(`/treatment/history/${historyId}`);
+            // If it's a final state record, also delete the treatment
+            if (eventType === 'FINISHED' || eventType === 'CANCELLED' || eventType === 'DELETED') {
+                await API.delete(`/treatment/${treatmentId}/permanent`);
+            } else {
+                // Just delete the history record
+                await API.delete(`/treatment/history/${historyId}`);
+            }
             await fetchTreatmentHistory();
-            setMessage('History record deleted permanently!');
+            setMessage('Record deleted permanently!');
             setMessageType('success');
         } catch (error) {
             console.error('Error deleting history:', error);
-            setMessage('Failed to delete history record');
+            setMessage('Failed to delete record');
             setMessageType('error');
         }
     };
@@ -338,6 +363,19 @@ const TreatmentPage = () => {
             case 'DELETED': return '🗑';
             default: return '•';
         }
+    };
+
+    const getStageState = (currentStatus, stage) => {
+        // If process is cancelled or deleted, show all stages as pending except current
+        if (currentStatus === 'CANCELLED' || currentStatus === 'DELETED') {
+            return 'pending';
+        }
+        const currentIndex = stages.indexOf(currentStatus);
+        const stageIndex = stages.indexOf(stage);
+
+        if (stageIndex < currentIndex) return 'completed';
+        if (stageIndex === currentIndex) return 'current';
+        return 'pending';
     };
 
     const isAdmin = user?.role === 'ADMIN';
@@ -443,11 +481,12 @@ const TreatmentPage = () => {
                                             <input
                                                 type="number"
                                                 name="chemicalQuantity"
-                                                placeholder="Enter chemical quantity"
+                                                placeholder={newTreatment.chemicalType ? `Max: ${chemicals.find(c => c.name === newTreatment.chemicalType)?.quantity || 0}` : "Enter chemical quantity"}
                                                 value={newTreatment.chemicalQuantity}
                                                 onChange={handleInputChange}
                                                 min="0.1"
                                                 step="0.1"
+                                                max={chemicals.find(c => c.name === newTreatment.chemicalType)?.quantity || ''}
                                                 className="form-input"
                                                 required
                                             />
@@ -581,6 +620,24 @@ const TreatmentPage = () => {
                                              </div>
                                           )}
                                        </div>
+                                       
+                                       {/* Status Stages */}
+                                       <div className="progress-tracker">
+                                            {stages.map((stage, index) => {
+                                                const state = getStageState(treatment.status, stage);
+                                                return (
+                                                    <div key={stage} className={`tracker-step ${state}`} onClick={() => handleStatusClick(treatment, stage)}>
+                                                        <div className="step-circle">
+                                                            {state === 'completed' || state === 'current' ? (
+                                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                            ) : null}
+                                                        </div>
+                                                        <span className="step-label">{stage.replace('_', ' ')}</span>
+                                                        {index < stages.length - 1 && <div className="step-line"></div>}
+                                                    </div>
+                                                );
+                                            })}
+                                       </div>
                                     </div>
                                 </div>
                              ))}
@@ -710,14 +767,14 @@ const TreatmentPage = () => {
                                           <span className="timber-tag">{history.treatment?.timber?.timberCode || 'N/A'}</span>
                                           <span className="id-tag">ID: {history.treatment?.id || '-'}</span>
                                           <span className="status-badge" style={{backgroundColor: getStatusColor(history.toStatus || history.eventType) + '20', color: getStatusColor(history.toStatus || history.eventType)}}>
-                                              {history.eventType}
+                                              {history.eventType === 'STATUS_CHANGE' ? `${history.fromStatus} → ${history.toStatus}` : history.eventType}
                                           </span>
                                        </div>
                                        <div className="process-meta">
                                           <span className="amount-tag">Timber: {history.treatment?.timberQuantity || '-'}</span>
                                           <span className="amount-tag">Chemical: {history.treatment?.chemicalQuantity || '-'}</span>
                                           {isAdmin && (
-                                              <button className="delete-sm-btn" onClick={() => handleDeleteHistoryRecord(history.id, history.treatment?.id, history.eventType)} title="Delete Record Permanently">
+                                              <button className="delete-sm-btn" onClick={() => handleDeleteHistory(history.id, history.treatment?.id, history.eventType)} title="Delete Record Permanently">
                                                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                     <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
                                                   </svg>
@@ -734,6 +791,9 @@ const TreatmentPage = () => {
                                           </div>
                                        </div>
                                        <p className="history-notes">{history.notes}</p>
+                                       {history.fromStatus && history.toStatus && (
+                                           <p className="timeline-status-change">{history.fromStatus} → {history.toStatus}</p>
+                                       )}
                                     </div>
                                 </div>
                              ))}
@@ -835,11 +895,54 @@ const TreatmentPage = () => {
                                                     <span className="timeline-time">{new Date(event.changeTime).toLocaleString()}</span>
                                                 </div>
                                                 <p className="timeline-notes">{event.notes}</p>
+                                                {event.fromStatus && event.toStatus && (
+                                                    <p className="timeline-status-change">
+                                                        {event.fromStatus} → {event.toStatus}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     ))
                                 )}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete History Modal */}
+            {deleteHistoryModal.isOpen && (
+                <div className="modal-overlay">
+                    <div className="confirm-modal">
+                        <div className="modal-header">
+                            <div className="modal-icon danger">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <h3>Confirm Deletion</h3>
+                        </div>
+                        <div className="modal-body">
+                            <p>Are you sure you want to permanently delete this history record?</p>
+                            <p style={{color: '#dc2626', fontSize: '13px', marginTop: '8px'}}>
+                                This will also delete the associated treatment from the database.
+                            </p>
+                        </div>
+                        <div className="modal-actions">
+                            <button
+                                className="modal-cancel-btn"
+                                onClick={() => setDeleteHistoryModal({ isOpen: false, historyId: null, treatmentId: null, eventType: '' })}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="modal-confirm-btn danger"
+                                onClick={() => confirmDeleteHistory(deleteHistoryModal.historyId, deleteHistoryModal.treatmentId, deleteHistoryModal.eventType)}
+                            >
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>
