@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
 import './AttendanceTracking.css';
@@ -23,10 +23,40 @@ const AttendanceTracking = () => {
     note: ''
   });
 
+  // State for datetime pickers
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showArrivalTimePicker, setShowArrivalTimePicker] = useState(false);
+  const [showDepartureTimePicker, setShowDepartureTimePicker] = useState(false);
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  
+  // Refs for picker positioning
+  const dateInputRef = useRef(null);
+  const arrivalTimeInputRef = useRef(null);
+  const departureTimeInputRef = useRef(null);
+
   useEffect(() => {
     fetchWorkers();
     fetchAttendance();
   }, [selectedDate]);
+
+  // Close pickers when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showDatePicker || showArrivalTimePicker || showDepartureTimePicker) {
+        // Don't close if clicking on the picker itself
+        if (!e.target.closest('.at-picker-popup')) {
+          setShowDatePicker(false);
+          setShowArrivalTimePicker(false);
+          setShowDepartureTimePicker(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDatePicker, showArrivalTimePicker, showDepartureTimePicker]);
 
   const fetchWorkers = async () => {
     try {
@@ -99,6 +129,154 @@ const AttendanceTracking = () => {
         departureTime: ''
       }));
     }
+  };
+
+  // Date picker helpers
+  const openDatePicker = (e) => {
+    const rect = e.target.getBoundingClientRect();
+    setPickerPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
+    setShowDatePicker(true);
+    setShowArrivalTimePicker(false);
+    setShowDepartureTimePicker(false);
+  };
+
+  const selectDate = (dateStr) => {
+    setFormData({ ...formData, date: dateStr });
+    setShowDatePicker(false);
+  };
+
+  // Time picker helpers
+  const [selectedHour, setSelectedHour] = useState('12');
+  const [selectedMinute, setSelectedMinute] = useState('00');
+  const [selectedPeriod, setSelectedPeriod] = useState('AM');
+
+  const openArrivalTimePicker = (e) => {
+    const rect = e.target.getBoundingClientRect();
+    setPickerPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
+    
+    // Pre-fill with current arrival time if exists
+    if (formData.arrivalTime) {
+      const [hour24, minute] = formData.arrivalTime.split(':');
+      const hour24Num = parseInt(hour24);
+      const period = hour24Num >= 12 ? 'PM' : 'AM';
+      const hour12 = hour24Num % 12 || 12;
+      setSelectedHour(hour12.toString().padStart(2, '0'));
+      setSelectedMinute(minute);
+      setSelectedPeriod(period);
+    } else {
+      setSelectedHour('12');
+      setSelectedMinute('00');
+      setSelectedPeriod('AM');
+    }
+    
+    setShowArrivalTimePicker(true);
+    setShowDatePicker(false);
+    setShowDepartureTimePicker(false);
+  };
+
+  const openDepartureTimePicker = (e) => {
+    const rect = e.target.getBoundingClientRect();
+    setPickerPosition({ top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX });
+    
+    // Pre-fill with current departure time if exists
+    if (formData.departureTime) {
+      const [hour24, minute] = formData.departureTime.split(':');
+      const hour24Num = parseInt(hour24);
+      const period = hour24Num >= 12 ? 'PM' : 'AM';
+      const hour12 = hour24Num % 12 || 12;
+      setSelectedHour(hour12.toString().padStart(2, '0'));
+      setSelectedMinute(minute);
+      setSelectedPeriod(period);
+    } else {
+      setSelectedHour('12');
+      setSelectedMinute('00');
+      setSelectedPeriod('AM');
+    }
+    
+    setShowDepartureTimePicker(true);
+    setShowDatePicker(false);
+    setShowArrivalTimePicker(false);
+  };
+
+  const selectTime = (field) => {
+    // Convert 12-hour format to 24-hour format for storage
+    let hour24 = parseInt(selectedHour);
+    if (selectedPeriod === 'PM' && hour24 !== 12) {
+      hour24 += 12;
+    } else if (selectedPeriod === 'AM' && hour24 === 12) {
+      hour24 = 0;
+    }
+    const timeStr = `${hour24.toString().padStart(2, '0')}:${selectedMinute}`;
+    setFormData({ ...formData, [field]: timeStr });
+    setShowArrivalTimePicker(false);
+    setShowDepartureTimePicker(false);
+  };
+
+  // Generate hours (1-12)
+  const generateHours = () => {
+    const hours = [];
+    for (let i = 1; i <= 12; i++) {
+      hours.push(i.toString().padStart(2, '0'));
+    }
+    return hours;
+  };
+
+  // Generate minutes (00-59)
+  const generateMinutes = () => {
+    const minutes = [];
+    for (let i = 0; i < 60; i++) {
+      minutes.push(i.toString().padStart(2, '0'));
+    }
+    return minutes;
+  };
+
+  // Generate calendar days for the current month
+  const generateCalendarDays = () => {
+    const currentDate = formData.date ? new Date(formData.date) : new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
+
+  // Generate time options (every 15 minutes)
+  const generateTimeOptions = () => {
+    const times = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        times.push(timeStr);
+      }
+    }
+    return times;
+  };
+
+  const formatDateForDisplay = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -360,7 +538,19 @@ const AttendanceTracking = () => {
                 </div>
                 <div className="at-field">
                   <label>Date *</label>
-                  <input type="date" name="date" value={formData.date} onChange={handleInputChange} required />
+                  <div className="at-datetime-input-wrapper">
+                    <input 
+                      ref={dateInputRef}
+                      type="text"
+                      className="at-datetime-display"
+                      value={formatDateForDisplay(formData.date)}
+                      onClick={openDatePicker}
+                      readOnly
+                      placeholder="Select date"
+                      required
+                    />
+                    <span className="at-datetime-icon">📅</span>
+                  </div>
                 </div>
                 <div className="at-field">
                   <label>Status *</label>
@@ -372,25 +562,35 @@ const AttendanceTracking = () => {
                 </div>
                 <div className="at-field">
                   <label>Arrival Time</label>
-                  <input 
-                    type="time" 
-                    name="arrivalTime" 
-                    value={formData.arrivalTime} 
-                    onChange={handleInputChange} 
-                    disabled={formData.status === 'Absent'}
-                    placeholder={formData.status === 'Absent' ? 'Not applicable' : ''}
-                  />
+                  <div className="at-datetime-input-wrapper">
+                    <input 
+                      ref={arrivalTimeInputRef}
+                      type="text"
+                      className="at-datetime-display"
+                      value={formData.arrivalTime || ''}
+                      onClick={openArrivalTimePicker}
+                      readOnly
+                      disabled={formData.status === 'Absent'}
+                      placeholder={formData.status === 'Absent' ? 'Not applicable' : 'Select time'}
+                    />
+                    <span className="at-datetime-icon">🕐</span>
+                  </div>
                 </div>
                 <div className="at-field">
                   <label>Departure Time</label>
-                  <input 
-                    type="time" 
-                    name="departureTime" 
-                    value={formData.departureTime} 
-                    onChange={handleInputChange}
-                    disabled={formData.status === 'Absent'}
-                    placeholder={formData.status === 'Absent' ? 'Not applicable' : ''}
-                  />
+                  <div className="at-datetime-input-wrapper">
+                    <input 
+                      ref={departureTimeInputRef}
+                      type="text"
+                      className="at-datetime-display"
+                      value={formData.departureTime || ''}
+                      onClick={openDepartureTimePicker}
+                      readOnly
+                      disabled={formData.status === 'Absent'}
+                      placeholder={formData.status === 'Absent' ? 'Not applicable' : 'Select time'}
+                    />
+                    <span className="at-datetime-icon">🕔</span>
+                  </div>
                 </div>
                 <div className="at-field at-field-full">
                   <label>Note</label>
@@ -404,6 +604,197 @@ const AttendanceTracking = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Date Picker Popup */}
+      {showDatePicker && (
+        <div 
+          className="at-picker-popup at-date-picker"
+          style={{ top: pickerPosition.top, left: pickerPosition.left }}
+        >
+          <div className="at-picker-header">
+            <button 
+              className="at-picker-nav"
+              onClick={() => {
+                const currentDate = new Date(formData.date);
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                setFormData({ ...formData, date: currentDate.toISOString().split('T')[0] });
+              }}
+            >
+              ‹
+            </button>
+            <h3>
+              {new Date(formData.date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </h3>
+            <button 
+              className="at-picker-nav"
+              onClick={() => {
+                const currentDate = new Date(formData.date);
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                setFormData({ ...formData, date: currentDate.toISOString().split('T')[0] });
+              }}
+            >
+              ›
+            </button>
+          </div>
+          <div className="at-picker-grid">
+            <div className="at-picker-day-header">Sun</div>
+            <div className="at-picker-day-header">Mon</div>
+            <div className="at-picker-day-header">Tue</div>
+            <div className="at-picker-day-header">Wed</div>
+            <div className="at-picker-day-header">Thu</div>
+            <div className="at-picker-day-header">Fri</div>
+            <div className="at-picker-day-header">Sat</div>
+            {generateCalendarDays().map((day, index) => (
+              <button
+                key={index}
+                className={`at-picker-day ${!day ? 'at-picker-day-empty' : ''} ${
+                  day && day.toISOString().split('T')[0] === formData.date ? 'at-picker-day-selected' : ''
+                }`}
+                onClick={() => day && selectDate(day.toISOString().split('T')[0])}
+                disabled={!day}
+              >
+                {day ? day.getDate() : ''}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Arrival Time Picker Popup */}
+      {showArrivalTimePicker && (
+        <div 
+          className="at-picker-popup at-time-picker"
+          style={{ top: pickerPosition.top, left: pickerPosition.left }}
+        >
+          <div className="at-picker-header">
+            <h3>Select Arrival Time</h3>
+          </div>
+          <div className="at-clock-picker">
+            <div className="at-clock-column">
+              <label>Hour</label>
+              <div className="at-clock-scroll">
+                {generateHours().map((hour) => (
+                  <button
+                    key={hour}
+                    className={`at-clock-option ${hour === selectedHour ? 'at-clock-selected' : ''}`}
+                    onClick={() => setSelectedHour(hour)}
+                  >
+                    {hour}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="at-clock-separator">:</div>
+            <div className="at-clock-column">
+              <label>Minute</label>
+              <div className="at-clock-scroll">
+                {generateMinutes().map((minute) => (
+                  <button
+                    key={minute}
+                    className={`at-clock-option ${minute === selectedMinute ? 'at-clock-selected' : ''}`}
+                    onClick={() => setSelectedMinute(minute)}
+                  >
+                    {minute}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="at-clock-column at-clock-period-column">
+              <label>Period</label>
+              <div className="at-clock-period-buttons">
+                <button
+                  className={`at-clock-period-btn ${selectedPeriod === 'AM' ? 'at-clock-period-selected' : ''}`}
+                  onClick={() => setSelectedPeriod('AM')}
+                >
+                  AM
+                </button>
+                <button
+                  className={`at-clock-period-btn ${selectedPeriod === 'PM' ? 'at-clock-period-selected' : ''}`}
+                  onClick={() => setSelectedPeriod('PM')}
+                >
+                  PM
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="at-clock-footer">
+            <button 
+              className="at-clock-confirm-btn"
+              onClick={() => selectTime('arrivalTime')}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Departure Time Picker Popup */}
+      {showDepartureTimePicker && (
+        <div 
+          className="at-picker-popup at-time-picker"
+          style={{ top: pickerPosition.top, left: pickerPosition.left }}
+        >
+          <div className="at-picker-header">
+            <h3>Select Departure Time</h3>
+          </div>
+          <div className="at-clock-picker">
+            <div className="at-clock-column">
+              <label>Hour</label>
+              <div className="at-clock-scroll">
+                {generateHours().map((hour) => (
+                  <button
+                    key={hour}
+                    className={`at-clock-option ${hour === selectedHour ? 'at-clock-selected' : ''}`}
+                    onClick={() => setSelectedHour(hour)}
+                  >
+                    {hour}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="at-clock-separator">:</div>
+            <div className="at-clock-column">
+              <label>Minute</label>
+              <div className="at-clock-scroll">
+                {generateMinutes().map((minute) => (
+                  <button
+                    key={minute}
+                    className={`at-clock-option ${minute === selectedMinute ? 'at-clock-selected' : ''}`}
+                    onClick={() => setSelectedMinute(minute)}
+                  >
+                    {minute}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="at-clock-column at-clock-period-column">
+              <label>Period</label>
+              <div className="at-clock-period-buttons">
+                <button
+                  className={`at-clock-period-btn ${selectedPeriod === 'AM' ? 'at-clock-period-selected' : ''}`}
+                  onClick={() => setSelectedPeriod('AM')}
+                >
+                  AM
+                </button>
+                <button
+                  className={`at-clock-period-btn ${selectedPeriod === 'PM' ? 'at-clock-period-selected' : ''}`}
+                  onClick={() => setSelectedPeriod('PM')}
+                >
+                  PM
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="at-clock-footer">
+            <button 
+              className="at-clock-confirm-btn"
+              onClick={() => selectTime('departureTime')}
+            >
+              Confirm
+            </button>
           </div>
         </div>
       )}

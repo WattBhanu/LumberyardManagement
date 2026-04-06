@@ -577,6 +577,49 @@
   background: #fff;
 }
 
+/* DateTime picker input wrapper */
+.at-datetime-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.at-datetime-display {
+  width: 100%;
+  padding: 10px 40px 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  background: #fff;
+  cursor: pointer;
+}
+
+.at-datetime-display:hover {
+  border-color: #4a7fc1;
+}
+
+.at-datetime-display:focus {
+  border-color: #4a7fc1;
+  box-shadow: 0 0 0 3px rgba(74,127,193,0.12);
+}
+
+.at-datetime-display:disabled {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.at-datetime-icon {
+  position: absolute;
+  right: 12px;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
 .at-field input:focus,
 .at-field select:focus,
 .at-field textarea:focus {
@@ -649,6 +692,291 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* ══════════════════════════════════════
+   DateTime Picker Popups
+══════════════════════════════════════ */
+
+.at-picker-popup {
+  position: fixed;
+  z-index: 1100;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  padding: 16px;
+  animation: at-pickerFadeIn 0.2s ease;
+  min-width: 280px;
+}
+
+@keyframes at-pickerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.at-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.at-picker-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.at-picker-nav {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.at-picker-nav:hover {
+  background: #e5e7eb;
+}
+
+/* Calendar Grid */
+.at-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.at-picker-day-header {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 8px 0;
+  text-transform: uppercase;
+}
+
+.at-picker-day {
+  padding: 10px;
+  border: none;
+  background: #fff;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.at-picker-day:hover:not(:disabled) {
+  background: #4a7fc1;
+  color: #fff;
+}
+
+.at-picker-day-empty {
+  cursor: default;
+  background: transparent;
+}
+
+.at-picker-day-empty:hover {
+  background: transparent;
+}
+
+.at-picker-day-selected {
+  background: #4a7fc1;
+  color: #fff;
+  font-weight: 700;
+}
+
+.at-picker-day-selected:hover {
+  background: #2d5fa0;
+}
+
+/* Time Picker - Alarm Clock Style */
+.at-time-picker {
+  min-width: 320px;
+}
+
+.at-clock-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.at-clock-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.at-clock-column label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.at-clock-scroll {
+  height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+  padding: 4px;
+}
+
+.at-clock-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.at-clock-scroll::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.at-clock-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.at-clock-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.at-clock-option {
+  display: block;
+  width: 100%;
+  padding: 12px 8px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+}
+
+.at-clock-option:hover {
+  background: #e5e7eb;
+}
+
+.at-clock-selected {
+  background: #4a7fc1 !important;
+  color: #fff !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(74,127,193,0.3);
+}
+
+.at-clock-selected:hover {
+  background: #2d5fa0 !important;
+}
+
+.at-clock-separator {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #4a7fc1;
+  padding: 0 4px;
+  margin-top: 24px;
+  font-family: 'Courier New', monospace;
+}
+
+.at-clock-footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.at-clock-confirm-btn {
+  padding: 10px 32px;
+  background: linear-gradient(135deg, #4a7fc1, #2d5fa0);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(74,127,193,0.3);
+}
+
+.at-clock-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74,127,193,0.4);
+}
+
+.at-clock-confirm-btn:active {
+  transform: translateY(0);
+}
+
+/* AM/PM Period Selector */
+.at-clock-period-column {
+  flex: 0.8;
+}
+
+.at-clock-period-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 200px;
+}
+
+.at-clock-period-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Courier New', monospace;
+}
+
+.at-clock-period-btn:hover {
+  border-color: #4a7fc1;
+  background: #f0f4f8;
+}
+
+.at-clock-period-selected {
+  background: #4a7fc1 !important;
+  color: #fff !important;
+  border-color: #4a7fc1 !important;
+  box-shadow: 0 2px 8px rgba(74,127,193,0.3);
+}
+
+.at-clock-period-selected:hover {
+  background: #2d5fa0 !important;
+  border-color: #2d5fa0 !important;
 }
 
 /* ── RESPONSIVE ── */
@@ -773,5 +1101,153 @@
   .at-time-filter {
     background: #1e293b;
     color: #e2e8f0;
+  }
+
+  /* DateTime Picker Dark Mode */
+  .at-picker-popup {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .at-picker-header {
+    border-bottom-color: #334155;
+  }
+
+  .at-picker-header h3 {
+    color: #f1f5f9;
+  }
+
+  .at-picker-nav {
+    background: #0f172a;
+    color: #cbd5e1;
+  }
+
+  .at-picker-nav:hover {
+    background: #334155;
+  }
+
+  .at-picker-day-header {
+    color: #94a3b8;
+  }
+
+  .at-picker-day {
+    background: #1e293b;
+    color: #e2e8f0;
+  }
+
+  .at-picker-day:hover:not(:disabled) {
+    background: #4a7fc1;
+    color: #fff;
+  }
+
+  .at-picker-day-empty {
+    background: transparent;
+  }
+
+  .at-picker-day-selected {
+    background: #4a7fc1;
+    color: #fff;
+  }
+
+  .at-time-grid::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+
+  .at-time-grid::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+
+  .at-time-option {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .at-time-option:hover {
+    background: #4a7fc1;
+    color: #fff;
+    border-color: #4a7fc1;
+  }
+
+  .at-time-selected {
+    background: #4a7fc1;
+    color: #fff;
+    border-color: #4a7fc1;
+  }
+
+  .at-datetime-display {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .at-datetime-display:hover {
+    border-color: #4a7fc1;
+  }
+
+  .at-datetime-display:disabled {
+    background: #1e293b;
+    color: #64748b;
+  }
+
+  /* Alarm Clock Picker Dark Mode */
+  .at-clock-picker {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  }
+
+  .at-clock-column label {
+    color: #94a3b8;
+  }
+
+  .at-clock-scroll {
+    background: #0f172a;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .at-clock-scroll::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+
+  .at-clock-scroll::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+
+  .at-clock-option {
+    color: #e2e8f0;
+  }
+
+  .at-clock-option:hover {
+    background: #334155;
+  }
+
+  .at-clock-separator {
+    color: #60a5fa;
+  }
+
+  .at-clock-footer {
+    border-top-color: #334155;
+  }
+
+  /* AM/PM Period Dark Mode */
+  .at-clock-period-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  .at-clock-period-btn:hover {
+    border-color: #4a7fc1;
+    background: #334155;
+  }
+
+  .at-clock-period-selected {
+    background: #4a7fc1 !important;
+    color: #fff !important;
+    border-color: #4a7fc1 !important;
+  }
+
+  .at-clock-period-selected:hover {
+    background: #2d5fa0 !important;
+    border-color: #2d5fa0 !important;
   }
 }
