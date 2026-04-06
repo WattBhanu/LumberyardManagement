@@ -6,6 +6,7 @@ com\lumberyard_backend\entity\Worker.class
 com\lumberyard_backend\LumberyardBackendApplication.class
 com\lumberyard_backend\entity\ProductionHistory.class
 com\lumberyard_backend\model\AuthRequest.class
+com\lumberyard_backend\entity\Treatment.class
 com\lumberyard_backend\entity\User.class
 com\lumberyard_backend\controller\TimberController.class
 com\lumberyard_backend\dto\WorkerAssignmentDTO.class
@@ -33,6 +34,7 @@ com\lumberyard_backend\entity\Worker$WorkerStatus.class
 com\lumberyard_backend\service\WorkerService.class
 com\lumberyard_backend\controller\FinanceController.class
 com\lumberyard_backend\model\AuthResponse.class
+com\lumberyard_backend\service\ProductionService.class
 com\lumberyard_backend\entity\JobAssignment.class
 com\lumberyard_backend\controller\ShiftController$ErrorResponse.class
 com\lumberyard_backend\entity\InventoryOperationsManager.class
@@ -48,7 +50,6 @@ com\lumberyard_backend\entity\TimberTracking.class
 com\lumberyard_backend\controller\UserController.class
 com\lumberyard_backend\service\AuthService.class
 com\lumberyard_backend\entity\ShiftWorkerAssignment.class
-com\lumberyard_backend\entity\TreatmentProcess.class
 com\lumberyard_backend\entity\JobWorkerAssignment$WorkerRole.class
 com\lumberyard_backend\entity\MaterialUsage.class
 com\lumberyard_backend\repository\WorkerRepository.class

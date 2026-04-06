@@ -500,9 +500,13 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+    min-width: 70px;
+    box-sizing: border-box;
+    line-height: 1;
 }
 
 .finish-btn {
@@ -518,6 +522,7 @@
 .cancel-btn {
     background: #fffbeb;
     color: #d97706;
+    border-radius: 8px;
 }
 
 .cancel-btn:hover {
