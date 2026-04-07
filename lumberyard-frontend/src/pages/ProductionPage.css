@@ -942,9 +942,9 @@
 .production-page .confirm-modal {
     background: white;
     border-radius: 16px;
-    padding: 24px;
+    padding: 28px;
     width: 90%;
-    max-width: 400px;
+    max-width: 450px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     animation: production-modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -953,7 +953,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     padding: 0;
     border-bottom: none;
     background: white;
@@ -961,12 +961,13 @@
 }
 
 .production-page .modal-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .production-page .modal-icon.danger {
@@ -987,14 +988,14 @@
 }
 
 .production-page .modal-body {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .production-page .modal-body p {
     margin: 0;
     color: #475569;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 .production-page .modal-actions {
@@ -1005,10 +1006,11 @@
     border-top: none;
     padding: 0;
     margin-top: 0;
+    align-items: center;
 }
 
 .production-page .modal-cancel-btn {
-    padding: 10px 16px;
+    padding: 10px 20px;
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -1017,6 +1019,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    min-width: 100px;
 }
 
 .production-page .modal-cancel-btn:hover {
@@ -1026,7 +1029,7 @@
 }
 
 .production-page .modal-confirm-btn {
-    padding: 10px 20px;
+    padding: 10px 24px;
     border: none;
     border-radius: 8px;
     color: white;
@@ -1034,6 +1037,7 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    min-width: 100px;
 }
 
 .production-page .modal-confirm-btn.primary {

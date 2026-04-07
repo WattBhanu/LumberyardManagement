@@ -658,7 +658,7 @@
 .treatment-page .confirm-modal {
     background: white;
     border-radius: 16px;
-    padding: 24px;
+    padding: 28px;
     max-width: 450px;
     width: 90%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -703,6 +703,10 @@
     flex: 1;
 }
 
+.treatment-page .modal-body {
+    margin-bottom: 28px;
+}
+
 .treatment-page .modal-body p {
     font-size: 14px;
     color: #475569;
@@ -717,19 +721,21 @@
     border-top: none;
     padding: 0;
     margin-top: 0;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .treatment-page .modal-cancel-btn {
-    flex: 1;
     padding: 10px 20px;
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border-radius: 8px;
     color: #475569;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 100px;
 }
 
 .treatment-page .modal-cancel-btn:hover {
@@ -738,16 +744,16 @@
 }
 
 .treatment-page .modal-confirm-btn {
-    flex: 2;
-    padding: 10px 20px;
+    padding: 10px 24px;
     background: #f59e0b;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: white;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 100px;
 }
 
 .treatment-page .modal-confirm-btn.primary {
