@@ -542,7 +542,7 @@ const TreatmentPage = () => {
 
                 <div className="table-section">
                     <div className="section-header">
-                        <h2>{activeTab === 'active' ? 'Active Treatments' : 'Treatment History'}</h2>
+                        <h2>{activeTab === 'active' ? 'Active Treatments' : activeTab === 'tracking' ? 'Timber Tracking' : 'Treatment History'}</h2>
                         <button className="action-button refresh" onClick={fetchData}>
                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                              <path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
