@@ -136,7 +136,7 @@ const TreatmentPage = () => {
             return;
         }
 
-        const confirmMessage = `Are you sure you want to start the treatment process using ${newTreatment.timberQuantity} unit(s) of ${newTreatment.timberCode} with ${newTreatment.chemicalQuantity} units of ${newTreatment.chemicalType}?`;
+        const confirmMessage = `Are you sure you want to start the treatment process using ${newTreatment.timberQuantity} units of ${newTreatment.timberCode} with ${newTreatment.chemicalQuantity} units of ${newTreatment.chemicalType}?`;
         setConfirmModal({
             isOpen: true,
             type: 'start',
@@ -162,7 +162,7 @@ const TreatmentPage = () => {
             await fetchTimbers(); // Refresh timber list with updated quantities
             await fetchChemicals(); // Refresh chemical list with updated quantities
             setNewTreatment({ timberCode: '', chemicalType: '', timberQuantity: '', chemicalQuantity: '' });
-            setMessage('Treatment process started successfully! Timber and chemicals deducted immediately.');
+            setMessage(`${confirmModal.data.timberQuantity} units of ${confirmModal.data.timberCode} and ${confirmModal.data.chemicalQuantity} units of ${confirmModal.data.chemicalType} deducted for treatment`);
             setMessageType('success');
         } catch (error) {
             console.error('Error adding treatment:', error);
@@ -178,7 +178,7 @@ const TreatmentPage = () => {
             isOpen: true,
             type: 'finish',
             data: treatment,
-            message: `Are you sure you want to finish the treatment? This will mark timber ${treatment.timber.timberCode} as "Treated". Chemicals and timber were deducted at start and will NOT be refunded.`
+            message: `Finish treatment process? Timber: ${treatment.timberQuantity} units of ${treatment.timber.timberCode}. Chemical: ${treatment.chemicalQuantity} units of ${treatment.chemicalType}. Deducted at start, will NOT be refunded.`
         });
     };
 
@@ -214,7 +214,7 @@ const TreatmentPage = () => {
             await fetchTimberTracking(); // Refresh tracking data
             
             // Show success message with info about new treated timber
-            setMessage('Treatment finished successfully! New treated timber created. Check inventory for details.');
+            setMessage(`${treatment.timberQuantity} units of ${treatment.timber.timberCode} treated with ${treatment.chemicalQuantity} units of ${treatment.chemicalType}. Process completed.`);
             setMessageType('success');
         } catch (error) {
             console.error('Error finishing treatment:', error);
@@ -228,7 +228,7 @@ const TreatmentPage = () => {
             isOpen: true,
             type: 'cancel',
             data: treatment,
-            message: `Are you sure you want to cancel the treatment? Timber (${treatment.timberQuantity} units) and chemicals (${treatment.chemicalQuantity} units of ${treatment.chemicalType}) will be refunded back to inventory.`
+            message: `Cancel treatment process? Timber: ${treatment.timberQuantity} units of ${treatment.timber.timberCode}. Chemical: ${treatment.chemicalQuantity} units of ${treatment.chemicalType}. Materials will be refunded to inventory.`
         });
     };
 
@@ -241,7 +241,7 @@ const TreatmentPage = () => {
             await fetchTreatmentHistory();
             await fetchTimbers(); // Refresh timber list with refunded quantity
             await fetchChemicals(); // Refresh chemical list
-            setMessage('Treatment cancelled successfully! Timber and chemicals refunded to inventory.');
+            setMessage(`${treatment.timberQuantity} units of ${treatment.timber.timberCode} and ${treatment.chemicalQuantity} units of ${treatment.chemicalType} refunded from treatment`);
             setMessageType('success');
         } catch (error) {
             console.error('Error cancelling treatment:', error);
@@ -255,7 +255,7 @@ const TreatmentPage = () => {
             isOpen: true,
             type: 'delete',
             data: treatment,
-            message: `Are you sure you want to delete this treatment? Materials will NOT be refunded (already deducted at start). Timber (${treatment.timberQuantity} units) and chemicals (${treatment.chemicalQuantity} units of ${treatment.chemicalType}) are considered lost.`
+            message: `Delete treatment record? Timber: ${treatment.timberQuantity} units of ${treatment.timber.timberCode}. Chemical: ${treatment.chemicalQuantity} units of ${treatment.chemicalType}. Materials considered lost (already deducted at start).`
         });
     };
 
@@ -296,11 +296,11 @@ const TreatmentPage = () => {
             if (treatment.isPermanent) {
                 // Permanent delete - removes from database completely
                 await API.delete(`/treatment/${treatment.id}/permanent`);
-                setMessage('Treatment permanently deleted! Timber and chemicals were NOT refunded (already deducted at start).');
+                setMessage(`${treatment.timberQuantity} units of ${treatment.timber.timberCode} and ${treatment.chemicalQuantity} units of ${treatment.chemicalType} lost from treatment process.`);
             } else {
                 // Soft delete - moves to history
                 await API.delete(`/treatment/${treatment.id}`);
-                setMessage('Treatment moved to history successfully! Timber and chemicals were NOT refunded (already deducted at start).');
+                setMessage(`${treatment.timberQuantity} units of ${treatment.timber.timberCode} and ${treatment.chemicalQuantity} units of ${treatment.chemicalType} lost from treatment process.`);
             }
             await fetchTreatments();
             await fetchTreatmentHistory();

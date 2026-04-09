@@ -539,10 +539,12 @@
     border: none;
     color: #ef4444;
     cursor: pointer;
-    padding: 4px;
+    padding: 8px 16px;
     display: flex;
-    border-radius: 6px;
+    border-radius: 8px;
     transition: background 0.2s ease;
+    align-items: center;
+    gap: 6px;
 }
 
 .production-page .delete-sm-btn:hover {

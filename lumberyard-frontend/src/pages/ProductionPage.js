@@ -145,7 +145,7 @@ const ProductionPage = () => {
             return;
         }
 
-        const confirmMessage = `Are you sure you want to start the ${finalProcessType} process using ${newProduction.amount} unit(s) of ${newProduction.timberCode}?`;
+        const confirmMessage = `Start ${finalProcessType} process using ${newProduction.amount} units of ${newProduction.timberCode}?`;
         setConfirmModal({
             isOpen: true,
             type: 'start',
@@ -164,7 +164,7 @@ const ProductionPage = () => {
             setNewProduction({ timberCode: '', processType: '', amount: '' });
             setCustomDimensions({ type: '', width: '', height: '' });
             setIsCustomType(false);
-            setMessage('Process started successfully!');
+            setMessage(`${confirmModal.data.amount} units of ${confirmModal.data.timberCode} deducted for production`);
             setMessageType('success');
         } catch (error) {
             console.error('Error adding production:', error);
@@ -201,7 +201,7 @@ const ProductionPage = () => {
             isOpen: true,
             type: 'finish',
             data: production,
-            message: `Are you sure you want to finish the "${production.processType}" process? This will mark it as completed and remove it from active processes.`
+            message: `Finish ${production.processType} process? Timber: ${production.amount} units of ${production.timber.timberCode}. Mark as completed and remove from active processes.`
         });
     };
 
@@ -212,7 +212,7 @@ const ProductionPage = () => {
             await API.post(`/production/${production.id}/finish`);
             await fetchProductions();
             await fetchProductionHistory();
-            setMessage('Process finished successfully!');
+            setMessage(`${production.amount} units of ${production.timber.timberCode} production completed`);
             setMessageType('success');
         } catch (error) {
             console.error('Error finishing production:', error);
@@ -226,7 +226,7 @@ const ProductionPage = () => {
             isOpen: true,
             type: 'cancel',
             data: production,
-            message: `Are you sure you want to cancel the "${production.processType}" process? This will restore ${production.amount} units to ${production.timber.timberCode} stock.`
+            message: `Cancel ${production.processType} process? Timber: ${production.amount} units of ${production.timber.timberCode}. Will be refunded to stock.`
         });
     };
 
@@ -238,7 +238,7 @@ const ProductionPage = () => {
             await fetchProductions();
             await fetchProductionHistory();
             await fetchTimbers(); // Refresh timber quantities
-            setMessage('Process cancelled and stock restored!');
+            setMessage(`${production.amount} units of ${production.timber.timberCode} refunded from production`);
             setMessageType('success');
         } catch (error) {
             console.error('Error cancelling production:', error);
@@ -257,20 +257,20 @@ const ProductionPage = () => {
         setConfirmModal({
             isOpen: true,
             type: 'delete',
-            data: production.id,
-            message: `Are you sure you want to delete the "${production.processType}" process? ${production.amount} units of timber will be discarded. This cannot be undone.`
+            data: production,
+            message: `Delete ${production.processType} process? Timber: ${production.amount} units of ${production.timber.timberCode}. Materials will be discarded (not refunded).`
         });
     };
 
     const confirmDeleteProduction = async () => {
-        const id = confirmModal.data;
+        const production = confirmModal.data;
         setConfirmModal({ isOpen: false, type: '', data: null, message: '' });
         try {
-            await API.delete(`/production/${id}`);
+            await API.delete(`/production/${production.id}`);
             await fetchProductions();
             await fetchProductionHistory();
             await fetchTimbers(); // Refresh dropdown after delete if backend restores stock
-            setMessage('Process deleted successfully!');
+            setMessage(`${production.amount} units of ${production.timber.timberCode} lost from production.`);
             setMessageType('success');
         } catch (error) {
             console.error('Error deleting production:', error);
