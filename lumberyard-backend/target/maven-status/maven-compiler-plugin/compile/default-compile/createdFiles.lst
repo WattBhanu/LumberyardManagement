@@ -13,6 +13,7 @@ com\lumberyard_backend\dto\WorkerAssignmentDTO.class
 com\lumberyard_backend\entity\Timber.class
 com\lumberyard_backend\service\TreatmentService.class
 com\lumberyard_backend\controller\LaborController$ErrorResponse.class
+com\lumberyard_backend\dto\ManagerSalaryResponse.class
 com\lumberyard_backend\dto\ShiftWorkerAssignmentDTO.class
 com\lumberyard_backend\security\JwtUtil.class
 com\lumberyard_backend\dto\JobAssignmentDTO.class
@@ -22,6 +23,7 @@ com\lumberyard_backend\repository\TreatmentRepository.class
 com\lumberyard_backend\dto\AssignedWorkerDTO.class
 com\lumberyard_backend\dto\JobCreateDTO.class
 com\lumberyard_backend\controller\AuthController$ErrorResponse.class
+com\lumberyard_backend\controller\ManagerSalaryController.class
 com\lumberyard_backend\controller\WorkerController.class
 com\lumberyard_backend\controller\ShiftController.class
 com\lumberyard_backend\dto\UserRegistrationRequest.class
@@ -29,6 +31,7 @@ com\lumberyard_backend\entity\Attendance.class
 com\lumberyard_backend\repository\JobAssignmentRepository.class
 com\lumberyard_backend\repository\MaterialUsageRepository.class
 com\lumberyard_backend\entity\ShiftWorkerAssignment$AssignmentStatus.class
+com\lumberyard_backend\entity\ManagerSalaryHistory.class
 com\lumberyard_backend\service\TimberTrackingService.class
 com\lumberyard_backend\entity\Worker$WorkerStatus.class
 com\lumberyard_backend\service\WorkerService.class
@@ -37,6 +40,7 @@ com\lumberyard_backend\model\AuthResponse.class
 com\lumberyard_backend\service\ProductionService.class
 com\lumberyard_backend\entity\JobAssignment.class
 com\lumberyard_backend\controller\ShiftController$ErrorResponse.class
+com\lumberyard_backend\repository\ManagerSalaryHistoryRepository.class
 com\lumberyard_backend\entity\InventoryOperationsManager.class
 com\lumberyard_backend\repository\ProductionHistoryRepository.class
 com\lumberyard_backend\repository\UserRepository.class
@@ -77,6 +81,7 @@ com\lumberyard_backend\service\SalaryCalculationService.class
 com\lumberyard_backend\controller\LogsController.class
 com\lumberyard_backend\repository\AttendanceRepository.class
 com\lumberyard_backend\entity\Wages.class
+com\lumberyard_backend\service\ManagerSalaryService.class
 com\lumberyard_backend\controller\JobAssignmentController.class
 com\lumberyard_backend\controller\InventoryController.class
 com\lumberyard_backend\entity\JobAssignment$JobStatus.class
@@ -86,6 +91,7 @@ com\lumberyard_backend\entity\TreatmentStatus.class
 com\lumberyard_backend\controller\TreatmentController.class
 com\lumberyard_backend\config\CorsConfig.class
 com\lumberyard_backend\controller\TimberTrackingController.class
+com\lumberyard_backend\dto\ManagerSalaryUpdateRequest.class
 com\lumberyard_backend\entity\Admin.class
 com\lumberyard_backend\service\UserService$1.class
 com\lumberyard_backend\repository\ChemicalRepository.class

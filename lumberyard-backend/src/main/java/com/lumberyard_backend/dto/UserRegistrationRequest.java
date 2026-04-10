@@ -10,4 +10,5 @@ public class UserRegistrationRequest {
     private String phone;
     private String password;
     private Role role;
+    private Double dailySalaryRate;
 }

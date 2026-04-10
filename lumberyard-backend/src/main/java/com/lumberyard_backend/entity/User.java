@@ -39,6 +39,9 @@ public abstract class User implements UserDetails {
     @Column(nullable = false)
     private Boolean status = true; // true for active, false for inactive
     
+    @Column(name = "daily_salary_rate")
+    private Double dailySalaryRate; // Daily salary rate for managers
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
