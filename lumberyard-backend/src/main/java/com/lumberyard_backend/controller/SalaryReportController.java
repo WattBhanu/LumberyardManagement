@@ -1,142 +1,154 @@
 package com.lumberyard_backend.controller;
 
-import com.lumberyard_backend.dto.SalaryReportResponse;
-import com.lumberyard_backend.dto.SalaryReportResponse.SalaryReportItem;
-import com.lumberyard_backend.entity.Attendance;
-import com.lumberyard_backend.entity.Worker;
-import com.lumberyard_backend.repository.AttendanceRepository;
-import com.lumberyard_backend.repository.WorkerRepository;
-import com.lumberyard_backend.service.SalaryCalculationService;
+import com.lumberyard_backend.dto.ConsolidatedSalarySummary;
+import com.lumberyard_backend.dto.ManagerAttendanceDTO;
+import com.lumberyard_backend.service.DailySalaryReportService;
+import com.lumberyard_backend.service.ManagerAttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/salary/reports")
+@RequestMapping("/api/salary-reports")
 @CrossOrigin(origins = "*")
 public class SalaryReportController {
-
+    
     @Autowired
-    private WorkerRepository workerRepository;
-
+    private ManagerAttendanceService managerAttendanceService;
+    
     @Autowired
-    private AttendanceRepository attendanceRepository;
-
-    @Autowired
-    private SalaryCalculationService salaryCalculationService;
-
-    @GetMapping("/daily")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER', 'LABOR_MANAGER')")
-    public SalaryReportResponse getDailyReport(
-            @RequestParam int year,
-            @RequestParam int month,
-            @RequestParam int day) {
-        
-        LocalDate date = LocalDate.of(year, month, day);
-        List<Worker> workers = workerRepository.findAll();
-        List<SalaryReportItem> items = new ArrayList<>();
-        double totalPayroll = 0;
-
-        for (Worker worker : workers) {
-            Optional<Attendance> attendanceOpt = attendanceRepository.findByWorker_WorkerIdAndDate(worker.getWorkerId(), date);
-            SalaryReportItem item = new SalaryReportItem();
-            item.setWorkerName(worker.getFirstName() + " " + worker.getLastName());
-            item.setPosition(worker.getPosition());
-            item.setDepartment(worker.getDepartment());
-
-            if (attendanceOpt.isPresent()) {
-                Attendance attendance = attendanceOpt.get();
-                boolean isPresent = "Present".equalsIgnoreCase(attendance.getStatus());
-                item.setPresentDays(isPresent ? 1 : 0);
-                item.setAbsentDays(isPresent ? 0 : 1);
-                
-                // Only calculate salary if worker is present
-                if (isPresent) {
-                    item.setTotalHours(attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 0);
-                    item.setAttendancePercentage(100);
-                    
-                    double hourlyWage = salaryCalculationService.calculateHourlyWage(worker);
-                    double dailySalary = salaryCalculationService.calculateDailySalary(hourlyWage, item.getTotalHours());
-                    item.setTotalSalary(dailySalary);
-                } else {
-                    // Worker is absent - set hours and salary to 0
-                    item.setTotalHours(0);
-                    item.setAttendancePercentage(0);
-                    item.setTotalSalary(0);
-                }
-                
-                totalPayroll += item.getTotalSalary();
-            } else {
-                item.setPresentDays(0);
-                item.setAbsentDays(1);
-                item.setTotalHours(0);
-                item.setAttendancePercentage(0);
-                item.setTotalSalary(0);
-            }
-            items.add(item);
+    private DailySalaryReportService dailySalaryReportService;
+    
+    // ========== MANAGER ATTENDANCE ENDPOINTS ==========
+    
+    // Get all managers for attendance marking
+    @GetMapping("/managers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllManagersForAttendance() {
+        try {
+            List<ManagerAttendanceDTO> managers = managerAttendanceService.getAllManagersForAttendance();
+            return ResponseEntity.ok(managers);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        SalaryReportResponse response = new SalaryReportResponse();
-        response.setItems(items);
-        response.setTotalPayroll(totalPayroll);
-        response.setAverageSalary(items.isEmpty() ? 0 : totalPayroll / items.size());
-        return response;
     }
-
-    @GetMapping("/monthly")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER', 'LABOR_MANAGER')")
-    public SalaryReportResponse getMonthlyReport(
-            @RequestParam int year,
-            @RequestParam int month) {
-        
-        LocalDate startDate = LocalDate.of(year, month, 1);
-        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
-        List<Worker> workers = workerRepository.findAll();
-        List<SalaryReportItem> items = new ArrayList<>();
-        double totalPayroll = 0;
-
-        int daysInMonth = endDate.getDayOfMonth();
-
-        for (Worker worker : workers) {
-            List<Attendance> attendances = attendanceRepository.findByWorker_WorkerIdAndDateBetween(worker.getWorkerId(), startDate, endDate);
-            SalaryReportItem item = new SalaryReportItem();
-            item.setWorkerName(worker.getFirstName() + " " + worker.getLastName());
-            item.setPosition(worker.getPosition());
-            item.setDepartment(worker.getDepartment());
-
-            int presentDays = 0;
-            double totalHours = 0;
-            for (Attendance a : attendances) {
-                if ("Present".equalsIgnoreCase(a.getStatus())) {
-                    presentDays++;
-                    totalHours += (a.getWorkedHours() != null ? a.getWorkedHours() : 0);
-                }
-                // Absent days are counted but don't add hours or salary
-            }
-
-            item.setPresentDays(presentDays);
-            item.setAbsentDays(daysInMonth - presentDays);
-            item.setTotalHours(totalHours);
-            item.setAttendancePercentage(((double) presentDays / daysInMonth) * 100);
-            
-            // Calculate salary only for hours worked (present days)
-            double hourlyWage = salaryCalculationService.calculateHourlyWage(worker);
-            double monthlySalary = salaryCalculationService.calculateDailySalary(hourlyWage, totalHours);
-            item.setTotalSalary(monthlySalary);
-            totalPayroll += monthlySalary;
-            
-            items.add(item);
+    
+    // Get attendance for a specific date
+    @GetMapping("/attendance/{date}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAttendanceForDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            List<ManagerAttendanceDTO> attendance = managerAttendanceService.getAttendanceForDate(date);
+            return ResponseEntity.ok(attendance);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        SalaryReportResponse response = new SalaryReportResponse();
-        response.setItems(items);
-        response.setTotalPayroll(totalPayroll);
-        response.setAverageSalary(items.isEmpty() ? 0 : totalPayroll / items.size());
-        return response;
+    }
+    
+    // Mark attendance for managers
+    @PostMapping("/attendance")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> markAttendance(@RequestBody MarkAttendanceRequest request) {
+        try {
+            if (request.getAttendanceList() == null || request.getAttendanceList().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Attendance list cannot be empty"));
+            }
+            
+            List<ManagerAttendanceDTO> savedRecords = managerAttendanceService.markAttendance(
+                request.getAttendanceList(),
+                request.getDate(),
+                request.getMarkedBy()
+            );
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Attendance marked successfully",
+                "count", savedRecords.size()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    // ========== SALARY REPORT ENDPOINTS ==========
+    
+    // Generate daily salary report
+    @PostMapping("/generate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> generateDailyReport(@RequestBody GenerateReportRequest request) {
+        try {
+            ConsolidatedSalarySummary summary = dailySalaryReportService.generateDailyReport(
+                request.getReportDate(),
+                request.getGeneratedBy()
+            );
+            
+            return ResponseEntity.ok(Map.of(
+                "message", "Report generated successfully",
+                "summary", summary
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    // Get report by date
+    @GetMapping("/{date}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getReportByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        try {
+            ConsolidatedSalarySummary summary = dailySalaryReportService.getReportByDate(date);
+            
+            if (summary == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "No report found for date: " + date));
+            }
+            
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    // Get report history
+    @GetMapping("/history")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getReportHistory() {
+        try {
+            List<ConsolidatedSalarySummary> history = dailySalaryReportService.getReportHistoryWithSummaries();
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    // ========== REQUEST DTOs ==========
+    
+    public static class MarkAttendanceRequest {
+        private List<ManagerAttendanceDTO> attendanceList;
+        private LocalDate date;
+        private String markedBy;
+        
+        public List<ManagerAttendanceDTO> getAttendanceList() { return attendanceList; }
+        public void setAttendanceList(List<ManagerAttendanceDTO> attendanceList) { this.attendanceList = attendanceList; }
+        public LocalDate getDate() { return date; }
+        public void setDate(LocalDate date) { this.date = date; }
+        public String getMarkedBy() { return markedBy; }
+        public void setMarkedBy(String markedBy) { this.markedBy = markedBy; }
+    }
+    
+    public static class GenerateReportRequest {
+        private LocalDate reportDate;
+        private String generatedBy;
+        
+        public LocalDate getReportDate() { return reportDate; }
+        public void setReportDate(LocalDate reportDate) { this.reportDate = reportDate; }
+        public String getGeneratedBy() { return generatedBy; }
+        public void setGeneratedBy(String generatedBy) { this.generatedBy = generatedBy; }
     }
 }

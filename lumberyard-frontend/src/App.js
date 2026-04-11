@@ -201,7 +201,7 @@ function App() {
                     path="/finance/*"
                     element={
                         <ProtectedRoute allowedRoles={['FINANCE_MANAGER', 'ADMIN']} userRole={user?.role}>
-                            <FinanceManagerDashboard user={user} onLogout={handleLogout} />
+                            <FinanceManagerDashboard user={user} onLogout={handleLogout} token={token} />
                         </ProtectedRoute>
                     }
                 />

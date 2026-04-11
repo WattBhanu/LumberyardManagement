@@ -4,6 +4,7 @@ com\lumberyard_backend\controller\ChemicalController.class
 com\lumberyard_backend\dto\ShiftScheduleDTO.class
 com\lumberyard_backend\entity\Worker.class
 com\lumberyard_backend\LumberyardBackendApplication.class
+com\lumberyard_backend\controller\SalaryReportController$GenerateReportRequest.class
 com\lumberyard_backend\entity\ProductionHistory.class
 com\lumberyard_backend\model\AuthRequest.class
 com\lumberyard_backend\entity\Treatment.class
@@ -24,10 +25,12 @@ com\lumberyard_backend\dto\JobCreateDTO.class
 com\lumberyard_backend\controller\AuthController$ErrorResponse.class
 com\lumberyard_backend\controller\WorkerController.class
 com\lumberyard_backend\controller\ShiftController.class
+com\lumberyard_backend\dto\DailySalaryReportDTO.class
 com\lumberyard_backend\dto\UserRegistrationRequest.class
 com\lumberyard_backend\entity\Attendance.class
 com\lumberyard_backend\repository\JobAssignmentRepository.class
 com\lumberyard_backend\repository\MaterialUsageRepository.class
+com\lumberyard_backend\service\ManagerAttendanceService.class
 com\lumberyard_backend\entity\ShiftWorkerAssignment$AssignmentStatus.class
 com\lumberyard_backend\service\TimberTrackingService.class
 com\lumberyard_backend\entity\Worker$WorkerStatus.class
@@ -36,6 +39,7 @@ com\lumberyard_backend\controller\FinanceController.class
 com\lumberyard_backend\model\AuthResponse.class
 com\lumberyard_backend\service\ProductionService.class
 com\lumberyard_backend\entity\JobAssignment.class
+com\lumberyard_backend\service\DailySalaryReportService.class
 com\lumberyard_backend\controller\ShiftController$ErrorResponse.class
 com\lumberyard_backend\entity\InventoryOperationsManager.class
 com\lumberyard_backend\repository\ProductionHistoryRepository.class
@@ -48,11 +52,13 @@ com\lumberyard_backend\repository\TreatmentHistoryRepository.class
 com\lumberyard_backend\controller\LaborController.class
 com\lumberyard_backend\entity\TimberTracking.class
 com\lumberyard_backend\controller\UserController.class
+com\lumberyard_backend\dto\ConsolidatedSalarySummary.class
 com\lumberyard_backend\service\AuthService.class
 com\lumberyard_backend\entity\ShiftWorkerAssignment.class
 com\lumberyard_backend\entity\JobWorkerAssignment$WorkerRole.class
 com\lumberyard_backend\entity\MaterialUsage.class
 com\lumberyard_backend\repository\WorkerRepository.class
+com\lumberyard_backend\entity\DailySalaryReport.class
 com\lumberyard_backend\controller\WorkerController$ErrorResponse.class
 com\lumberyard_backend\entity\FinanceManager.class
 com\lumberyard_backend\entity\LaborManager.class
@@ -60,10 +66,13 @@ com\lumberyard_backend\dto\SalaryReportResponse.class
 com\lumberyard_backend\entity\TreatmentHistory.class
 com\lumberyard_backend\service\JobAssignmentService.class
 com\lumberyard_backend\security\SecurityConfig.class
+com\lumberyard_backend\dto\ManagerAttendanceDTO.class
 com\lumberyard_backend\repository\ShiftRepository.class
 com\lumberyard_backend\security\JwtRequestFilter.class
+com\lumberyard_backend\repository\DailySalaryReportRepository.class
 com\lumberyard_backend\dto\AttendanceRequest.class
 com\lumberyard_backend\service\ShiftService.class
+com\lumberyard_backend\entity\ManagerAttendance.class
 com\lumberyard_backend\entity\JobWorkerAssignment.class
 com\lumberyard_backend\entity\Shift$ShiftType.class
 com\lumberyard_backend\repository\ProductionRepository.class
@@ -76,6 +85,7 @@ com\lumberyard_backend\repository\JobWorkerAssignmentRepository.class
 com\lumberyard_backend\service\SalaryCalculationService.class
 com\lumberyard_backend\controller\LogsController.class
 com\lumberyard_backend\repository\AttendanceRepository.class
+com\lumberyard_backend\controller\SalaryReportController$MarkAttendanceRequest.class
 com\lumberyard_backend\entity\Wages.class
 com\lumberyard_backend\controller\JobAssignmentController.class
 com\lumberyard_backend\controller\InventoryController.class
@@ -96,6 +106,7 @@ com\lumberyard_backend\dto\ShiftDTO.class
 com\lumberyard_backend\entity\Chemical.class
 com\lumberyard_backend\entity\Role.class
 com\lumberyard_backend\service\CustomUserDetailsService.class
+com\lumberyard_backend\repository\ManagerAttendanceRepository.class
 com\lumberyard_backend\dto\SalaryReportResponse$SalaryReportItem.class
 com\lumberyard_backend\controller\JobAssignmentController$SuccessResponse.class
 com\lumberyard_backend\service\UserService.class

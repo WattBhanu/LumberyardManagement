@@ -225,6 +225,16 @@
   color: #059669;
 }
 
+.card-icon.reports {
+  background: #ede9fe;
+  color: #7c3aed;
+}
+
+.card-icon.income {
+  background: #d1fae5;
+  color: #059669;
+}
+
 .card-icon.workers {
   background: #eff6ff;
   color: #3b82f6;
