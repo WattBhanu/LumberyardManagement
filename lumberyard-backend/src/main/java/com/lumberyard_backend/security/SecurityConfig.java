@@ -63,6 +63,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/attendance/**").hasAnyRole("ADMIN", "LABOR_MANAGER", "FINANCE_MANAGER")
                 // Finance endpoints - Admin and Finance Manager
                 .requestMatchers("/api/finance/**").hasAnyRole("ADMIN", "FINANCE_MANAGER")
+                // Salary reports endpoints
+                .requestMatchers("/api/salary/reports/**", "/api/salary-reports/**").hasAnyRole("ADMIN", "LABOR_MANAGER", "FINANCE_MANAGER")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

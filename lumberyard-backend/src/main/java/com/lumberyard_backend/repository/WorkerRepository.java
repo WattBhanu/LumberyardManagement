@@ -15,6 +15,7 @@ public interface WorkerRepository extends JpaRepository<Worker, Long> {
     Optional<Worker> findByFirstNameAndLastName(String firstName, String lastName);
     List<Worker> findByDepartment(String department);
     List<Worker> findByStatus(Worker.WorkerStatus status);
+    long countByStatus(Worker.WorkerStatus status);
     List<Worker> findByIsAvailable(Boolean isAvailable);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);

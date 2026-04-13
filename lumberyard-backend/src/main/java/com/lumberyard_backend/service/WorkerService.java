@@ -173,23 +173,13 @@ public class WorkerService {
     /**
      * Get worker statistics
      */
-    public Object getWorkerStats() {
-        List<Worker> allWorkers = workerRepository.findAll();
-        long totalWorkers = allWorkers.size();
-        long activeWorkers = allWorkers.stream()
-                .filter(w -> w.getStatus() == Worker.WorkerStatus.ACTIVE)
-                .count();
-        long inactiveWorkers = allWorkers.stream()
-                .filter(w -> w.getStatus() == Worker.WorkerStatus.INACTIVE)
-                .count();
+    public com.lumberyard_backend.dto.WorkerStatsDTO getWorkerStats() {
+        long totalWorkers = workerRepository.count();
+        long activeWorkers = workerRepository.countByStatus(Worker.WorkerStatus.ACTIVE);
+        long inactiveWorkers = workerRepository.countByStatus(Worker.WorkerStatus.INACTIVE);
         
-        // Create a simple response object using Map
-        java.util.Map<String, Object> stats = new java.util.HashMap<>();
-        stats.put("totalWorkers", totalWorkers);
-        stats.put("activeWorkers", activeWorkers);
-        stats.put("inactiveWorkers", inactiveWorkers);
-        
-        return stats;
+        System.out.println("DEBUG: Calculating Worker Stats - Total: " + totalWorkers + ", Active: " + activeWorkers + ", Inactive: " + inactiveWorkers);
+        return new com.lumberyard_backend.dto.WorkerStatsDTO(totalWorkers, activeWorkers, inactiveWorkers);
     }
 
     /**

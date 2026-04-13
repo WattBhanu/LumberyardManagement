@@ -8,6 +8,8 @@ const LaborManagerDashboard = ({ user, onLogout }) => {
   const location = useLocation();
   const isAdmin = user && user.role === 'ADMIN';
   const [stats, setStats] = useState({ totalWorkers: 0, activeWorkers: 0, inactiveWorkers: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchStats();
@@ -15,10 +17,16 @@ const LaborManagerDashboard = ({ user, onLogout }) => {
 
   const fetchStats = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await API.get('/workers/stats');
+      console.log('Worker Stats API Response:', response.data);
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching worker stats:', error);
+      setError('Failed to load statistics');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,18 +79,52 @@ const LaborManagerDashboard = ({ user, onLogout }) => {
         </div>
 
         {/* Info Bars/Stats */}
-        <div className="summary-grid" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-          <div className="summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>Total Workers</h4>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{stats.totalWorkers}</div>
+        {error && <div className="stats-error">{error}</div>}
+        <div className="summary-grid">
+          <div className="summary-card highlight-blue">
+            <h4>Total Workers</h4>
+            <div className="stat-value">
+              {loading ? (
+                <span className="stat-loading">...</span>
+              ) : (
+                stats.totalWorkers !== undefined && stats.totalWorkers !== null ? stats.totalWorkers : (stats.total_workers || '0')
+              )}
+            </div>
+            <div className="card-decoration">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
           </div>
-          <div className="summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ margin: 0, color: '#059669', fontSize: '0.875rem' }}>Active Workers</h4>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{stats.activeWorkers}</div>
+          
+          <div className="summary-card highlight-green">
+            <h4>Active Workers</h4>
+            <div className="stat-value">
+              {loading ? <span className="stat-loading">...</span> : stats.activeWorkers}
+            </div>
+            <div className="card-decoration">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
           </div>
-          <div className="summary-card" style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ margin: 0, color: '#dc2626', fontSize: '0.875rem' }}>Inactive Workers</h4>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{stats.inactiveWorkers}</div>
+          
+          <div className="summary-card highlight-red">
+            <h4>Inactive Workers</h4>
+            <div className="stat-value">
+              {loading ? <span className="stat-loading">...</span> : stats.inactiveWorkers}
+            </div>
+            <div className="card-decoration">
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+            </div>
           </div>
         </div>
 
