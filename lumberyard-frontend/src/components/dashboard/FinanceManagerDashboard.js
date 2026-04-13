@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SalaryReports from './SalaryReports';
 import IncomeRecording from '../finance/IncomeRecording';
+import ExpenseRecording from '../finance/ExpenseRecording';
 import './AdminDashboard.css';
 
 const FinanceManagerDashboard = ({ user, onLogout, token }) => {
   const navigate = useNavigate();
   const isAdmin = user && user.role === 'ADMIN';
-  const [activeView, setActiveView] = useState('overview'); // 'overview', 'salary-reports', 'income-recording'
+  const [activeView, setActiveView] = useState('overview'); // 'overview', 'salary-reports', 'income-recording', 'expense-recording'
 
   const handleLogout = () => {
     onLogout();
@@ -20,6 +21,8 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
         return <SalaryReports token={token} />;
       case 'income-recording':
         return <IncomeRecording token={token} />;
+      case 'expense-recording':
+        return <ExpenseRecording token={token} />;
       default:
         return (
           <div className="dashboard-cards">
@@ -66,9 +69,14 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
                   <line x1="1" y1="10" x2="23" y2="10"></line>
                 </svg>
               </div>
-              <h3>Expense Tracking</h3>
+              <h3>Expense Recording</h3>
               <p>Record and track business expenses</p>
-              <button className="card-button" disabled>Coming Soon</button>
+              <button 
+                className="card-button"
+                onClick={() => setActiveView('expense-recording')}
+              >
+                Open Expense Recording
+              </button>
             </div>
 
             <div className="dashboard-card">
@@ -91,6 +99,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
     switch(activeView) {
       case 'salary-reports': return 'Salary Tracking';
       case 'income-recording': return 'Income Recording';
+      case 'expense-recording': return 'Expense Recording';
       default: return 'Finance Manager Dashboard';
     }
   };
@@ -99,6 +108,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
     switch(activeView) {
       case 'salary-reports': return 'Daily Reports';
       case 'income-recording': return 'Transaction Recording';
+      case 'expense-recording': return 'Cost Recording';
       default: return 'Financial Operations';
     }
   };
@@ -157,4 +167,4 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
   );
 };
 
-export default FinanceManagerDashboard;
+export default FinanceManagerDashboard;
