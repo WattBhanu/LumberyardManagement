@@ -309,6 +309,7 @@ const IncomeRecording = ({ token }) => {
                   <th>Type</th>
                   <th>Product</th>
                   <th>Qty</th>
+                  <th>Description</th>
                   <th>Amount</th>
                   <th>Actions</th>
                 </tr>
@@ -323,6 +324,7 @@ const IncomeRecording = ({ token }) => {
                       </td>
                       <td>{t.product || '-'}</td>
                       <td>{t.quantity || '-'}</td>
+                      <td>{t.description || '-'}</td>
                       <td className="amount">LKR {t.amount.toLocaleString()}</td>
                       <td className="actions">
                         <button className="edit-link" onClick={() => handleEdit(t)}>Edit</button>
@@ -332,7 +334,7 @@ const IncomeRecording = ({ token }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="no-data">No transactions recorded yet.</td>
+                    <td colSpan="7" className="no-data">No transactions recorded yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -445,6 +447,7 @@ const IncomeRecording = ({ token }) => {
                             <th>Type</th>
                             <th>Product</th>
                             <th>Qty</th>
+                            <th>Description</th>
                             <th>Amount</th>
                           </tr>
                         </thead>
@@ -457,6 +460,7 @@ const IncomeRecording = ({ token }) => {
                               </td>
                               <td>{t.product || '-'}</td>
                               <td>{t.quantity || '-'}</td>
+                              <td>{t.description || '-'}</td>
                               <td className="amount">LKR {t.amount.toLocaleString()}</td>
                             </tr>
                           ))}
