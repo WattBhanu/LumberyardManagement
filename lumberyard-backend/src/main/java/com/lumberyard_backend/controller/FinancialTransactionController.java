@@ -1,7 +1,7 @@
 package com.lumberyard_backend.controller;
 
 import com.lumberyard_backend.entity.FinancialTransaction;
-import com.lumberyard_backend.repository.FinancialTransactionRepository;
+import com.lumberyard_backend.service.FinancialTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,12 +16,12 @@ import java.util.Map;
 public class FinancialTransactionController {
 
     @Autowired
-    private FinancialTransactionRepository repository;
+    private FinancialTransactionService service;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
     public List<FinancialTransaction> getAllTransactions() {
-        return repository.findAllByOrderByDateDesc();
+        return service.getAllTransactions();
     }
 
     @PostMapping
@@ -38,49 +38,52 @@ public class FinancialTransactionController {
             }
         }
 
-        return ResponseEntity.ok(repository.save(transaction));
+        return ResponseEntity.ok(service.saveTransaction(transaction));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
     public ResponseEntity<?> updateTransaction(@PathVariable Long id, @RequestBody FinancialTransaction transactionDetails) {
-        FinancialTransaction transaction = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-
-        transaction.setType(transactionDetails.getType());
-        transaction.setProduct(transactionDetails.getProduct());
-        transaction.setAmount(transactionDetails.getAmount());
-        transaction.setQuantity(transactionDetails.getQuantity());
-        transaction.setDate(transactionDetails.getDate());
-        transaction.setDescription(transactionDetails.getDescription());
-
-        // Validation
-        if (transaction.getType() == null || transaction.getAmount() == null || transaction.getDate() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Type, Amount and Date are required"));
+        try {
+            return ResponseEntity.ok(service.updateTransaction(id, transactionDetails));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
-
-        if ("SALE".equalsIgnoreCase(transaction.getType())) {
-            if (transaction.getProduct() == null || transaction.getQuantity() == null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Product and Quantity are required for sales"));
-            }
-        }
-
-        return ResponseEntity.ok(repository.save(transaction));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
     public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
-        FinancialTransaction transaction = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transaction not found"));
-        repository.delete(transaction);
-        return ResponseEntity.ok(Map.of("message", "Transaction deleted successfully"));
+        try {
+            service.deleteTransaction(id);
+            return ResponseEntity.ok(Map.of("message", "Transaction deleted successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/summary")
     @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
     public ResponseEntity<?> getSummary() {
-        Double totalRevenue = repository.getTotalRevenue();
-        return ResponseEntity.ok(Map.of("totalRevenue", totalRevenue != null ? totalRevenue : 0.0));
+        return ResponseEntity.ok(Map.of("totalRevenue", service.getTotalRevenue()));
+    }
+
+    @GetMapping("/report")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
+    public ResponseEntity<?> getReport(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) String type) {
+        
+        java.time.LocalDate start = startDate != null ? java.time.LocalDate.parse(startDate) : null;
+        java.time.LocalDate end = endDate != null ? java.time.LocalDate.parse(endDate) : null;
+        
+        Map<String, Object> report = service.generateReport(start, end, type);
+        
+        if (Boolean.FALSE.equals(report.get("success"))) {
+            return ResponseEntity.ok(report);
+        }
+        
+        return ResponseEntity.ok(report);
     }
 }

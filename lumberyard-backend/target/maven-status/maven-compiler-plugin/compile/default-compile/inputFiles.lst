@@ -2,7 +2,9 @@ D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\config\Cors
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\AttendanceController.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\AuthController.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\ChemicalController.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\ExpenseController.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\FinanceController.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\FinancialTransactionController.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\InventoryController.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\JobAssignmentController.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\controller\LaborController.java
@@ -38,7 +40,9 @@ D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Admi
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Attendance.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Chemical.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\DailySalaryReport.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\Expense.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\FinanceManager.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\FinancialTransaction.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\InventoryOperationsManager.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\JobAssignment.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\entity\JobWorkerAssignment.java
@@ -66,6 +70,8 @@ D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\model\AuthR
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\AttendanceRepository.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\ChemicalRepository.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\DailySalaryReportRepository.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\ExpenseRepository.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\FinancialTransactionRepository.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\JobAssignmentRepository.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\JobWorkerAssignmentRepository.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\repository\LogsRepository.java
@@ -89,6 +95,7 @@ D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\Att
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\AuthService.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\CustomUserDetailsService.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\DailySalaryReportService.java
+D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\FinancialTransactionService.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\JobAssignmentService.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\ManagerAttendanceService.java
 D:\SCRUM-144\lumberyard-backend\src\main\java\com\lumberyard_backend\service\ProductionService.java
