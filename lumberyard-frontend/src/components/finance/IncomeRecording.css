@@ -6,24 +6,33 @@
   margin-bottom: 2rem;
 }
 
-.summary-card.total-revenue {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+.summary-card.total-revenue, 
+.summary-card {
+  color: #FFFFFF !important;
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
   max-width: 400px;
 }
 
+.summary-card.total-revenue {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.summary-card h4,
 .summary-card.total-revenue h4 {
   margin: 0;
-  opacity: 0.9;
+  color: #FFFFFF !important;
+  opacity: 1; /* Increased from 0.9 for better contrast */
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
+.summary-card .stat-value,
 .summary-card.total-revenue .stat-value {
+  color: #FFFFFF !important;
   font-size: 2.5rem;
   font-weight: 800;
   margin-top: 0.5rem;
@@ -40,7 +49,7 @@
 .transaction-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #0f172a;
+  color: #42495a;
 }
 
 .form-row {
@@ -184,7 +193,7 @@
 
 .amount {
   font-weight: 600;
-  color: #0f172a;
+  color: #9199ac;
 }
 
 .actions {
