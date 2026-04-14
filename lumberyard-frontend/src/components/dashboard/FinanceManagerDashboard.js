@@ -21,7 +21,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
         return <SalaryReports token={token} />;
       case 'income-recording':
         return <IncomeRecording token={token} />;
-      case 'expense-recording':
+      case 'expense-reporting':
         return <ExpenseRecording token={token} />;
       default:
         return (
@@ -69,13 +69,13 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
                   <line x1="1" y1="10" x2="23" y2="10"></line>
                 </svg>
               </div>
-              <h3>Expense Recording</h3>
-              <p>Record and track business expenses</p>
+              <h3>Expense Reporting</h3>
+              <p>Record and track business expenses with reports</p>
               <button 
                 className="card-button"
-                onClick={() => setActiveView('expense-recording')}
+                onClick={() => setActiveView('expense-reporting')}
               >
-                Open Expense Recording
+                Open Expense Reporting
               </button>
             </div>
 
@@ -99,7 +99,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
     switch(activeView) {
       case 'salary-reports': return 'Salary Tracking';
       case 'income-recording': return 'Income Recording';
-      case 'expense-recording': return 'Expense Recording';
+      case 'expense-reporting': return 'Expense Reporting';
       default: return 'Finance Manager Dashboard';
     }
   };
@@ -108,7 +108,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
     switch(activeView) {
       case 'salary-reports': return 'Daily Reports';
       case 'income-recording': return 'Transaction Recording';
-      case 'expense-recording': return 'Cost Recording';
+      case 'expense-reporting': return 'Spending Analysis';
       default: return 'Financial Operations';
     }
   };
