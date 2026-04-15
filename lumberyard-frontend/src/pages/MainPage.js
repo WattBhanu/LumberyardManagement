@@ -18,7 +18,7 @@ const MainPage = ({ user, onLogout }) => {
                 <div className="main-header">
                     <div className="header-left">
                         <h1>Lumberyard Management</h1>
-                        <span className="header-badge">Inventory Operations</span>
+                        <span className="io-header-badge">Inventory Operations</span>
                     </div>
                     <div className="header-right">
                         {user && (

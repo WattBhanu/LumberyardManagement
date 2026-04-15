@@ -399,11 +399,11 @@ function SummaryBox({ title, count, quantity, icon, color }) {
       <div className="summary-info">
         <div className="stat-row">
           <span className="stat-label">ITEMS:</span>
-          <span className="stat-value">{count}</span>
+          <span className="display-stat-value">{count}</span>
         </div>
         <div className="stat-row">
           <span className="stat-label">QUANTITY:</span>
-          <span className="stat-value">{quantity}</span>
+          <span className="display-stat-value">{quantity}</span>
         </div>
       </div>
     </div>

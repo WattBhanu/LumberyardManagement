@@ -87,6 +87,17 @@
   margin-top: 5px; /* Subtle baseline align */
 }
 
+.io-header-badge {
+    padding: 4px 12px;
+    background: #eff6ff;
+    color: #3b82f6;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 5px; /* Subtle baseline align */
+}
+
 .date-display {
   display: flex;
   align-items: center;
@@ -359,17 +370,24 @@
 
 .stat-label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   color: #64748b;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.0em;
   text-transform: uppercase;
 }
 
 .stat-value {
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1;
+  line-height: 0;
+}
+
+.display-stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 0;
 }
 
 /* Results Section */
