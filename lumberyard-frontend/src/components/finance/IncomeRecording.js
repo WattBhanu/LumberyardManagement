@@ -29,6 +29,11 @@ const IncomeRecording = ({ token }) => {
   const [reportData, setReportData] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
 
+  // Sorting and Filtering states for Recent Transactions table
+  const [filterDate, setFilterDate] = useState('');
+  const [filterType, setFilterType] = useState('ALL');
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
+
   useEffect(() => {
     fetchTransactions();
     fetchSummary();
@@ -203,6 +208,78 @@ const IncomeRecording = ({ token }) => {
     }
   };
 
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortData = (data) => {
+    if (!data) return [];
+    let processed = [...data];
+    processed.sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+      
+      if (sortConfig.key === 'amount' || sortConfig.key === 'quantity') {
+        valA = parseFloat(valA) || 0;
+        valB = parseFloat(valB) || 0;
+      } else {
+        valA = valA ? valA.toString().toLowerCase() : '';
+        valB = valB ? valB.toString().toLowerCase() : '';
+      }
+
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return processed;
+  };
+
+  const getProcessedTransactions = () => {
+    let processed = [...transactions];
+    
+    // Filter by date
+    if (filterDate) {
+      processed = processed.filter(t => t.date === filterDate);
+    }
+    
+    // Filter by type
+    if (filterType !== 'ALL') {
+      processed = processed.filter(t => t.type === filterType);
+    }
+    
+    return sortData(processed);
+  };
+
+  const SortIcon = ({ column }) => {
+    const isActive = sortConfig.key === column;
+    const isAsc = isActive && sortConfig.direction === 'asc';
+    const isDesc = isActive && sortConfig.direction === 'desc';
+
+    return (
+      <span className={`sort-icon ${isActive ? 'active' : ''}`}>
+        {isActive ? (
+          isAsc ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          )
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3">
+            <path d="M7 15l5 5 5-5M7 9l5-5 5 5"></path>
+          </svg>
+        )}
+      </span>
+    );
+  };
+
   const resetForm = () => {
     setFormData({
       type: 'INCOME',
@@ -301,22 +378,58 @@ const IncomeRecording = ({ token }) => {
           </div>
 
           <div className="records-table-container">
-            <h3>Recent Transactions</h3>
+            <div className="table-header-row">
+              <h3>Recent Transactions</h3>
+              <div className="table-filter-group">
+                <div className="table-filter">
+                  <label>DATE:</label>
+                  <input 
+                    type="date" 
+                    value={filterDate} 
+                    onChange={(e) => setFilterDate(e.target.value)} 
+                    className="filter-date-input"
+                  />
+                </div>
+                <div className="table-filter">
+                  <label>TYPE:</label>
+                  <select 
+                    value={filterType} 
+                    onChange={(e) => setFilterType(e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="ALL">All types</option>
+                    <option value="SALE">Sale</option>
+                    <option value="INCOME">Income</option>
+                  </select>
+                </div>
+                {(filterDate || filterType !== 'ALL') && (
+                  <button className="clear-filter" onClick={() => { setFilterDate(''); setFilterType('ALL'); }}>Clear</button>
+                )}
+              </div>
+            </div>
             <table className="records-table">
               <thead>
                 <tr>
-                  <th>Date</th>
+                  <th onClick={() => requestSort('date')} className="sortable">
+                    Date <SortIcon column="date" />
+                  </th>
                   <th>Type</th>
-                  <th>Product</th>
-                  <th>Qty</th>
+                  <th onClick={() => requestSort('product')} className="sortable">
+                    Product <SortIcon column="product" />
+                  </th>
+                  <th onClick={() => requestSort('quantity')} className="sortable">
+                    Qty <SortIcon column="quantity" />
+                  </th>
                   <th>Description</th>
-                  <th>Amount</th>
+                  <th onClick={() => requestSort('amount')} className="sortable">
+                    Amount <SortIcon column="amount" />
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {transactions.length > 0 ? (
-                  transactions.map((t) => (
+                {getProcessedTransactions().length > 0 ? (
+                  getProcessedTransactions().map((t) => (
                     <tr key={t.id}>
                       <td>{t.date}</td>
                       <td>
@@ -443,16 +556,24 @@ const IncomeRecording = ({ token }) => {
                       <table className="records-table">
                         <thead>
                           <tr>
-                            <th>Date</th>
+                            <th onClick={() => requestSort('date')} className="sortable">
+                              Date <SortIcon column="date" />
+                            </th>
                             <th>Type</th>
-                            <th>Product</th>
-                            <th>Qty</th>
+                            <th onClick={() => requestSort('product')} className="sortable">
+                              Product <SortIcon column="product" />
+                            </th>
+                            <th onClick={() => requestSort('quantity')} className="sortable">
+                              Qty <SortIcon column="quantity" />
+                            </th>
                             <th>Description</th>
-                            <th>Amount</th>
+                            <th onClick={() => requestSort('amount')} className="sortable">
+                              Amount <SortIcon column="amount" />
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {reportData.transactions.map((t) => (
+                          {sortData(reportData.transactions).map((t) => (
                             <tr key={t.id}>
                               <td>{t.date}</td>
                               <td>

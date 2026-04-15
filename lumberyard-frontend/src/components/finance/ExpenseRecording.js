@@ -27,6 +27,10 @@ const ExpenseRecording = ({ token }) => {
   const [reportData, setReportData] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
 
+  // Sorting and Filtering states for Recent Expenses table
+  const [filterDate, setFilterDate] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'desc' });
+
   const categories = ['Transport', 'Salary', 'Maintenance', 'Chemicals', 'Utilities', 'Taxes', 'Other'];
 
   useEffect(() => {
@@ -189,6 +193,66 @@ const ExpenseRecording = ({ token }) => {
     }
   };
 
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortData = (data) => {
+    let processed = [...data];
+    processed.sort((a, b) => {
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+      
+      if (sortConfig.key === 'amount') {
+        valA = parseFloat(valA);
+        valB = parseFloat(valB);
+      } else {
+        valA = valA ? valA.toString().toLowerCase() : '';
+        valB = valB ? valB.toString().toLowerCase() : '';
+      }
+
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return processed;
+  };
+
+  const getProcessedExpenses = () => {
+    let processed = filterDate ? expenses.filter(e => e.date === filterDate) : [...expenses];
+    return sortData(processed);
+  };
+
+  const SortIcon = ({ column }) => {
+    const isActive = sortConfig.key === column;
+    const isAsc = isActive && sortConfig.direction === 'asc';
+    const isDesc = isActive && sortConfig.direction === 'desc';
+
+    return (
+      <span className={`sort-icon ${isActive ? 'active' : ''}`}>
+        {isActive ? (
+          isAsc ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          )
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3">
+            <path d="M7 15l5 5 5-5M7 9l5-5 5 5"></path>
+          </svg>
+        )}
+      </span>
+    );
+  };
+
   const resetForm = () => {
     setFormData({
       category: 'Transport',
@@ -202,7 +266,7 @@ const ExpenseRecording = ({ token }) => {
   return (
     <div className="income-recording">
       <div className="finance-summary">
-        <div className="summary-card" style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.2)' }}>
+        <div className="summary-card" style={{ background: 'linear-gradient(135deg, #fef2f2, #fee2e2)', borderLeft: '5px solid #ef4444', boxShadow: '0 4px 6px -1px rgba(239, 68, 68, 0.1)' }}>
           <h4>Total Expenses</h4>
           <div className="stat-value">LKR {totalExpenses.toLocaleString()}</div>
         </div>
@@ -270,20 +334,40 @@ const ExpenseRecording = ({ token }) => {
           </div>
 
           <div className="records-table-container">
-            <h3>Recent Expenses</h3>
+            <div className="table-header-row">
+              <h3>Recent Expenses</h3>
+              <div className="table-filter">
+                <label>FILTER BY DATE:</label>
+                <input 
+                  type="date" 
+                  value={filterDate} 
+                  onChange={(e) => setFilterDate(e.target.value)} 
+                  className="filter-date-input"
+                />
+                {filterDate && (
+                  <button className="clear-filter" onClick={() => setFilterDate('')}>Clear</button>
+                )}
+              </div>
+            </div>
             <table className="records-table">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Category</th>
+                  <th onClick={() => requestSort('date')} className="sortable">
+                    Date <SortIcon column="date" />
+                  </th>
+                  <th onClick={() => requestSort('category')} className="sortable">
+                    Category <SortIcon column="category" />
+                  </th>
                   <th>Description</th>
-                  <th>Amount</th>
+                  <th onClick={() => requestSort('amount')} className="sortable">
+                    Amount <SortIcon column="amount" />
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {expenses.length > 0 ? (
-                  expenses.map((e) => (
+                {getProcessedExpenses().length > 0 ? (
+                  getProcessedExpenses().map((e) => (
                     <tr key={e.id}>
                       <td>{e.date}</td>
                       <td>
@@ -408,14 +492,20 @@ const ExpenseRecording = ({ token }) => {
                       <table className="records-table">
                         <thead>
                           <tr>
-                            <th>Date</th>
-                            <th>Category</th>
+                            <th onClick={() => requestSort('date')} className="sortable">
+                              Date <SortIcon column="date" />
+                            </th>
+                            <th onClick={() => requestSort('category')} className="sortable">
+                              Category <SortIcon column="category" />
+                            </th>
                             <th>Description</th>
-                            <th>Amount</th>
+                            <th onClick={() => requestSort('amount')} className="sortable">
+                              Amount <SortIcon column="amount" />
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {reportData.expenses.map((e) => (
+                          {sortData(reportData.expenses).map((e) => (
                             <tr key={e.id}>
                               <td>{e.date}</td>
                               <td>

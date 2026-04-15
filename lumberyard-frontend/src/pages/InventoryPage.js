@@ -109,6 +109,12 @@ function InventoryPage() {
     }
   };
 
+  const formattedDate = new Date().toLocaleDateString('en-US', { 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+
   return (
     <div className="dashboard">
       <div className="dashboard-content">
@@ -119,12 +125,23 @@ function InventoryPage() {
             <span className="header-badge">Lumberyard</span>
           </div>
           <div className="header-right">
-            <Link to="/main" className="action-button">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle><polyline points="12 8 8 12 12 16"></polyline><line x1="16" y1="12" x2="8" y2="12"></line>
+            <Link to="/main" className="back-link">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 8 8 12 12 16"></polyline>
+                <line x1="16" y1="12" x2="8" y2="12"></line>
               </svg>
-              Back to Main
+              <span>Back to Main</span>
             </Link>
+            <div className="date-display">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              {formattedDate}
+            </div>
           </div>
         </div>
 
@@ -230,7 +247,7 @@ function InventoryPage() {
           {viewMode === "" && (
             <div className="dashboard-home">
               <div className="summary-section">
-                <h2 className="section-title">Inventory Overview</h2>
+                <h2 className="section-title">INVENTORY OVERVIEW</h2>
                 <div className="summary-grid">
                   <SummaryBox
                     title="Timber"
@@ -363,30 +380,30 @@ function InventoryPage() {
 function SummaryBox({ title, count, quantity, icon, color }) {
   return (
     <div className="summary-card">
-      <div className="summary-icon" style={{ backgroundColor: `${color}15`, color: color }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          {icon === "timber" && (
-            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
-          )}
-          {icon === "logs" && (
-            <path d="M4 4h16v16H4z"></path>
-          )}
-          {icon === "chemical" && (
-            <path d="M4 8h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"></path>
-          )}
-        </svg>
-      </div>
-      <div className="summary-content">
+      <div className="summary-icon-container">
+        <div className="summary-icon" style={{ backgroundColor: `${color}15`, color: color }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            {icon === "timber" && (
+              <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M10 7h4v10h-4z"></path>
+            )}
+            {icon === "logs" && (
+              <path d="M4 4h16v16H4z M9 9h6v6H9z"></path>
+            )}
+            {icon === "chemical" && (
+              <path d="M10 2v4 M8 2h8 M5 6h14v12a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6z M9 10h6"></path>
+            )}
+          </svg>
+        </div>
         <h3>{title}</h3>
-        <div className="summary-stats">
-          <div className="stat-item">
-            <span className="stat-label">Items:</span>
-            <span className="stat-value">{count}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Quantity:</span>
-            <span className="stat-value">{quantity}</span>
-          </div>
+      </div>
+      <div className="summary-info">
+        <div className="stat-row">
+          <span className="stat-label">ITEMS:</span>
+          <span className="stat-value">{count}</span>
+        </div>
+        <div className="stat-row">
+          <span className="stat-label">QUANTITY:</span>
+          <span className="stat-value">{quantity}</span>
         </div>
       </div>
     </div>

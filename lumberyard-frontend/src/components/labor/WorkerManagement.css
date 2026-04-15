@@ -276,7 +276,7 @@
 .wm-stat-number {
   font-size: 2.1rem;
   font-weight: 800;
-  color: #4A90D9 !important;
+  color: #0f172a !important; /* Changed from blue to dark slate */
   line-height: 1;
 }
 
