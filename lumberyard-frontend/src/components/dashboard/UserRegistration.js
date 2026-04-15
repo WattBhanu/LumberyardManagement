@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './UserRegistration.css';
+import ManagerSalaryManagement from '../labor/ManagerSalaryManagement';
 
 const UserRegistration = ({ token }) => {
   console.log('UserRegistration component rendered with token:', token);
@@ -9,7 +10,8 @@ const UserRegistration = ({ token }) => {
     email: '',
     phone: '',
     password: '',
-    role: 'FINANCE_MANAGER'
+    role: 'FINANCE_MANAGER',
+    dailySalaryRate: ''
   });
   
   const [users, setUsers] = useState([]);
@@ -17,10 +19,14 @@ const UserRegistration = ({ token }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
   const [deleteConfirm, setDeleteConfirm] = useState(null); // { userId, userName }
+  const [showManagerSalaries, setShowManagerSalaries] = useState(false);
   
   // Get current user from localStorage to check admin role and prevent self-deletion
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
   const isAdmin = currentUser.role === 'ADMIN';
+  
+  // Only admins can see manager salaries
+  const canViewManagerSalaries = isAdmin;
 
   const roles = [
     { value: 'FINANCE_MANAGER', label: 'Finance Manager' },
@@ -118,7 +124,8 @@ const UserRegistration = ({ token }) => {
           email: '',
           phone: '',
           password: '',
-          role: 'FINANCE_MANAGER'
+          role: 'FINANCE_MANAGER',
+          dailySalaryRate: ''
         });
         // Refresh user list
         fetchAllUsers();
@@ -221,8 +228,39 @@ const UserRegistration = ({ token }) => {
 
   return (
     <div className="user-registration">
-      <div className="registration-form-container">
-        <h2>User Registration</h2>
+      {/* Toggle Buttons */}
+      <div className="registration-toggle">
+        <button 
+          className={`toggle-btn ${!showManagerSalaries ? 'active' : ''}`}
+          onClick={() => setShowManagerSalaries(false)}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          User Management
+        </button>
+        {canViewManagerSalaries && (
+          <button 
+            className={`toggle-btn ${showManagerSalaries ? 'active' : ''}`}
+            onClick={() => setShowManagerSalaries(true)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            Manager Salaries
+          </button>
+        )}
+      </div>
+
+      {/* User Registration Section */}
+      {!showManagerSalaries && (
+        <>
+          <div className="registration-form-container">
+            <h2>User Registration</h2>
         <form onSubmit={handleSubmit} className="registration-form">
           <div className="form-group">
             <label htmlFor="name">Full Name *</label>
@@ -287,6 +325,24 @@ const UserRegistration = ({ token }) => {
               ))}
             </select>
           </div>
+          
+          {(formData.role === 'ADMIN' || formData.role === 'FINANCE_MANAGER' || formData.role === 'LABOR_MANAGER' || formData.role === 'INVENTORY_OPERATIONS_MANAGER') && (
+            <div className="form-group">
+              <label htmlFor="dailySalaryRate">Daily Salary Rate (LKR) *</label>
+              <input
+                type="number"
+                id="dailySalaryRate"
+                name="dailySalaryRate"
+                value={formData.dailySalaryRate}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                placeholder="e.g., 5000"
+                required
+              />
+              <small className="form-hint">This is the amount paid per day when the manager is present</small>
+            </div>
+          )}
           
           <button 
             type="submit" 
@@ -362,7 +418,14 @@ const UserRegistration = ({ token }) => {
             </div>
           </div>
         )}
-      </div>
+          </div>
+        </>
+      )}
+
+      {/* Manager Salaries Section */}
+      {showManagerSalaries && canViewManagerSalaries && (
+        <ManagerSalaryManagement />
+      )}
     </div>
   );
 };

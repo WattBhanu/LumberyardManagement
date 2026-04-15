@@ -1,13 +1,16 @@
 package com.lumberyard_backend.service;
 
 import com.lumberyard_backend.entity.*;
+import com.lumberyard_backend.repository.ManagerSalaryHistoryRepository;
 import com.lumberyard_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private ManagerSalaryHistoryRepository salaryHistoryRepository;
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -32,7 +38,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User createUser(String name, String email, String phone, String password, Role role) {
+    @Transactional
+    public User createUser(String name, String email, String phone, String password, Role role, Double dailySalaryRate) {
         // Check if user with email or phone already exists
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("User with email " + email + " already exists");
@@ -66,8 +73,29 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password)); // Encrypt the password
         user.setRole(role);
         user.setStatus(true); // Set status to active by default
+        
+        // Set daily salary rate for managers
+        boolean isManagerRole = (role == Role.ADMIN || role == Role.FINANCE_MANAGER || 
+                                role == Role.LABOR_MANAGER || role == Role.INVENTORY_OPERATIONS_MANAGER);
+        
+        if (isManagerRole && dailySalaryRate != null && dailySalaryRate > 0) {
+            user.setDailySalaryRate(dailySalaryRate);
+        }
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Create initial salary history record for managers
+        if (isManagerRole && dailySalaryRate != null && dailySalaryRate > 0) {
+            ManagerSalaryHistory history = new ManagerSalaryHistory();
+            history.setManager(savedUser);
+            history.setDailyRate(dailySalaryRate);
+            history.setEffectiveDate(LocalDate.now());
+            history.setReason("Initial salary");
+            history.setCreatedBy("System - User Registration");
+            salaryHistoryRepository.save(history);
+        }
+
+        return savedUser;
     }
 
     public User getUserById(Long userId) {

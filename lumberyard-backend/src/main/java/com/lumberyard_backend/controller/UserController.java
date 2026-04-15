@@ -28,7 +28,8 @@ public class UserController {
                 request.getEmail(), 
                 request.getPhone(), 
                 request.getPassword(), 
-                request.getRole()
+                request.getRole(),
+                request.getDailySalaryRate()
             );
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
