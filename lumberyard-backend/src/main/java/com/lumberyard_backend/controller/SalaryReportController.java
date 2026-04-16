@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -122,6 +123,49 @@ public class SalaryReportController {
         try {
             List<ConsolidatedSalarySummary> history = dailySalaryReportService.getReportHistoryWithSummaries();
             return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    // Generate salary report for date range
+    @GetMapping("/report")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> generateSalaryReport(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        try {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            
+            List<ConsolidatedSalarySummary> reports = dailySalaryReportService.getReportsBetweenDates(start, end);
+            
+            if (reports.isEmpty()) {
+                return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "No salary data available for the selected date range"
+                ));
+            }
+            
+            double totalWorkerCost = reports.stream()
+                .mapToDouble(r -> r.getWorkerTotalCost() != null ? r.getWorkerTotalCost().doubleValue() : 0)
+                .sum();
+            double totalManagerCost = reports.stream()
+                .mapToDouble(r -> r.getManagerTotalCost() != null ? r.getManagerTotalCost().doubleValue() : 0)
+                .sum();
+            double grandTotal = totalWorkerCost + totalManagerCost;
+            
+            Map<String, Object> reportData = new HashMap<>();
+            reportData.put("success", true);
+            reportData.put("reports", reports);
+            reportData.put("totalWorkerCost", totalWorkerCost);
+            reportData.put("totalManagerCost", totalManagerCost);
+            reportData.put("grandTotal", grandTotal);
+            reportData.put("startDate", startDate);
+            reportData.put("endDate", endDate);
+            reportData.put("totalDays", reports.size());
+            
+            return ResponseEntity.ok(reportData);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

@@ -26,8 +26,11 @@ public class DailySalaryReportService {
     @Autowired
     private UserRepository userRepository;
     
-    // Note: You'll need to inject worker attendance/worker repositories here
-    // For now, I'm creating a placeholder - we'll integrate with existing worker system
+    @Autowired
+    private AttendanceRepository attendanceRepository;
+    
+    @Autowired
+    private WorkerRepository workerRepository;
     
     // Generate daily consolidated salary report
     @Transactional
@@ -84,28 +87,56 @@ public class DailySalaryReportService {
             }
         }
         
-        // 2. Process Workers (placeholder - will integrate with existing worker attendance)
-        // TODO: Integrate with actual worker attendance system
-        // For now, returning empty worker list
-        BigDecimal workerTotalCost = BigDecimal.ZERO;
+        // 2. Process Workers
+        List<Attendance> workerAttendances = attendanceRepository.findByDate(reportDate);
         int workerCount = 0;
+        BigDecimal workerTotalCost = BigDecimal.ZERO;
         
-        // Once you have worker attendance data, uncomment and modify:
-        /*
-        List<WorkerAttendance> workerAttendances = workerAttendanceRepository.findByAttendanceDate(reportDate);
-        for (WorkerAttendance attendance : workerAttendances) {
-            Worker worker = attendance.getWorker();
-            BigDecimal hourlyRate = worker.getPosition().getHourlyRate();
-            BigDecimal hoursWorked = attendance.getHoursWorked();
-            BigDecimal totalSalary = hourlyRate.multiply(hoursWorked);
-            
-            // Create report entry and DTO similar to managers above
-            // ...
-            
-            workerTotalCost = workerTotalCost.add(totalSalary);
-            workerCount++;
+        for (Attendance attendance : workerAttendances) {
+            if (attendance.getStatus() != null && !attendance.getStatus().equalsIgnoreCase("Absent")) {
+                Worker worker = attendance.getWorker();
+                if (worker == null) continue;
+                
+                // Calculate salary based on worked hours
+                double workedHours = attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 8.0;
+                double hourlyRate = calculateHourlyRate(worker);
+                BigDecimal hoursBD = BigDecimal.valueOf(workedHours);
+                BigDecimal rateBD = BigDecimal.valueOf(hourlyRate);
+                BigDecimal totalSalary = rateBD.multiply(hoursBD);
+                
+                // Create report entry
+                DailySalaryReport report = new DailySalaryReport();
+                report.setReportDate(reportDate);
+                report.setStaffType("WORKER");
+                report.setStaffId(worker.getWorkerId());
+                report.setStaffName(worker.getFirstName() + " " + worker.getLastName());
+                report.setPositionRole(worker.getPosition());
+                report.setRateType("HOURLY");
+                report.setRateAmount(rateBD);
+                report.setHoursOrDays(hoursBD);
+                report.setTotalSalary(totalSalary);
+                report.setIsPresent(true);
+                report.setGeneratedBy(generatedBy);
+                
+                reportRepository.save(report);
+                
+                // Add to DTO list
+                DailySalaryReportDTO dto = new DailySalaryReportDTO();
+                dto.setStaffId(worker.getWorkerId());
+                dto.setStaffName(worker.getFirstName() + " " + worker.getLastName());
+                dto.setStaffType("WORKER");
+                dto.setPositionRole(worker.getPosition());
+                dto.setRateType("HOURLY");
+                dto.setRateAmount(rateBD);
+                dto.setHoursOrDays(hoursBD);
+                dto.setTotalSalary(totalSalary);
+                dto.setIsPresent(true);
+                
+                staffDetails.add(dto);
+                workerTotalCost = workerTotalCost.add(totalSalary);
+                workerCount++;
+            }
         }
-        */
         
         // 3. Calculate totals
         BigDecimal totalCost = workerTotalCost.add(managerTotalCost);
@@ -194,8 +225,100 @@ public class DailySalaryReportService {
         return summaries;
     }
     
+    // Get reports between dates (for date range reporting)
+    public List<ConsolidatedSalarySummary> getReportsBetweenDates(LocalDate startDate, LocalDate endDate) {
+        List<ConsolidatedSalarySummary> summaries = new ArrayList<>();
+        
+        LocalDate currentDate = startDate;
+        while (!currentDate.isAfter(endDate)) {
+            // First, try to get existing report
+            ConsolidatedSalarySummary summary = getReportByDate(currentDate);
+            
+            if (summary == null) {
+                // If no report exists, create one dynamically from attendance data
+                summary = createSummaryFromAttendance(currentDate);
+            } else {
+                // Only include summary info, not full details
+                summary.setStaffDetails(null);
+            }
+            
+            if (summary != null) {
+                summaries.add(summary);
+            }
+            currentDate = currentDate.plusDays(1);
+        }
+        
+        return summaries;
+    }
+    
+    // Create summary from attendance data (for dates without generated reports)
+    private ConsolidatedSalarySummary createSummaryFromAttendance(LocalDate reportDate) {
+        // Get manager attendance
+        List<ManagerAttendance> managerAttendances = managerAttendanceRepository.findByAttendanceDate(reportDate);
+        BigDecimal managerTotalCost = BigDecimal.ZERO;
+        int managerCount = 0;
+        
+        for (ManagerAttendance attendance : managerAttendances) {
+            if (attendance.getIsPresent() != null && attendance.getIsPresent()) {
+                User manager = attendance.getManager();
+                if (manager == null) continue;
+                
+                BigDecimal dailyRate = manager.getDailySalary() != null ? manager.getDailySalary() : BigDecimal.ZERO;
+                managerTotalCost = managerTotalCost.add(dailyRate);
+                managerCount++;
+            }
+        }
+        
+        // Get worker attendance
+        List<Attendance> workerAttendances = attendanceRepository.findByDate(reportDate);
+        int workerCount = 0;
+        BigDecimal workerTotalCost = BigDecimal.ZERO;
+        
+        for (Attendance attendance : workerAttendances) {
+            if (attendance.getStatus() != null && !attendance.getStatus().equalsIgnoreCase("Absent")) {
+                Worker worker = attendance.getWorker();
+                if (worker == null) continue;
+                
+                double workedHours = attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 8.0;
+                double hourlyRate = calculateHourlyRate(worker);
+                BigDecimal hoursBD = BigDecimal.valueOf(workedHours);
+                BigDecimal rateBD = BigDecimal.valueOf(hourlyRate);
+                BigDecimal totalSalary = rateBD.multiply(hoursBD);
+                
+                workerTotalCost = workerTotalCost.add(totalSalary);
+                workerCount++;
+            }
+        }
+        
+        // Only return summary if there's at least some attendance data
+        if (workerCount == 0 && managerCount == 0) {
+            return null;
+        }
+        
+        ConsolidatedSalarySummary summary = new ConsolidatedSalarySummary();
+        summary.setReportDate(reportDate);
+        summary.setTotalWorkers(workerCount);
+        summary.setTotalManagers(managerCount);
+        summary.setWorkerTotalCost(workerTotalCost);
+        summary.setManagerTotalCost(managerTotalCost);
+        summary.setTotalCost(workerTotalCost.add(managerTotalCost));
+        summary.setStaffDetails(null);
+        
+        return summary;
+    }
+    
     // Check if report exists for date
     public boolean reportExists(LocalDate date) {
         return reportRepository.existsByReportDate(date);
+    }
+    
+    // Helper method to calculate hourly rate for a worker
+    private double calculateHourlyRate(Worker worker) {
+        // Use the hourlyRate field from Worker entity
+        if (worker.getHourlyRate() != null) {
+            return worker.getHourlyRate();
+        }
+        // Default rate if no hourly rate is set
+        return 100.0; // LKR per hour
     }
 }

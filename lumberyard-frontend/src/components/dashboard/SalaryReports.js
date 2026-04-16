@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import API from '../../services/api';
 import './SalaryReports.css';
 
@@ -7,18 +9,30 @@ const SalaryReports = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
   
   // Attendance tab state
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [managers, setManagers] = useState([]);
+  const [hasExistingAttendance, setHasExistingAttendance] = useState(false);
+  const managersLoadedRef = useRef(false);
   
   // Report tab state
   const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0]);
   const [currentReport, setCurrentReport] = useState(null);
   const [reportFilter, setReportFilter] = useState('ALL'); // 'ALL', 'WORKER', 'MANAGER'
+  const [workerReportData, setWorkerReportData] = useState(null);
   
   // History tab state
   const [reportHistory, setReportHistory] = useState([]);
+  
+  // Salary Report tab state (date range reporting)
+  const [salaryReportFilters, setSalaryReportFilters] = useState({
+    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0]
+  });
+  const [salaryReportData, setSalaryReportData] = useState(null);
+  const [salaryReportLoading, setSalaryReportLoading] = useState(false);
   
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
   
@@ -31,12 +45,23 @@ const SalaryReports = () => {
   useEffect(() => {
     loadManagers();
     loadReportHistory();
+    managersLoadedRef.current = false; // Reset ref on mount
   }, []);
+
+  // Load attendance from backend when managers are loaded or date changes
+  useEffect(() => {
+    if (managers.length > 0 && !managersLoadedRef.current) {
+      console.log('Managers loaded, now fetching attendance for:', selectedDate);
+      managersLoadedRef.current = true;
+      loadAttendanceForDate(selectedDate);
+    }
+  }, [managers, selectedDate]);
 
   // Load managers for attendance
   const loadManagers = async () => {
     try {
       const response = await API.get('/salary-reports/managers');
+      console.log('Managers loaded from API:', response.data);
       setManagers(response.data);
     } catch (error) {
       console.error('Error loading managers:', error);
@@ -45,14 +70,37 @@ const SalaryReports = () => {
     }
   };
 
-  // Load attendance for selected date
+  // Load attendance from backend for selected date
   const loadAttendanceForDate = async (date) => {
     try {
+      console.log('Loading attendance for date:', date);
       setLoading(true);
       const response = await API.get(`/salary-reports/attendance/${date}`);
-      setManagers(response.data);
+      const attendanceData = response.data;
+      console.log('Attendance data from backend:', attendanceData);
+      
+      // Update managers with attendance status from backend
+      if (attendanceData && attendanceData.length > 0) {
+        setHasExistingAttendance(true);
+        // Create a new array to avoid reference issues
+        const updatedManagers = managers.map(m => {
+          const attendanceRecord = attendanceData.find(a => a.managerId === m.managerId);
+          if (attendanceRecord) {
+            console.log(`Updating manager ${m.managerName}: isPresent = ${attendanceRecord.isPresent}`);
+            return { ...m, isPresent: attendanceRecord.isPresent };
+          }
+          return m;
+        });
+        setManagers(updatedManagers);
+        console.log('Managers after applying attendance:', updatedManagers);
+      } else {
+        setHasExistingAttendance(false);
+        console.log('No attendance data found for this date');
+      }
     } catch (error) {
       console.error('Error loading attendance:', error);
+      setHasExistingAttendance(false);
+      // If no attendance found for this date, that's okay - managers will have null isPresent
     } finally {
       setLoading(false);
     }
@@ -61,14 +109,13 @@ const SalaryReports = () => {
   // Handle date change for attendance
   const handleAttendanceDateChange = (date) => {
     setSelectedDate(date);
-    loadAttendanceForDate(date);
   };
 
   // Toggle attendance for a manager
-  const toggleAttendance = (managerId) => {
-    setManagers(managers.map(m => {
+  const toggleAttendance = (managerId, value) => {
+    setManagers(prevManagers => prevManagers.map(m => {
       if (m.managerId === managerId) {
-        return { ...m, isPresent: m.isPresent === true ? false : true };
+        return { ...m, isPresent: value };
       }
       return m;
     }));
@@ -100,6 +147,9 @@ const SalaryReports = () => {
       setMessage(`Attendance marked and report generated for ${selectedDate}`);
       setMessageType('success');
       
+      // Reload attendance to show updated state
+      loadAttendanceForDate(selectedDate);
+      
       // Load the report
       setCurrentReport(reportResponse.data.summary);
       
@@ -121,9 +171,17 @@ const SalaryReports = () => {
   // Load report for a date
   const loadReport = async (date) => {
     try {
-      setLoading(true);
+      setReportLoading(true);
+      
+      // Load consolidated report (managers)
       const response = await API.get(`/salary-reports/${date}`);
       setCurrentReport(response.data);
+      
+      // Load worker salary report
+      const [year, month, day] = date.split('-');
+      const workerResponse = await API.get(`/salary/reports/daily?year=${year}&month=${parseInt(month)}&day=${parseInt(day)}`);
+      setWorkerReportData(workerResponse.data);
+      
       setMessageType('');
       setMessage('');
     } catch (error) {
@@ -136,8 +194,9 @@ const SalaryReports = () => {
         setMessageType('error');
       }
       setCurrentReport(null);
+      setWorkerReportData(null);
     } finally {
-      setLoading(false);
+      setReportLoading(false);
     }
   };
 
@@ -145,7 +204,42 @@ const SalaryReports = () => {
   const loadReportHistory = async () => {
     try {
       const response = await API.get('/salary-reports/history');
-      setReportHistory(response.data);
+      const historyData = response.data;
+      
+      // Enhance each history entry with worker data
+      const enhancedHistory = await Promise.all(
+        historyData.map(async (report) => {
+          try {
+            // Fetch worker report for this date
+            const [year, month, day] = report.reportDate.split('-');
+            const workerResponse = await API.get(`/salary/reports/daily?year=${year}&month=${parseInt(month)}&day=${parseInt(day)}`);
+            const workerData = workerResponse.data;
+            
+            // Calculate combined total
+            const workerTotalCost = workerData?.totalPayroll || 0;
+            const managerTotalCost = report.managerTotalCost || 0;
+            const combinedTotal = workerTotalCost + managerTotalCost;
+            
+            return {
+              ...report,
+              workerTotalCost: workerTotalCost,
+              workerCount: workerData?.items?.length || 0,
+              combinedTotalCost: combinedTotal
+            };
+          } catch (error) {
+            console.error(`Error fetching worker data for ${report.reportDate}:`, error);
+            // Return original report with zero worker data
+            return {
+              ...report,
+              workerTotalCost: 0,
+              workerCount: 0,
+              combinedTotalCost: report.managerTotalCost || 0
+            };
+          }
+        })
+      );
+      
+      setReportHistory(enhancedHistory);
     } catch (error) {
       console.error('Error loading history:', error);
     }
@@ -195,6 +289,125 @@ const SalaryReports = () => {
     return currentReport.staffDetails.filter(s => s.staffType === reportFilter);
   };
 
+  // Salary Report filter change
+  const handleSalaryReportFilterChange = (e) => {
+    const { name, value } = e.target;
+    setSalaryReportFilters({ ...salaryReportFilters, [name]: value });
+  };
+
+  // Generate salary report for date range
+  const handleGenerateSalaryReport = async () => {
+    setSalaryReportLoading(true);
+    setSalaryReportData(null);
+    try {
+      const { startDate, endDate } = salaryReportFilters;
+      const response = await API.get(`/salary-reports/report?startDate=${startDate}&endDate=${endDate}`);
+      const reportData = response.data;
+      
+      if (!reportData.success) {
+        setSalaryReportData(reportData);
+        return;
+      }
+      
+      // Enhance each report entry with worker data from the worker salary API
+      const enhancedReports = await Promise.all(
+        reportData.reports.map(async (report) => {
+          try {
+            // Fetch worker report for this date
+            const [year, month, day] = report.reportDate.split('-');
+            const workerResponse = await API.get(`/salary/reports/daily?year=${year}&month=${parseInt(month)}&day=${parseInt(day)}`);
+            const workerData = workerResponse.data;
+            
+            // Get worker cost and count from worker API
+            const workerTotalCost = workerData?.totalPayroll || 0;
+            const workerCount = workerData?.items?.length || 0;
+            
+            return {
+              ...report,
+              workerTotalCost: workerTotalCost,
+              totalWorkers: workerCount
+            };
+          } catch (error) {
+            console.error(`Error fetching worker data for ${report.reportDate}:`, error);
+            // Return original report with existing worker data (from backend calculation)
+            return report;
+          }
+        })
+      );
+      
+      // Recalculate totals with enhanced worker data
+      const totalWorkerCost = enhancedReports.reduce((sum, r) => sum + (r.workerTotalCost || 0), 0);
+      const totalManagerCost = enhancedReports.reduce((sum, r) => sum + (r.managerTotalCost || 0), 0);
+      const grandTotal = totalWorkerCost + totalManagerCost;
+      
+      setSalaryReportData({
+        ...reportData,
+        reports: enhancedReports,
+        totalWorkerCost: totalWorkerCost,
+        totalManagerCost: totalManagerCost,
+        grandTotal: grandTotal
+      });
+    } catch (error) {
+      console.error('Error generating salary report:', error);
+      setMessage('Failed to generate salary report');
+      setMessageType('error');
+    } finally {
+      setSalaryReportLoading(false);
+    }
+  };
+
+  // Print salary report
+  const handlePrintSalaryReport = () => {
+    window.print();
+  };
+
+  // Download salary report as PDF
+  const handleDownloadSalaryPDF = () => {
+    if (!salaryReportData || !salaryReportData.success) return;
+
+    const doc = new jsPDF();
+    const title = "Salary Report";
+    const dateRange = `Period: ${salaryReportData.startDate} to ${salaryReportData.endDate}`;
+
+    doc.setFontSize(18);
+    doc.text(title, 14, 22);
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(dateRange, 14, 30);
+
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`Total Days: ${salaryReportData.totalDays || 0}`, 14, 42);
+    doc.text(`Total Worker Cost: LKR ${(salaryReportData.totalWorkerCost || 0).toLocaleString()}`, 14, 49);
+    doc.text(`Total Manager Cost: LKR ${(salaryReportData.totalManagerCost || 0).toLocaleString()}`, 14, 56);
+    doc.text(`Grand Total: LKR ${(salaryReportData.grandTotal || 0).toLocaleString()}`, 14, 63);
+
+    const tableColumn = ["Date", "Workers", "Managers", "Worker Cost (LKR)", "Manager Cost (LKR)", "Total Cost (LKR)"];
+    const tableRows = [];
+
+    salaryReportData.reports.forEach(r => {
+      const reportData = [
+        r.reportDate,
+        r.totalWorkers || 0,
+        r.totalManagers || 0,
+        (r.workerTotalCost || 0).toLocaleString(),
+        (r.managerTotalCost || 0).toLocaleString(),
+        ((r.workerTotalCost || 0) + (r.managerTotalCost || 0)).toLocaleString()
+      ];
+      tableRows.push(reportData);
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 72,
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246] }
+    });
+
+    doc.save(`Salary_Report_${salaryReportData.startDate}_${salaryReportData.endDate}.pdf`);
+  };
+
   return (
     <div className="salary-reports-container">
       <div className="salary-reports-header">
@@ -227,6 +440,12 @@ const SalaryReports = () => {
         >
           Report History
         </button>
+        <button 
+          className={`tab-button ${activeTab === 'salary-report' ? 'active' : ''}`}
+          onClick={() => setActiveTab('salary-report')}
+        >
+          Salary Report
+        </button>
       </div>
 
       {/* Tab Content */}
@@ -244,13 +463,19 @@ const SalaryReports = () => {
             </div>
 
             <div className="attendance-table-container">
-              <h3>Manager Attendance for {formatDate(selectedDate)}</h3>
+              <div className="attendance-header">
+                <h3>Manager Attendance for {formatDate(selectedDate)}</h3>
+                {hasExistingAttendance && (
+                  <span className="saved-badge">✓ Attendance Saved</span>
+                )}
+              </div>
               <table className="attendance-table">
                 <thead>
                   <tr>
                     <th>Manager Name</th>
                     <th>Role</th>
-                    <th>Present?</th>
+                    <th>Present</th>
+                    <th>Absent</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -259,12 +484,20 @@ const SalaryReports = () => {
                       <td>{manager.managerName}</td>
                       <td>{getRoleLabel(manager.managerRole)}</td>
                       <td>
-                        <button 
-                          className={`attendance-toggle ${manager.isPresent === true ? 'present' : manager.isPresent === false ? 'absent' : 'unmarked'}`}
-                          onClick={() => toggleAttendance(manager.managerId)}
-                        >
-                          {manager.isPresent === true ? '✓ Present' : manager.isPresent === false ? '✗ Absent' : '○ Not Marked'}
-                        </button>
+                        <input
+                          type="checkbox"
+                          checked={manager.isPresent === true}
+                          onChange={(e) => toggleAttendance(manager.managerId, e.target.checked)}
+                          className="attendance-checkbox present-checkbox"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={manager.isPresent === false}
+                          onChange={(e) => toggleAttendance(manager.managerId, e.target.checked ? false : null)}
+                          className="attendance-checkbox absent-checkbox"
+                        />
                       </td>
                     </tr>
                   ))}
@@ -273,13 +506,23 @@ const SalaryReports = () => {
             </div>
 
             <div className="attendance-actions">
-              <button 
-                className="apply-btn"
-                onClick={handleMarkAttendance}
-                disabled={loading || managers.every(m => m.isPresent === null)}
-              >
-                {loading ? 'Processing...' : 'Apply & Generate Report'}
-              </button>
+              {hasExistingAttendance ? (
+                <button 
+                  className="update-btn"
+                  onClick={handleMarkAttendance}
+                  disabled={loading}
+                >
+                  {loading ? 'Updating...' : 'Update Attendance'}
+                </button>
+              ) : (
+                <button 
+                  className="apply-btn"
+                  onClick={handleMarkAttendance}
+                  disabled={loading || managers.every(m => m.isPresent === null)}
+                >
+                  {loading ? 'Processing...' : 'Apply & Generate Report'}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -297,9 +540,9 @@ const SalaryReports = () => {
               <button 
                 className="load-report-btn"
                 onClick={() => loadReport(reportDate)}
-                disabled={loading}
+                disabled={reportLoading}
               >
-                {loading ? 'Loading...' : 'Load Report'}
+                {reportLoading ? 'Loading...' : 'Load Report'}
               </button>
             </div>
 
@@ -309,11 +552,11 @@ const SalaryReports = () => {
                 <div className="summary-cards">
                   <div className="summary-card">
                     <h4>Workers Present</h4>
-                    <p className="summary-value">{currentReport.totalWorkers || 0}</p>
+                    <p className="summary-value">{workerReportData?.items?.length || 0}</p>
                   </div>
                   <div className="summary-card">
                     <h4>Workers Cost</h4>
-                    <p className="summary-value">LKR {formatCurrency(currentReport.workerTotalCost)}</p>
+                    <p className="summary-value">LKR {formatCurrency(workerReportData?.totalPayroll)}</p>
                   </div>
                   <div className="summary-card">
                     <h4>Managers Present</h4>
@@ -325,66 +568,84 @@ const SalaryReports = () => {
                   </div>
                   <div className="summary-card total">
                     <h4>Total Cost</h4>
-                    <p className="summary-value">LKR {formatCurrency(currentReport.totalCost)}</p>
+                    <p className="summary-value">LKR {formatCurrency((workerReportData?.totalPayroll || 0) + (currentReport.managerTotalCost || 0))}</p>
                   </div>
                 </div>
 
-                {/* Filter */}
-                <div className="report-filter">
-                  <label>Filter:</label>
-                  <select 
-                    value={reportFilter} 
-                    onChange={(e) => setReportFilter(e.target.value)}
-                  >
-                    <option value="ALL">All Staff</option>
-                    <option value="WORKER">Workers Only</option>
-                    <option value="MANAGER">Managers Only</option>
-                  </select>
+                {/* Managers Table */}
+                <div className="staff-table-container">
+                  <h3>Manager Details for {formatDate(reportDate)}</h3>
+                  {currentReport.staffDetails && currentReport.staffDetails.filter(s => s.staffType === 'MANAGER').length > 0 ? (
+                    <table className="staff-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Role</th>
+                          <th>Rate Type</th>
+                          <th>Daily Rate</th>
+                          <th>Days</th>
+                          <th>Total Salary</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentReport.staffDetails
+                          .filter(s => s.staffType === 'MANAGER')
+                          .map((staff, index) => (
+                            <tr key={index}>
+                              <td>{staff.staffName}</td>
+                              <td>
+                                <span className="staff-badge manager">
+                                  {staff.positionRole}
+                                </span>
+                              </td>
+                              <td>{staff.rateType}</td>
+                              <td>LKR {formatCurrency(staff.rateAmount)}</td>
+                              <td>{staff.hoursOrDays}</td>
+                              <td className="salary-cell">
+                                LKR {formatCurrency(staff.totalSalary)}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p className="no-data-text">No manager attendance records for this date</p>
+                  )}
                 </div>
 
-                {/* Staff Table */}
+                {/* Workers Table */}
                 <div className="staff-table-container">
-                  <h3>Staff Details for {formatDate(reportDate)}</h3>
-                  <table className="staff-table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Position/Role</th>
-                        <th>Rate Type</th>
-                        <th>Rate</th>
-                        <th>Days/Hours</th>
-                        <th>Total Salary</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {getFilteredStaff().length === 0 ? (
+                  <h3>Worker Details for {formatDate(reportDate)}</h3>
+                  {workerReportData && workerReportData.items && workerReportData.items.length > 0 ? (
+                    <table className="staff-table">
+                      <thead>
                         <tr>
-                          <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
-                            No staff records found
-                          </td>
+                          <th>Name</th>
+                          <th>Position</th>
+                          <th>Department</th>
+                          <th>Total Hours</th>
+                          <th>Attendance %</th>
+                          <th>Total Salary</th>
                         </tr>
-                      ) : (
-                        getFilteredStaff().map((staff, index) => (
+                      </thead>
+                      <tbody>
+                        {workerReportData.items.map((worker, index) => (
                           <tr key={index}>
-                            <td>{staff.staffName}</td>
-                            <td>
-                              <span className={`staff-badge ${staff.staffType.toLowerCase()}`}>
-                                {staff.staffType}
-                              </span>
-                            </td>
-                            <td>{staff.positionRole}</td>
-                            <td>{staff.rateType}</td>
-                            <td>LKR {formatCurrency(staff.rateAmount)}</td>
-                            <td>{staff.hoursOrDays}</td>
+                            <td>{worker.workerName}</td>
+                            <td>{worker.position}</td>
+                            <td>{worker.department}</td>
+                            <td>{worker.totalHours.toFixed(2)}</td>
+                            <td>{worker.attendancePercentage.toFixed(0)}%</td>
                             <td className="salary-cell">
-                              LKR {formatCurrency(staff.totalSalary)}
+                              LKR {formatCurrency(worker.totalSalary)}
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p className="no-data-text">No worker attendance records for this date</p>
+                  )}
                 </div>
               </>
             )}
@@ -419,11 +680,11 @@ const SalaryReports = () => {
                   {reportHistory.map((report, index) => (
                     <tr key={index}>
                       <td>{formatDate(report.reportDate)}</td>
-                      <td>{report.totalWorkers || 0}</td>
+                      <td>{report.workerCount || report.totalWorkers || 0}</td>
                       <td>{report.totalManagers || 0}</td>
                       <td>LKR {formatCurrency(report.workerTotalCost)}</td>
                       <td>LKR {formatCurrency(report.managerTotalCost)}</td>
-                      <td className="total-cost">LKR {formatCurrency(report.totalCost)}</td>
+                      <td className="total-cost">LKR {formatCurrency(report.combinedTotalCost || report.totalCost)}</td>
                       <td>
                         <button 
                           className="view-btn"
@@ -436,6 +697,124 @@ const SalaryReports = () => {
                   ))}
                 </tbody>
               </table>
+            )}
+          </div>
+        )}
+
+        {/* TAB 4: Salary Report (Date Range) */}
+        {activeTab === 'salary-report' && (
+          <div className="salary-report-tab">
+            <h3>Generate Salary Report</h3>
+            
+            <div className="report-filters-section">
+              <div className="filter-group">
+                <label>Start Date:</label>
+                <input 
+                  type="date" 
+                  name="startDate"
+                  value={salaryReportFilters.startDate}
+                  onChange={handleSalaryReportFilterChange}
+                />
+              </div>
+              <div className="filter-group">
+                <label>End Date:</label>
+                <input 
+                  type="date" 
+                  name="endDate"
+                  value={salaryReportFilters.endDate}
+                  onChange={handleSalaryReportFilterChange}
+                />
+              </div>
+              <button 
+                className="generate-report-btn"
+                onClick={handleGenerateSalaryReport}
+                disabled={salaryReportLoading}
+              >
+                {salaryReportLoading ? 'Generating...' : 'Generate Report'}
+              </button>
+            </div>
+
+            {salaryReportData && salaryReportData.success && (
+              <div className="printable-report">
+                <div className="salary-report-results">
+                {/* Summary Cards */}
+                <div className="summary-cards">
+                  <div className="summary-card">
+                    <h4>Total Days</h4>
+                    <p className="summary-value">{salaryReportData.totalDays || 0}</p>
+                  </div>
+                  <div className="summary-card">
+                    <h4>Total Worker Cost</h4>
+                    <p className="summary-value">LKR {(salaryReportData.totalWorkerCost || 0).toLocaleString()}</p>
+                  </div>
+                  <div className="summary-card">
+                    <h4>Total Manager Cost</h4>
+                    <p className="summary-value">LKR {(salaryReportData.totalManagerCost || 0).toLocaleString()}</p>
+                  </div>
+                  <div className="summary-card total">
+                    <h4>Grand Total</h4>
+                    <p className="summary-value">LKR {(salaryReportData.grandTotal || 0).toLocaleString()}</p>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="report-actions">
+                  <button className="print-btn" onClick={handlePrintSalaryReport}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                      <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print Report
+                  </button>
+                  <button className="pdf-btn" onClick={handleDownloadSalaryPDF}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download PDF
+                  </button>
+                </div>
+
+                {/* Report Table */}
+                <div className="report-table-container">
+                  <h4>Salary Details</h4>
+                  <table className="report-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Workers</th>
+                        <th>Managers</th>
+                        <th>Worker Cost</th>
+                        <th>Manager Cost</th>
+                        <th>Total Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {salaryReportData.reports.map((report, index) => (
+                        <tr key={index}>
+                          <td>{formatDate(report.reportDate)}</td>
+                          <td>{report.totalWorkers || 0}</td>
+                          <td>{report.totalManagers || 0}</td>
+                          <td>LKR {(report.workerTotalCost || 0).toLocaleString()}</td>
+                          <td>LKR {(report.managerTotalCost || 0).toLocaleString()}</td>
+                          <td className="total-cost">
+                            LKR {((report.workerTotalCost || 0) + (report.managerTotalCost || 0)).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              </div>
+            )}
+
+            {!salaryReportData && !salaryReportLoading && (
+              <div className="no-data-message">
+                <p>Select a date range and click "Generate Report"</p>
+              </div>
             )}
           </div>
         )}
