@@ -181,14 +181,14 @@ function App() {
                 <Route
                     path="/labor"
                     element={
-                        <ProtectedRoute allowedRoles={['LABOR_MANAGER', 'ADMIN']} userRole={user?.role}>
+                        <ProtectedRoute allowedRoles={['LABOR_MANAGER', 'ADMIN', 'FINANCE_MANAGER']} userRole={user?.role}>
                             <LaborManagerDashboard user={user} onLogout={handleLogout} />
                         </ProtectedRoute>
                     }
                 >
                     <Route path="workers" element={<WorkerManagement />} />
                     <Route path="attendance" element={<AttendanceTracking />} />
-                    <Route path="salary" element={<SalaryReports />} />
+                    <Route path="salary" element={<SalaryReports user={user} />} />
                     <Route path="jobs" element={<Jobs />}>
                         <Route path="assignment" element={<JobAssignment />} />
                         <Route path="select" element={<SelectJobs />} />

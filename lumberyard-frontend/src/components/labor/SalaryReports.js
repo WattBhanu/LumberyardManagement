@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import API from '../../services/api';
 import './LaborManagement.css';
 
-const SalaryReports = () => {
+const SalaryReports = ({ user }) => {
   const navigate = useNavigate();
   const [reportData, setReportData] = useState({ items: [], totalPayroll: 0, averageSalary: 0 });
   const [loading, setLoading] = useState(true);
@@ -11,6 +11,15 @@ const SalaryReports = () => {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
+
+  const handleBack = () => {
+    // Finance Managers go back to Finance Dashboard, others go to Labor Dashboard
+    if (user && user.role === 'FINANCE_MANAGER') {
+      navigate('/finance');
+    } else {
+      navigate('/labor');
+    }
+  };
 
   useEffect(() => {
     fetchReport();
@@ -37,7 +46,7 @@ const SalaryReports = () => {
   return (
     <div className="labor-mgmt-management">
       <div className="labor-mgmt-header">
-        <button className="labor-mgmt-back-btn" onClick={() => navigate('/labor')}>
+        <button className="labor-mgmt-back-btn" onClick={handleBack}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>

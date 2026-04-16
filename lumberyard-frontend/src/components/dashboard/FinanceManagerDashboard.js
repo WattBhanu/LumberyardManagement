@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import SalaryReports from './SalaryReports';
 import IncomeRecording from '../finance/IncomeRecording';
 import ExpenseRecording from '../finance/ExpenseRecording';
+import ProfitLossSummary from '../finance/ProfitLossSummary';
 import './AdminDashboard.css';
 
 const FinanceManagerDashboard = ({ user, onLogout, token }) => {
   const navigate = useNavigate();
   const isAdmin = user && user.role === 'ADMIN';
-  const [activeView, setActiveView] = useState('overview'); // 'overview', 'salary-reports', 'income-recording', 'expense-recording'
+  const [activeView, setActiveView] = useState('overview'); // 'overview', 'salary-reports', 'income-recording', 'expense-reporting', 'profit-loss'
 
   const handleLogout = () => {
     onLogout();
@@ -23,25 +24,46 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
         return <IncomeRecording token={token} />;
       case 'expense-reporting':
         return <ExpenseRecording token={token} />;
+      case 'profit-loss':
+        return <ProfitLossSummary token={token} />;
       default:
         return (
           <div className="dashboard-cards">
+            {isAdmin && (
+              <div className="dashboard-card">
+                <div className="card-icon salary">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <h3>Salary Tracking</h3>
+                <p>Mark attendance and generate daily salary reports</p>
+                <button 
+                  className="card-button"
+                  onClick={() => setActiveView('salary-reports')}
+                >
+                  Open Salary Reports
+                </button>
+              </div>
+            )}
+
             <div className="dashboard-card">
-              <div className="card-icon salary">
+              <div className="card-icon labor">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
               </div>
-              <h3>Salary Tracking</h3>
-              <p>Mark attendance and generate daily salary reports</p>
+              <h3>Labor Salary Tracking</h3>
+              <p>View worker salary reports and attendance</p>
               <button 
                 className="card-button"
-                onClick={() => setActiveView('salary-reports')}
+                onClick={() => navigate('/labor/salary')}
               >
-                Open Salary Reports
+                Open Labor Salary Reports
               </button>
             </div>
 
@@ -88,7 +110,12 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
               </div>
               <h3>Profit & Loss Summary</h3>
               <p>View profit and loss analysis</p>
-              <button className="card-button" disabled>Coming Soon</button>
+              <button 
+                className="card-button"
+                onClick={() => setActiveView('profit-loss')}
+              >
+                Open Profit & Loss
+              </button>
             </div>
           </div>
         );
@@ -100,6 +127,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
       case 'salary-reports': return 'Salary Tracking';
       case 'income-recording': return 'Income Recording';
       case 'expense-reporting': return 'Expense Reporting';
+      case 'profit-loss': return 'Profit & Loss Summary';
       default: return 'Finance Manager Dashboard';
     }
   };
@@ -109,6 +137,7 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
       case 'salary-reports': return 'Daily Reports';
       case 'income-recording': return 'Transaction Recording';
       case 'expense-reporting': return 'Spending Analysis';
+      case 'profit-loss': return 'Financial Performance';
       default: return 'Financial Operations';
     }
   };
@@ -167,4 +196,4 @@ const FinanceManagerDashboard = ({ user, onLogout, token }) => {
   );
 };
 
-export default FinanceManagerDashboard;
+export default FinanceManagerDashboard;
