@@ -3,6 +3,7 @@ package com.lumberyard_backend.repository;
 import com.lumberyard_backend.entity.ManagerAttendance;
 import com.lumberyard_backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -24,4 +25,7 @@ public interface ManagerAttendanceRepository extends JpaRepository<ManagerAttend
     boolean existsByAttendanceDate(LocalDate attendanceDate);
     
     void deleteByAttendanceDate(LocalDate attendanceDate);
+    
+    @Query("SELECT DISTINCT m.attendanceDate FROM ManagerAttendance m")
+    List<LocalDate> findDistinctAttendanceDates();
 }

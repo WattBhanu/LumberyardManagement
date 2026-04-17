@@ -88,7 +88,7 @@ const AdminDashboard = ({ user, onLogout, token }) => {
                 <h3>Finance Dashboard</h3>
                 <p>Access financial reports and expense tracking</p>
                 <button 
-                  className="card-button secondary"
+                  className="card-button"
                   onClick={() => navigate('/finance')}
                 >
                   Open Finance

@@ -32,6 +32,9 @@ public class DailySalaryReportService {
     @Autowired
     private WorkerRepository workerRepository;
     
+    @Autowired
+    private SalaryCalculationService salaryCalculationService;
+    
     // Generate daily consolidated salary report
     @Transactional
     public ConsolidatedSalarySummary generateDailyReport(LocalDate reportDate, String generatedBy) {
@@ -97,12 +100,12 @@ public class DailySalaryReportService {
                 Worker worker = attendance.getWorker();
                 if (worker == null) continue;
                 
-                // Calculate salary based on worked hours
+                // Calculate salary based on worked hours using Labor Manager's logic
                 double workedHours = attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 8.0;
-                double hourlyRate = calculateHourlyRate(worker);
+                double hourlyRate = salaryCalculationService.calculateHourlyWage(worker);
                 BigDecimal hoursBD = BigDecimal.valueOf(workedHours);
                 BigDecimal rateBD = BigDecimal.valueOf(hourlyRate);
-                BigDecimal totalSalary = rateBD.multiply(hoursBD);
+                BigDecimal totalSalary = BigDecimal.valueOf(salaryCalculationService.calculateDailySalary(hourlyRate, workedHours));
                 
                 // Create report entry
                 DailySalaryReport report = new DailySalaryReport();
@@ -203,9 +206,25 @@ public class DailySalaryReportService {
         return summary;
     }
     
-    // Get report history (list of all dates with reports)
+    // Get report history (list of all dates with reports OR attendance)
     public List<LocalDate> getReportHistory() {
-        return reportRepository.findDistinctReportDates();
+        List<LocalDate> dates = reportRepository.findDistinctReportDates();
+        
+        // Add dates from manager attendance
+        List<LocalDate> managerDates = managerAttendanceRepository.findDistinctAttendanceDates();
+        for (LocalDate d : managerDates) {
+            if (!dates.contains(d)) dates.add(d);
+        }
+        
+        // Add dates from worker attendance
+        List<LocalDate> workerDates = attendanceRepository.findDistinctDates();
+        for (LocalDate d : workerDates) {
+            if (!dates.contains(d)) dates.add(d);
+        }
+        
+        // Sort dates descending
+        dates.sort((a,b) -> b.compareTo(a));
+        return dates;
     }
     
     // Get summary for history view
@@ -215,6 +234,11 @@ public class DailySalaryReportService {
         
         for (LocalDate date : dates) {
             ConsolidatedSalarySummary summary = getReportByDate(date);
+            if (summary == null) {
+                // If no report exists, create one dynamically from attendance data so it shows in history
+                summary = createSummaryFromAttendance(date);
+            }
+            
             if (summary != null) {
                 // Only include summary info, not full details
                 summary.setStaffDetails(null);
@@ -263,7 +287,8 @@ public class DailySalaryReportService {
                 User manager = attendance.getManager();
                 if (manager == null) continue;
                 
-                BigDecimal dailyRate = manager.getDailySalary() != null ? manager.getDailySalary() : BigDecimal.ZERO;
+                BigDecimal dailyRate = manager.getDailySalaryRate() != null ? 
+                    BigDecimal.valueOf(manager.getDailySalaryRate()) : BigDecimal.ZERO;
                 managerTotalCost = managerTotalCost.add(dailyRate);
                 managerCount++;
             }
@@ -280,10 +305,8 @@ public class DailySalaryReportService {
                 if (worker == null) continue;
                 
                 double workedHours = attendance.getWorkedHours() != null ? attendance.getWorkedHours() : 8.0;
-                double hourlyRate = calculateHourlyRate(worker);
-                BigDecimal hoursBD = BigDecimal.valueOf(workedHours);
-                BigDecimal rateBD = BigDecimal.valueOf(hourlyRate);
-                BigDecimal totalSalary = rateBD.multiply(hoursBD);
+                double hourlyRate = salaryCalculationService.calculateHourlyWage(worker);
+                BigDecimal totalSalary = BigDecimal.valueOf(salaryCalculationService.calculateDailySalary(hourlyRate, workedHours));
                 
                 workerTotalCost = workerTotalCost.add(totalSalary);
                 workerCount++;
@@ -310,15 +333,5 @@ public class DailySalaryReportService {
     // Check if report exists for date
     public boolean reportExists(LocalDate date) {
         return reportRepository.existsByReportDate(date);
-    }
-    
-    // Helper method to calculate hourly rate for a worker
-    private double calculateHourlyRate(Worker worker) {
-        // Use the hourlyRate field from Worker entity
-        if (worker.getHourlyRate() != null) {
-            return worker.getHourlyRate();
-        }
-        // Default rate if no hourly rate is set
-        return 100.0; // LKR per hour
     }
 }
