@@ -761,43 +761,55 @@
 
 /* Print Styles */
 @media print {
-  /* Hide everything by default */
+  /* Hide everything except the report section */
   body * {
     visibility: hidden;
   }
-
-  /* Show only report content */
-  .pl-reporting-content,
-  .pl-reporting-content * {
+  .printable-report, .printable-report * {
     visibility: visible;
   }
-
-  /* Position report at top */
-  .pl-reporting-content {
+  .printable-report {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
-    padding: 20px;
+    padding: 0;
+    margin: 0;
     background: white;
-    box-shadow: none;
   }
-
+  
   /* Hide filters and buttons when printing */
   .pl-report-filters,
-  .pl-report-actions {
+  .pl-report-actions,
+  .pl-alert,
+  .pl-header,
+  .pl-tabs,
+  .pl-no-data {
     display: none !important;
+  }
+  
+  /* Remove min-height and backgrounds from containers */
+  .profit-loss-summary,
+  .pl-reporting-content {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
   }
 
   /* Ensure tables print properly */
   .pl-report-table {
     page-break-inside: auto;
     box-shadow: none;
-    border: 1px solid #e2e8f0;
+    border: none;
+    padding: 0;
+    margin: 0;
   }
 
   .pl-report-table table {
     page-break-inside: auto;
+    width: 100%;
   }
 
   .pl-report-table tr {
@@ -817,17 +829,20 @@
   .pl-report-summary {
     page-break-inside: avoid;
     box-shadow: none;
-    border: 1px solid #e2e8f0;
+    border: none;
+    padding: 10px;
+    margin: 0;
+  }
+
+  /* Results container */
+  .pl-report-results {
+    margin: 0;
+    padding: 0;
   }
 
   /* Status badges */
   .pl-status-badge {
     border: 1px solid currentColor;
-  }
-
-  /* Remove backgrounds for better printing */
-  .pl-summary-item {
-    background: transparent !important;
   }
 
   /* Ensure colors print */

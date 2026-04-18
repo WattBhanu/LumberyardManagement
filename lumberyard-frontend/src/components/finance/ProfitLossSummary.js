@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import API from '../../services/api';
 import './ProfitLossSummary.css';
 
@@ -134,178 +136,116 @@ const ProfitLossSummary = ({ token }) => {
 
   // Print report function
   const printReport = () => {
-    if (!reportData) return;
-
-    const printWindow = window.open('', '_blank');
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Profit & Loss Report - ${reportData.startDate} to ${reportData.endDate}</title>
-        <style>
-          body { 
-            font-family: Arial, sans-serif; 
-            padding: 40px; 
-            color: #1e293b;
-            margin: 0;
-          }
-          h1 { 
-            color: #1e293b; 
-            text-align: center; 
-            margin-bottom: 10px;
-            font-size: 28px;
-          }
-          .period { 
-            text-align: center; 
-            color: #64748b; 
-            margin-bottom: 30px;
-            font-size: 14px;
-          }
-          .summary { 
-            background: #f8fafc; 
-            padding: 20px; 
-            margin: 20px 0; 
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-          }
-          .summary-item { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 12px 0; 
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-          }
-          .summary-item:last-child { 
-            border-bottom: none; 
-            font-weight: bold;
-            font-size: 16px;
-          }
-          .profit { color: #10b981; }
-          .loss { color: #ef4444; }
-          table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 30px;
-            font-size: 12px;
-          }
-          th, td { 
-            padding: 10px; 
-            text-align: left; 
-            border-bottom: 1px solid #e2e8f0;
-          }
-          th { 
-            background: #f1f5f9; 
-            font-weight: 600; 
-            color: #475569;
-          }
-          .text-right { text-align: right; }
-          @media print {
-            body { padding: 20px; }
-            .no-print { display: none; }
-          }
-        </style>
-      </head>
-      <body>
-        <h1>Profit & Loss Report</h1>
-        <p class="period"><strong>Period:</strong> ${reportData.startDate} to ${reportData.endDate}</p>
-        <div class="summary">
-          <div class="summary-item"><span>Total Income:</span><span>${formatCurrency(reportData.totalIncome)}</span></div>
-          <div class="summary-item"><span>Total Expenses:</span><span>${formatCurrency(reportData.totalExpenses)}</span></div>
-          <div class="summary-item"><span>Total Salary:</span><span>${formatCurrency(reportData.totalSalary)}</span></div>
-          <div class="summary-item"><span>Net:</span><span class="${reportData.net >= 0 ? 'profit' : 'loss'}">${formatCurrency(Math.abs(reportData.net))} ${reportData.net >= 0 ? '(Profit)' : '(Loss)'}</span></div>
-          <div class="summary-item"><span>Status:</span><span class="${reportData.status === 'Profit' ? 'profit' : 'loss'}">${reportData.status}</span></div>
-        </div>
-        <table>
-          <thead>
-            <tr><th>Date</th><th class="text-right">Income</th><th class="text-right">Expenses</th><th class="text-right">Salary</th><th class="text-right">Net</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            ${reportData.dailyReports.map(r => `
-              <tr>
-                <td>${r.date}</td>
-                <td class="text-right">${formatCurrency(r.totalIncome)}</td>
-                <td class="text-right">${formatCurrency(r.totalExpenses)}</td>
-                <td class="text-right">${formatCurrency(r.totalSalary)}</td>
-                <td class="text-right ${r.net >= 0 ? 'profit' : 'loss'}">${formatCurrency(Math.abs(r.net))}</td>
-                <td class="${r.status === 'Profit' ? 'profit' : 'loss'}">${r.status}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <script>
-          window.onload = function() {
-            window.print();
-          }
-        </script>
-      </body>
-      </html>
-    `;
-
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
+    window.print();
   };
 
   // Download PDF function
   const downloadPDF = () => {
     if (!reportData) return;
 
-    const printWindow = window.open('', '_blank');
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Profit & Loss Report - ${reportData.startDate} to ${reportData.endDate}</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 40px; color: #1e293b; }
-          h1 { color: #1e293b; text-align: center; margin-bottom: 10px; }
-          .period { text-align: center; color: #64748b; margin-bottom: 30px; }
-          .summary { background: #f8fafc; padding: 20px; margin: 20px 0; border-radius: 8px; }
-          .summary-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
-          .summary-item:last-child { border-bottom: none; font-weight: bold; }
-          .profit { color: #10b981; }
-          .loss { color: #ef4444; }
-          table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-          th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-          th { background: #f1f5f9; font-weight: 600; color: #475569; }
-          .text-right { text-align: right; }
-        </style>
-      </head>
-      <body>
-        <h1>Profit & Loss Report</h1>
-        <p class="period"><strong>Period:</strong> ${reportData.startDate} to ${reportData.endDate}</p>
-        <div class="summary">
-          <div class="summary-item"><span>Total Income:</span><span>${formatCurrency(reportData.totalIncome)}</span></div>
-          <div class="summary-item"><span>Total Expenses:</span><span>${formatCurrency(reportData.totalExpenses)}</span></div>
-          <div class="summary-item"><span>Total Salary:</span><span>${formatCurrency(reportData.totalSalary)}</span></div>
-          <div class="summary-item"><span>Net:</span><span class="${reportData.net >= 0 ? 'profit' : 'loss'}">${formatCurrency(Math.abs(reportData.net))} ${reportData.net >= 0 ? '(Profit)' : '(Loss)'}</span></div>
-          <div class="summary-item"><span>Status:</span><span class="${reportData.status === 'Profit' ? 'profit' : 'loss'}">${reportData.status}</span></div>
-        </div>
-        <table>
-          <thead>
-            <tr><th>Date</th><th class="text-right">Income</th><th class="text-right">Expenses</th><th class="text-right">Salary</th><th class="text-right">Net</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            ${reportData.dailyReports.map(r => `
-              <tr>
-                <td>${r.date}</td>
-                <td class="text-right">${formatCurrency(r.totalIncome)}</td>
-                <td class="text-right">${formatCurrency(r.totalExpenses)}</td>
-                <td class="text-right">${formatCurrency(r.totalSalary)}</td>
-                <td class="text-right ${r.net >= 0 ? 'profit' : 'loss'}">${formatCurrency(Math.abs(r.net))}</td>
-                <td class="${r.status === 'Profit' ? 'profit' : 'loss'}">${r.status}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </body>
-      </html>
-    `;
+    const doc = new jsPDF();
+    const title = "Profit & Loss Report";
+    const dateRange = `Period: ${reportData.startDate} to ${reportData.endDate}`;
 
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    setTimeout(() => {
-      printWindow.print();
-    }, 250);
+    // Header
+    doc.setFontSize(18);
+    doc.text(title, 14, 22);
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(dateRange, 14, 30);
+
+    // Summary Section
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    let yPos = 40;
+    
+    doc.setFont(undefined, 'bold');
+    doc.text('Summary:', 14, yPos);
+    yPos += 8;
+    doc.setFont(undefined, 'normal');
+    
+    doc.text(`Total Income: ${formatCurrency(reportData.totalIncome)}`, 14, yPos);
+    yPos += 7;
+    doc.text(`Total Expenses: ${formatCurrency(reportData.totalExpenses)}`, 14, yPos);
+    yPos += 7;
+    doc.text(`Total Salary: ${formatCurrency(reportData.totalSalary)}`, 14, yPos);
+    yPos += 7;
+    
+    const netText = `Net: ${formatCurrency(Math.abs(reportData.net))} (${reportData.status})`;
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(reportData.net >= 0 ? 16 : 239, reportData.net >= 0 ? 185 : 68, reportData.net >= 0 ? 129 : 68);
+    doc.text(netText, 14, yPos);
+    yPos += 15;
+
+    // Daily Breakdown Table with colors
+    const tableColumn = ["Date", "Income", "Expenses", "Salary", "Net", "Status"];
+    const tableRows = [];
+    const rowStyles = [];
+
+    reportData.dailyReports.forEach((r, index) => {
+      const reportRow = [
+        r.date,
+        formatCurrency(r.totalIncome),
+        formatCurrency(r.totalExpenses),
+        formatCurrency(r.totalSalary),
+        formatCurrency(Math.abs(r.net)),
+        r.status
+      ];
+      tableRows.push(reportRow);
+      
+      // Store color info for each row
+      rowStyles.push({
+        isProfit: r.net >= 0
+      });
+    });
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: yPos,
+      theme: 'grid',
+      headStyles: { 
+        fillColor: [74, 127, 193],
+        textColor: 255
+      },
+      styles: { fontSize: 10 },
+      columnStyles: {
+        1: { halign: 'right' },
+        2: { halign: 'right' },
+        3: { halign: 'right' },
+        4: { halign: 'right' },
+        5: { halign: 'center' }
+      },
+      didParseCell: function(data) {
+        // Color the Net column and Status column based on profit/loss
+        if (data.section === 'body') {
+          const rowInfo = rowStyles[data.row.index];
+          // Net column (index 4)
+          if (data.column.index === 4) {
+            if (rowInfo.isProfit) {
+              data.cell.styles.textColor = [16, 185, 129]; // Green
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [239, 68, 68]; // Red
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+          // Status column (index 5)
+          if (data.column.index === 5) {
+            if (rowInfo.isProfit) {
+              data.cell.styles.textColor = [16, 185, 129]; // Green
+              data.cell.styles.fontStyle = 'bold';
+            } else {
+              data.cell.styles.textColor = [239, 68, 68]; // Red
+              data.cell.styles.fontStyle = 'bold';
+            }
+          }
+        }
+      }
+    });
+
+    // Download the PDF
+    doc.save(`Profit_Loss_Report_${reportData.startDate}_${reportData.endDate}.pdf`);
   };
 
   return (
@@ -522,7 +462,8 @@ const ProfitLossSummary = ({ token }) => {
 
           {/* Report Results */}
           {reportData && reportData.success && (
-            <div className="pl-report-results">
+            <div className={reportData.success ? "printable-report" : ""}>
+              <div className="pl-report-results">
               {/* Summary Section */}
               <div className="pl-report-summary">
                 <h4>Report Summary</h4>
@@ -606,6 +547,7 @@ const ProfitLossSummary = ({ token }) => {
                   </tbody>
                 </table>
               </div>
+            </div>
             </div>
           )}
 
