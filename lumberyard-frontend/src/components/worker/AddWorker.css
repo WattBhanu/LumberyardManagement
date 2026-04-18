@@ -81,6 +81,22 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+/* Ensure date inputs are clickable */
+.form-group input[type="date"] {
+  cursor: pointer;
+  position: relative;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 4px;
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
 .form-group input:focus,
 .form-group select:focus {
   outline: none;

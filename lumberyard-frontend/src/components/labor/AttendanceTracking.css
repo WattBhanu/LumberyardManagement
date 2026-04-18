@@ -577,6 +577,25 @@
   background: #fff;
 }
 
+/* Ensure date and time inputs are clickable */
+.at-field input[type="date"],
+.at-field input[type="time"] {
+  cursor: pointer;
+  position: relative;
+}
+
+.at-field input[type="date"]::-webkit-calendar-picker-indicator,
+.at-field input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 4px;
+}
+
+.at-field input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.at-field input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
 /* DateTime picker input wrapper */
 .at-datetime-input-wrapper {
   position: relative;
