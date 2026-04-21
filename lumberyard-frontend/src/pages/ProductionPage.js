@@ -83,7 +83,7 @@ const ProductionPage = () => {
 
     const fetchTimbers = async () => {
         try {
-            const response = await API.get('/production/timber');
+            const response = await API.get('/timber/all');
             setTimbers(response.data);
         } catch (error) {
             console.error('Error fetching timbers:', error);
