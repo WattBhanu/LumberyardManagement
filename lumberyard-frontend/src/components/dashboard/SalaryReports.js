@@ -295,6 +295,8 @@ const SalaryReports = () => {
     doc.text(`Managers Present: ${managersPresent} (LKR ${managerCost})`, 14, 37);
     doc.text(`Total Daily Cost: LKR ${totalCost}`, 14, 44);
 
+    let currentY = 50;
+
     // Manager Table
     const managerData = currentReport.staffDetails
       .filter(s => s.staffType === 'MANAGER')
@@ -310,15 +312,17 @@ const SalaryReports = () => {
     if (managerData.length > 0) {
       doc.setFontSize(14);
       doc.setTextColor(0);
-      doc.text("Manager Details", 14, 55);
+      doc.text("Manager Details", 14, currentY);
       
       autoTable(doc, {
         head: [['Name', 'Role', 'Rate Type', 'Rate', 'Days', 'Salary (LKR)']],
         body: managerData,
-        startY: 60,
+        startY: currentY + 5,
         theme: 'grid',
         headStyles: { fillColor: [59, 130, 246] }
       });
+      
+      currentY = doc.lastAutoTable.finalY + 15;
     }
 
     // Worker Table
@@ -332,15 +336,14 @@ const SalaryReports = () => {
     ]);
 
     if (workerData.length > 0) {
-      const finalY = (doc).lastAutoTable.finalY + 15;
       doc.setFontSize(14);
       doc.setTextColor(0);
-      doc.text("Worker Details", 14, finalY);
+      doc.text("Worker Details", 14, currentY);
       
       autoTable(doc, {
         head: [['Name', 'Position', 'Department', 'Hours', 'Attnd %', 'Salary (LKR)']],
         body: workerData,
-        startY: finalY + 5,
+        startY: currentY + 5,
         theme: 'grid',
         headStyles: { fillColor: [16, 185, 129] }
       });
