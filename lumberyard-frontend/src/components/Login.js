@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Login.css';
 import LogoImage from '../Logo.png';
 import BackgroundImage from '../Image.jpg';
+import API from '../services/api';
 
 const Login = ({ onLogin }) => {
   const [credentials, setCredentials] = useState({
@@ -28,37 +29,28 @@ const Login = ({ onLogin }) => {
     try {
       console.log('Attempting login with:', credentials);
       
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+      const response = await API.post('/auth/login', credentials);
 
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
       
-      const data = await response.json();
+      const data = response.data;
       console.log('Response data:', data);
 
-      if (response.ok) {
-        // Store token and user info in localStorage
-        localStorage.setItem('token', data.jwt);
-        localStorage.setItem('user', JSON.stringify({
-          username: data.username,
-          name: data.name,
-          role: data.role
-        }));
+      // Store token and user info in localStorage
+      localStorage.setItem('token', data.jwt);
+      localStorage.setItem('user', JSON.stringify({
+        username: data.username,
+        name: data.name,
+        role: data.role
+      }));
 
-        // Call the onLogin callback to update app state
-        onLogin(data);
-      } else {
-        setError(data.error || `Login failed with status ${response.status}. Please check your credentials.`);
-      }
+      // Call the onLogin callback to update app state
+      onLogin(data);
     } catch (err) {
       console.error('Network error details:', err);
-      setError(`Network error: ${err.message}. Please check if the backend server is running on http://localhost:8080`);
+      const errorMessage = err.response?.data?.error || err.message || 'Login failed';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

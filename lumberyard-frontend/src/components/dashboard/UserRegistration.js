@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './UserRegistration.css';
 import ManagerSalaryManagement from '../labor/ManagerSalaryManagement';
+import API from '../../services/api';
 
 const UserRegistration = ({ token }) => {
   console.log('UserRegistration component rendered with token:', token);
@@ -44,40 +45,16 @@ const UserRegistration = ({ token }) => {
   const fetchAllUsers = async () => {
     try {
       console.log('Fetching users with token:', token);
-      const response = await fetch('http://localhost:8080/api/users/all', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await API.get('/users/all');
       
       console.log('Users fetch response status:', response.status);
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Users fetched successfully:', data);
-        setUsers(data);
-      } else {
-        const errorText = await response.text();
-        console.error('Failed to fetch users. Status:', response.status, 'Error:', errorText);
-        setMessage(`Failed to load users: ${response.status} ${response.statusText}`);
-        setMessageType('error');
-      }
+      const data = response.data;
+      console.log('Users fetched successfully:', data);
+      setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
-      console.error('Fetch error name:', error.name);
-      console.error('Fetch error message:', error.message);
-      console.error('Fetch error stack:', error.stack);
-      
-      let errorMessage = 'Network error while fetching users';
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'Failed to connect to server to fetch users. Please check if the backend is running on http://localhost:8080';
-      } else if (error.message) {
-        errorMessage = `Network error while fetching users: ${error.message}`;
-      }
-      
-      setMessage(errorMessage);
+      setMessage('Failed to load users. Please check your connection.');
       setMessageType('error');
     }
   };
@@ -98,61 +75,26 @@ const UserRegistration = ({ token }) => {
       console.log('Registering user with token:', token);
       console.log('Form data:', formData);
       
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-      
-      if (token && token !== 'undefined' && token !== 'null') {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
-      const response = await fetch('http://localhost:8080/api/users/register', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(formData)
-      });
+      const response = await API.post('/users/register', formData);
 
       console.log('Registration response status:', response.status);
       
-      if (response.ok) {
-        await response.json();
-        setMessage('User registered successfully!');
-        setMessageType('success');
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          password: '',
-          role: 'FINANCE_MANAGER',
-          dailySalaryRate: ''
-        });
-        // Refresh user list
-        fetchAllUsers();
-      } else {
-        const errorText = await response.text();
-        console.error('Registration failed. Status:', response.status, 'Error:', errorText);
-        try {
-          const errorData = JSON.parse(errorText);
-          setMessage(errorData.error || `Registration failed: ${response.status} ${response.statusText}`);
-        } catch {
-          setMessage(`Registration failed: ${response.status} ${response.statusText}`);
-        }
-        setMessageType('error');
-      }
+      setMessage('User registered successfully!');
+      setMessageType('success');
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        role: 'FINANCE_MANAGER',
+        dailySalaryRate: ''
+      });
+      // Refresh user list
+      fetchAllUsers();
     } catch (error) {
       console.error('Network error during registration:', error);
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-      
-      let errorMessage = 'Network error occurred';
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'Failed to connect to server. Please check if the backend is running on http://localhost:8080';
-      } else if (error.message) {
-        errorMessage = `Network error: ${error.message}`;
-      }
-      
+      const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
       setMessage(errorMessage);
       setMessageType('error');
     } finally {
@@ -196,26 +138,19 @@ const UserRegistration = ({ token }) => {
     }
     
     try {
-      const response = await fetch(`http://localhost:8080/api/users/delete/${deleteConfirm.userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await API.delete(`/users/delete/${deleteConfirm.userId}`);
       
-      if (response.ok) {
+      if (response.status === 200 || response.status === 204) {
         setMessage('User deleted successfully!');
         setMessageType('success');
         fetchAllUsers(); // Refresh the list
       } else {
-        const errorData = await response.json();
-        setMessage(errorData.error || 'Failed to delete user');
+        setMessage('Failed to delete user');
         setMessageType('error');
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      setMessage('Network error while deleting user');
+      setMessage('Failed to delete user. Please try again.');
       setMessageType('error');
     } finally {
       setDeleteConfirm(null);
