@@ -502,31 +502,6 @@ Manages all financial aspects of the lumberyard including transactions, expenses
 
 ---
 
-## 🚀 Getting Started
-
-### Prerequisites
-- **Java 21** or higher
-- **Node.js 16+** and npm
-- **MySQL 8.0+** (for local development)
-- **Maven 3.6+** (included via Maven Wrapper)
-
-### Environment Variables
-
-#### Backend (`application.properties` or Environment)
-```properties
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/lumberyard_db
-SPRING_DATASOURCE_USERNAME=root
-SPRING_DATASOURCE_PASSWORD=your_password
-JWT_SECRET=your-256-bit-secret-key-must-be-at-least-32-characters
-SERVER_PORT=8080
-```
-
-#### Frontend
-- API base URL is configured in `src/services/api.js`
-- Default: `http://localhost:8080/api`
-
----
-
 ## 📡 API Documentation
 
 ### Authentication Endpoints
