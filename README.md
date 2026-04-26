@@ -4,7 +4,7 @@ Developed for **Wood Moon Enterprises** — Client: Mr. Sigman Shanthapriya
 
 [🔗 Visit Wood Moon Enterprises on Facebook](https://www.facebook.com/p/Wood-Moon-Enterprises-100090445121861/)
 
-![Wood Moon Logo](lumberyard-frontend/src/Logo.png)
+<img src="lumberyard-frontend/src/Logo.png" alt="Wood Moon Logo" width="100">
 
 **Developed By**
 
