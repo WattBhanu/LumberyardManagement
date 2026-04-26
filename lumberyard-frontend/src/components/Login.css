@@ -4,19 +4,74 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: #f8fafc;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     padding: 24px;
+    position: relative;
+}
+
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay for better readability */
+    z-index: 1;
+}
+
+.login-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.login-header-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.central-logo {
+    width: 120px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.company-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 8px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.02em;
+}
+
+.portal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 0 0 10px 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .login-form {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
     padding: 40px;
     border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 420px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
 }
 
 .login-form h2 {
@@ -142,6 +197,20 @@
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+    .company-title {
+        font-size: 26px;
+    }
+    
+    .portal-title {
+        font-size: 18px;
+    }
+    
+    .central-logo {
+        width: 100px;
+    }
+}
+
 @media (max-width: 480px) {
     .login-form {
         padding: 32px 24px;
@@ -149,5 +218,17 @@
     
     .login-form h2 {
         font-size: 24px;
+    }
+    
+    .company-title {
+        font-size: 22px;
+    }
+    
+    .portal-title {
+        font-size: 16px;
+    }
+    
+    .central-logo {
+        width: 80px;
     }
 }
