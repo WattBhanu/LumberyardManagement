@@ -1,21 +1,17 @@
-<div align="center">
-
 # 🌙 Lumberyard Management System
 
-### Developed for Wood Moon Enterprises
-**Client:** Mr. Sigman Shanthapriya  
+Developed for **Wood Moon Enterprises** — Client: Mr. Sigman Shanthapriya
+
 [🔗 Visit Wood Moon Enterprises on Facebook](https://www.facebook.com/p/Wood-Moon-Enterprises-100090445121861/)
 
-![Wood Moon Logo](../lumberyard-frontend/src/Logo.png)
+![Wood Moon Logo](lumberyard-frontend/src/Logo.png)
 
-### Developed By
+**Developed By**
 
 [![GitHub](https://img.shields.io/badge/GitHub-Wattegamabc-black?logo=github)](https://github.com/Wattegamabc)
 [![GitHub](https://img.shields.io/badge/GitHub-PraveenSanjaya-black?logo=github)](https://github.com/PraveenSanjaya)
 [![GitHub](https://img.shields.io/badge/GitHub-DinugaRansen-black?logo=github)](https://github.com/DinugaRansen)
 [![GitHub](https://img.shields.io/badge/GitHub-oneldesilva-black?logo=github)](https://github.com/oneldesilva)
-
-</div>
 
 ---
 
