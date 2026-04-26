@@ -1,3 +1,5 @@
+<div align="center">
+
 # 🌙 Lumberyard Management System
 
 Developed for **Wood Moon Enterprises** — Client: Mr. Sigman Shanthapriya
@@ -12,6 +14,8 @@ Developed for **Wood Moon Enterprises** — Client: Mr. Sigman Shanthapriya
 [![GitHub](https://img.shields.io/badge/GitHub-PraveenSanjaya-black?logo=github)](https://github.com/PraveenSanjaya)
 [![GitHub](https://img.shields.io/badge/GitHub-DinugaRansen-black?logo=github)](https://github.com/DinugaRansen)
 [![GitHub](https://img.shields.io/badge/GitHub-oneldesilva-black?logo=github)](https://github.com/oneldesilva)
+
+</div>
 
 ---
 
