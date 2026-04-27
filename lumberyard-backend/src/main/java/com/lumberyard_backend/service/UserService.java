@@ -72,19 +72,22 @@ public class UserService {
         user.setPhone(phone);
         user.setPassword(passwordEncoder.encode(password)); // Encrypt the password
         user.setRole(role);
-        user.setStatus(true); // Set status to active by default
         
         // Set daily salary rate for managers
         boolean isManagerRole = (role == Role.ADMIN || role == Role.FINANCE_MANAGER || 
                                 role == Role.LABOR_MANAGER || role == Role.INVENTORY_OPERATIONS_MANAGER);
         
-        if (isManagerRole && dailySalaryRate != null && dailySalaryRate > 0) {
+        if (isManagerRole && dailySalaryRate != null) {
             user.setDailySalaryRate(dailySalaryRate);
+            // Auto-set status based on salary: 0 = INACTIVE, >0 = ACTIVE
+            user.setStatus(dailySalaryRate > 0);
+        } else {
+            user.setStatus(true); // Default to active if no salary rate
         }
 
         User savedUser = userRepository.save(user);
         
-        // Create initial salary history record for managers
+        // Create initial salary history record for managers (only if salary > 0)
         if (isManagerRole && dailySalaryRate != null && dailySalaryRate > 0) {
             ManagerSalaryHistory history = new ManagerSalaryHistory();
             history.setManager(savedUser);

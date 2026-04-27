@@ -12,14 +12,14 @@ const UserRegistration = ({ token }) => {
     phone: '',
     password: '',
     role: 'FINANCE_MANAGER',
-    dailySalaryRate: ''
+    dailySalaryRate: '',
+    status: true // true = active, false = inactive
   });
   
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-  const [deleteConfirm, setDeleteConfirm] = useState(null); // { userId, userName }
   const [showManagerSalaries, setShowManagerSalaries] = useState(false);
   
   // Get current user from localStorage to check admin role and prevent self-deletion
@@ -88,7 +88,8 @@ const UserRegistration = ({ token }) => {
         phone: '',
         password: '',
         role: 'FINANCE_MANAGER',
-        dailySalaryRate: ''
+        dailySalaryRate: '',
+        status: true
       });
       // Refresh user list
       fetchAllUsers();
@@ -105,60 +106,6 @@ const UserRegistration = ({ token }) => {
   const getRoleLabel = (role) => {
     const roleObj = roles.find(r => r.value === role);
     return roleObj ? roleObj.label : role;
-  };
-
-  const handleDeleteClick = (user) => {
-    // Frontend check: only admin can delete
-    if (!isAdmin) {
-      setMessage('Only administrators can delete users.');
-      setMessageType('error');
-      return;
-    }
-    
-    // Prevent deleting yourself
-    if (currentUser.username === user.email || currentUser.userId === user.userId) {
-      setMessage('You cannot delete your own account.');
-      setMessageType('error');
-      return;
-    }
-    
-    // Show site popup confirmation
-    setDeleteConfirm({ userId: user.userId, userName: user.name });
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deleteConfirm) return;
-    
-    // Second confirmation: browser confirm dialog
-    const browserConfirm = window.confirm(`Are you absolutely sure you want to delete user "${deleteConfirm.userName}"? This action cannot be undone.`);
-    
-    if (!browserConfirm) {
-      setDeleteConfirm(null);
-      return;
-    }
-    
-    try {
-      const response = await API.delete(`/users/delete/${deleteConfirm.userId}`);
-      
-      if (response.status === 200 || response.status === 204) {
-        setMessage('User deleted successfully!');
-        setMessageType('success');
-        fetchAllUsers(); // Refresh the list
-      } else {
-        setMessage('Failed to delete user');
-        setMessageType('error');
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      setMessage('Failed to delete user. Please try again.');
-      setMessageType('error');
-    } finally {
-      setDeleteConfirm(null);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirm(null);
   };
 
   return (
@@ -272,10 +219,10 @@ const UserRegistration = ({ token }) => {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                placeholder="e.g., 5000"
+                placeholder="e.g., 5000 (0 for inactive)"
                 required
               />
-              <small className="form-hint">This is the amount paid per day when the manager is present</small>
+              <small className="form-hint">Set to 0 to mark manager as inactive. Status auto-sets based on salary.</small>
             </div>
           )}
           
@@ -308,7 +255,8 @@ const UserRegistration = ({ token }) => {
                   <th>Email</th>
                   <th>Phone</th>
                   <th>Role</th>
-                  <th>Actions</th>
+                  <th>Salary Rate</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -318,20 +266,11 @@ const UserRegistration = ({ token }) => {
                     <td>{user.email}</td>
                     <td>{user.phone || 'N/A'}</td>
                     <td>{getRoleLabel(user.role)}</td>
+                    <td>{user.dailySalaryRate ? `LKR ${user.dailySalaryRate}` : 'N/A'}</td>
                     <td>
-                      {isAdmin && currentUser.email !== user.email && (
-                        <button 
-                          className="delete-user-btn"
-                          onClick={() => handleDeleteClick(user)}
-                          title="Delete user"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
-                          Delete
-                        </button>
-                      )}
+                      <span className={`status-badge ${user.status ? 'active' : 'inactive'}`}>
+                        {user.status ? 'Active' : 'Inactive'}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -339,20 +278,6 @@ const UserRegistration = ({ token }) => {
             </table>
           )}
         </div>
-        
-        {/* Site Popup Confirmation */}
-        {deleteConfirm && (
-          <div className="delete-confirm-overlay">
-            <div className="delete-confirm-popup">
-              <h3>Confirm Deletion</h3>
-              <p>Are you sure you want to delete user <strong>"{deleteConfirm.userName}"</strong>?</p>
-              <div className="delete-confirm-actions">
-                <button className="confirm-btn" onClick={handleDeleteConfirm}>Yes, Delete</button>
-                <button className="cancel-btn" onClick={handleDeleteCancel}>Cancel</button>
-              </div>
-            </div>
-          </div>
-        )}
           </div>
         </>
       )}
