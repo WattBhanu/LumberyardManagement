@@ -68,6 +68,12 @@ public class FinancialTransactionController {
         return ResponseEntity.ok(Map.of("totalRevenue", service.getTotalRevenue()));
     }
 
+    @GetMapping("/summary/today")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
+    public ResponseEntity<?> getSummaryForToday() {
+        return ResponseEntity.ok(Map.of("totalRevenue", service.getTotalRevenueForToday()));
+    }
+
     @GetMapping("/report")
     @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
     public ResponseEntity<?> getReport(

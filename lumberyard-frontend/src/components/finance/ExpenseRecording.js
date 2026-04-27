@@ -49,7 +49,7 @@ const ExpenseRecording = ({ token }) => {
 
   const fetchTotalExpenses = async () => {
     try {
-      const response = await API.get('/finance/expenses/total');
+      const response = await API.get('/finance/expenses/total/today');
       setTotalExpenses(response.data.totalExpenses);
     } catch (error) {
       console.error('Error fetching total expenses:', error);
@@ -172,7 +172,7 @@ const ExpenseRecording = ({ token }) => {
     setFormData({
       category: expense.category,
       amount: expense.amount,
-      date: expense.date,
+      date: new Date().toISOString().split('T')[0],
       description: expense.description || ''
     });
     setEditingId(expense.id);
@@ -308,7 +308,7 @@ const ExpenseRecording = ({ token }) => {
                 </div>
                 <div className="form-group">
                   <label>Date</label>
-                  <input type="date" name="date" value={formData.date} onChange={handleInputChange} />
+                  <input type="text" name="date" value={formData.date} readOnly className="date-readonly" />
                 </div>
               </div>
 

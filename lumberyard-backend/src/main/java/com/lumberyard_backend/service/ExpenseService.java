@@ -53,6 +53,12 @@ public class ExpenseService {
         return total != null ? total : 0.0;
     }
 
+    public Double getTotalExpensesForToday() {
+        LocalDate today = LocalDate.now();
+        Double total = repository.getTotalExpensesByDate(today);
+        return total != null ? total : 0.0;
+    }
+
     /**
      * Open/Closed Principle (OCP): Reporting logic is designed to be extendable 
      * with new filters or export formats without modifying core fetching logic.

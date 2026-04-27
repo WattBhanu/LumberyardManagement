@@ -15,6 +15,9 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
     @Query("SELECT SUM(t.amount) FROM FinancialTransaction t")
     Double getTotalRevenue();
 
+    @Query("SELECT SUM(t.amount) FROM FinancialTransaction t WHERE t.date = :date")
+    Double getTotalRevenueByDate(java.time.LocalDate date);
+
     List<FinancialTransaction> findByDateBetweenOrderByDateDesc(java.time.LocalDate startDate, java.time.LocalDate endDate);
 
     List<FinancialTransaction> findByDateBetweenAndTypeOrderByDateDesc(java.time.LocalDate startDate, java.time.LocalDate endDate, String type);

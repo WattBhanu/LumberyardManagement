@@ -50,7 +50,7 @@ const IncomeRecording = ({ token }) => {
 
   const fetchSummary = async () => {
     try {
-      const response = await API.get('/finance/transactions/summary');
+      const response = await API.get('/finance/transactions/summary/today');
       setSummary(response.data);
     } catch (error) {
       console.error('Error fetching summary:', error);
@@ -187,7 +187,7 @@ const IncomeRecording = ({ token }) => {
       product: transaction.product || '',
       amount: transaction.amount,
       quantity: transaction.quantity || '',
-      date: transaction.date,
+      date: new Date().toISOString().split('T')[0],
       description: transaction.description || ''
     });
     setEditingId(transaction.id);
@@ -338,7 +338,7 @@ const IncomeRecording = ({ token }) => {
                 </div>
                 <div className="form-group">
                   <label>Date</label>
-                  <input type="date" name="date" value={formData.date} onChange={handleInputChange} />
+                  <input type="text" name="date" value={formData.date} readOnly className="date-readonly" />
                 </div>
               </div>
 

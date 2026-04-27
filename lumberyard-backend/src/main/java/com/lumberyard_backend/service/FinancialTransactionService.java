@@ -57,6 +57,12 @@ public class FinancialTransactionService {
         return total != null ? total : 0.0;
     }
 
+    public Double getTotalRevenueForToday() {
+        LocalDate today = LocalDate.now();
+        Double total = repository.getTotalRevenueByDate(today);
+        return total != null ? total : 0.0;
+    }
+
     /**
      * Open/Closed Principle (OCP): This method is designed to generate reports based on 
      * criteria. It can be extended with new filters or report types without modifying 

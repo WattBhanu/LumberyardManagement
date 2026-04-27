@@ -82,6 +82,13 @@
   font-size: 0.95rem;
 }
 
+.form-group input.date-readonly {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  color: #475569;
+  font-weight: 500;
+}
+
 .form-group textarea {
   min-height: 80px;
   resize: vertical;

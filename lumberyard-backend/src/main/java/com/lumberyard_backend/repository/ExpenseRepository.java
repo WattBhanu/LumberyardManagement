@@ -15,6 +15,9 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     @Query("SELECT SUM(e.amount) FROM Expense e")
     Double getTotalExpenses();
 
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.date = :date")
+    Double getTotalExpensesByDate(java.time.LocalDate date);
+
     List<Expense> findByDateBetweenOrderByDateDesc(java.time.LocalDate startDate, java.time.LocalDate endDate);
 
     List<Expense> findByDateBetweenAndCategoryOrderByDateDesc(java.time.LocalDate startDate, java.time.LocalDate endDate, String category);

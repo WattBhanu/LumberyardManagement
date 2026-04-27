@@ -63,6 +63,12 @@ public class ExpenseController {
         return ResponseEntity.ok(Map.of("totalExpenses", service.getTotalExpenses()));
     }
 
+    @GetMapping("/total/today")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
+    public ResponseEntity<?> getTotalExpensesForToday() {
+        return ResponseEntity.ok(Map.of("totalExpenses", service.getTotalExpensesForToday()));
+    }
+
     @GetMapping("/report")
     @PreAuthorize("hasAnyRole('ADMIN', 'FINANCE_MANAGER')")
     public ResponseEntity<?> getReport(
